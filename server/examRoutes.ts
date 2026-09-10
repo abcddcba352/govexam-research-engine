@@ -13,6 +13,7 @@ import type { PreparationMode } from '../src/types.ts';
 import { buildCoverage, subjectsForExam, evidenceEligible } from '../src/researchCoverage.ts';
 import { SUBJECT_PUBLISHERS, getSubjectPublisher, publisherApplies } from './subjectPublishers.ts';
 import { discoverSubjectLinks, collectSubjectEvidence, evidenceSource } from './subjectResearch.ts';
+import { fetchExamStructure } from './examStructureService.ts';
 
 type Reply = { status?: number; body: unknown };
 export function examEndpoint(work: (req: Request) => Reply | Promise<Reply>): RequestHandler {
@@ -176,5 +177,13 @@ export function registerExamRoutes(app: Express) {
       desiredQuestionCount: question_count, difficulty, preparation_mode });
     if (getPersistenceBackend() === 'DATABASE') await getRepositoryRegistry().mocks.saveMock(mock);
     return { body: { success: true, mock } };
+  }));
+  app.post('/api/research/exam-structure', examEndpoint(async req => {
+    const query = typeof req.body?.query === 'string' ? req.body.query.trim() : '';
+    if (!query) {
+      return { status: 400, body: { error: 'query is required.' } };
+    }
+    const structure = await fetchExamStructure(query);
+    return { body: { success: true, structure } };
   }));
 }

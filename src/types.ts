@@ -9,6 +9,47 @@ export interface ExamIdentification {
   stage: string;
   paper: string;
   recruitment_cycle: string;
+  structure_scheme?: ExamStructureScheme;
+}
+
+export interface ExamStagePaper {
+  paper_id: string;
+  paper_number: string;
+  title: string;
+  type: 'OBJECTIVE' | 'DESCRIPTIVE' | 'SKILL_TEST' | 'PHYSICAL_TEST' | 'INTERVIEW';
+  total_questions?: number;
+  total_marks: number;
+  duration_minutes?: number;
+  negative_marking_rate?: number;
+  is_qualifying?: boolean;
+  language_mediums?: string[];
+  sections?: string[];
+  syllabus_highlights?: string[];
+}
+
+export interface ExamStage {
+  stage_id: string;
+  stage_number: number;
+  stage_name: string;
+  stage_type: 'PRELIMINARY' | 'MAINS' | 'INTERVIEW' | 'PHYSICAL_TEST' | 'SKILL_TEST';
+  description?: string;
+  is_qualifying_only?: boolean;
+  total_papers: number;
+  total_marks?: number;
+  papers: ExamStagePaper[];
+}
+
+export interface ExamStructureScheme {
+  query: string;
+  exam_name: string;
+  commission: string;
+  state_or_central: string;
+  recruitment_cycle?: string;
+  total_stages: number;
+  selection_summary: string;
+  stages: ExamStage[];
+  official_reference?: string;
+  source_status: 'VERIFIED_OFFICIAL_CATALOG' | 'LIVE_AI_RETRIEVED' | 'HYBRID_VERIFIED';
 }
 
 export type AuthorityType = 

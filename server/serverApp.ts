@@ -13,6 +13,7 @@ import {
   saveRegistry,
   saveRuns,
 } from "./researchService.ts";
+import { fetchExamStructure } from "./examStructureService.ts";
 import {
   getExams,
   saveExams,
@@ -667,6 +668,21 @@ export function createApp(): express.Application {
     } catch (err: any) {
       console.error("API Error in /api/research/identify:", err);
       res.status(500).json({ error: err.message || "Failed to identify examination" });
+    }
+  });
+
+  // Identify Multi-Stage Exam Scheme & Papers Breakdown
+  app.post("/api/research/exam-structure", async (req, res) => {
+    try {
+      const { query } = req.body;
+      if (!query || typeof query !== 'string') {
+        return res.status(400).json({ error: "Missing query parameter" });
+      }
+      const structure = await fetchExamStructure(query);
+      res.json({ success: true, structure });
+    } catch (err: any) {
+      console.error("API Error in /api/research/exam-structure:", err);
+      res.status(500).json({ error: err.message || "Failed to fetch exam structure" });
     }
   });
 

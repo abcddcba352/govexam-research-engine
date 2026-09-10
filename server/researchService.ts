@@ -1,5 +1,6 @@
 import { buildExamResearchQuery } from '../src/researchQuery.ts';
 import { cycleNumber, paperNumber, extractDirectFacts, validateResearchFact, RetrievedResearchSource, isAuthenticOfficialDocument } from './researchEvidence.ts';
+import { findOfficialScheme } from './examStructureService.ts';
 import fs from 'fs';
 import path from 'path';
 import {
@@ -197,14 +198,18 @@ async function directFetchWeb(url: string): Promise<{ text: string; status: numb
 // Intake/query identity describes the research target; it is never itself official evidence.
 export async function identifyExamDetails(query: string): Promise<ExamIdentification> {
   const matched = matchAuthority(query);
+  const scheme = findOfficialScheme(query);
   const paper = query.match(/\bPaper\s*[-–—:]?\s*(?:III|II|IV|I|[1-4])\b[^—;]*/i)?.[0];
   const post = query.match(/Executive Officer\s+Grade\s*[-–—]?\s*III/i)?.[0];
   return {
-    commission: matched?.authority_name || 'Unknown commission',
-    state_or_central: matched?.state || 'Unknown jurisdiction',
-    exam: query, post: post || 'Not specified',
-    stage: /written/i.test(query) ? 'Written Examination' : /screening|prelim/i.test(query) ? 'Screening Test' : 'Not specified',
-    paper: paper || 'Not specified', recruitment_cycle: cycleNumber(query) || 'Unknown cycle',
+    commission: scheme?.commission || matched?.authority_name || 'Unknown commission',
+    state_or_central: scheme?.state_or_central || matched?.state || 'Unknown jurisdiction',
+    exam: scheme?.exam_name || query,
+    post: post || scheme?.exam_name || 'Not specified',
+    stage: scheme?.stages[0]?.stage_name || (/written/i.test(query) ? 'Written Examination' : /screening|prelim/i.test(query) ? 'Screening Test' : 'Not specified'),
+    paper: paper || scheme?.stages[0]?.papers[0]?.title || 'Not specified',
+    recruitment_cycle: scheme?.recruitment_cycle || cycleNumber(query) || 'Unknown cycle',
+    structure_scheme: scheme || undefined,
   };
 }
 

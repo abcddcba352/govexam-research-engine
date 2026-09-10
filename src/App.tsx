@@ -7,7 +7,11 @@ import {
   ResearchMode,
   ResearchRunLog,
   ExamRecord,
+  ExamStructureScheme,
+  ExamStage,
+  ExamStagePaper,
 } from './types.ts';
+import { ExamStructureExplorer } from './components/common/ExamStructureExplorer.tsx';
 import { ModeSelector } from './components/ModeSelector.tsx';
 import { ExamIdentificationCard } from './components/ExamIdentificationCard.tsx';
 import { FactsDisplay } from './components/FactsDisplay.tsx';
@@ -101,6 +105,35 @@ export default function App() {
 
   // Benchmarking state
   const [isBenchmarking, setIsBenchmarking] = useState(false);
+
+  // Exam Selection Structure Scheme state
+  const [structureScheme, setStructureScheme] = useState<ExamStructureScheme | null>(null);
+  const [isLoadingStructure, setIsLoadingStructure] = useState<boolean>(false);
+  const [showStructureExplorer, setShowStructureExplorer] = useState<boolean>(false);
+
+  const handleFetchStructure = async (queryToFetch?: string) => {
+    const q = (queryToFetch || examQuery || '').trim();
+    if (!q) return;
+    setIsLoadingStructure(true);
+    setShowStructureExplorer(true);
+    try {
+      const res = await fetch('/api/research/exam-structure', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: q }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.structure) {
+          setStructureScheme(data.structure);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch exam structure:', err);
+    } finally {
+      setIsLoadingStructure(false);
+    }
+  };
 
   // Fetch initial data from server
   useEffect(() => {
@@ -210,6 +243,9 @@ export default function App() {
       const runData: ResearchRunLog = await runRes.json();
       setCurrentRunLog(runData);
       setIdentification(runData.identification);
+      if (runData.identification?.structure_scheme) {
+        setStructureScheme(runData.identification.structure_scheme);
+      }
       setCurrentFacts(runData.facts);
 
       // Refresh runs list
@@ -536,6 +572,7 @@ export default function App() {
               onSelectExam={(examTitle, matchedDbExam) => {
                 setExamQuery(examTitle);
                 setResearchExamId(matchedDbExam?.exam_id);
+                void handleFetchStructure(examTitle);
               }}
               onLaunchResearch={(query, examId) => {
                 setExamQuery(query);
@@ -574,6 +611,27 @@ export default function App() {
                       className="w-full text-sm pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                     />
                   </div>
+
+                  <button
+                    type="button"
+                    id="fetch-stages-btn"
+                    disabled={isLoadingStructure || !examQuery.trim()}
+                    onClick={() => handleFetchStructure(examQuery)}
+                    className="px-4 py-2.5 rounded-xl bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 text-indigo-700 font-bold text-xs shadow-xs transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer shrink-0"
+                    title="Fetch selection stages and all papers breakdown for this exam"
+                  >
+                    {isLoadingStructure ? (
+                      <>
+                        <div className="w-3.5 h-3.5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                        <span>Fetching Stages...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Layers className="w-3.5 h-3.5 text-indigo-600" />
+                        <span>Stages & Papers</span>
+                      </>
+                    )}
+                  </button>
 
                   <button
                     type="button"
@@ -616,6 +674,30 @@ export default function App() {
                 onChangeDocumentName={setDocumentName}
               />
             </div>
+
+            {/* Stages & Papers Scheme Explorer */}
+            {(showStructureExplorer || structureScheme || isLoadingStructure) && (
+              <ExamStructureExplorer
+                structure={structureScheme}
+                isLoading={isLoadingStructure}
+                onSearchStructure={(q) => {
+                  setExamQuery(q);
+                  void handleFetchStructure(q);
+                }}
+                onSelectPaperForResearch={(paperTitle, stageName) => {
+                  const queryStr = `${structureScheme?.exam_name || examQuery} ${stageName} ${paperTitle}`;
+                  setExamQuery(queryStr);
+                  void handleStartResearch(undefined, queryStr);
+                }}
+                onSelectPaperForIntake={(_paper, _stage, _scheme) => {
+                  setActiveTab('INTAKE');
+                }}
+                onSelectPaperForMocks={(_paperTitle) => {
+                  setActiveTab('MOCKS');
+                }}
+                onClose={() => setShowStructureExplorer(false)}
+              />
+            )}
 
             {/* Research Progress State */}
             {isResearching && (
