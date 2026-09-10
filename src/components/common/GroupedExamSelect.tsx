@@ -1,6 +1,6 @@
 import React from 'react';
 import type { ExamRecord } from '../../types.ts';
-import { groupExamsByJurisdiction } from '../../utils/examJurisdiction.ts';
+import { getBoardForExam, groupExamsByJurisdiction } from '../../utils/examJurisdiction.ts';
 
 export interface GroupedExamSelectProps {
   exams: ExamRecord[];
@@ -40,21 +40,29 @@ export const GroupedExamSelect: React.FC<GroupedExamSelectProps> = ({
 
       {central.length > 0 && (
         <optgroup label="🏛️ Central / National (All-India)">
-          {central.map((ex) => (
-            <option key={ex.exam_id} value={ex.exam_id}>
-              {ex.title}{showPaper && ex.paper ? ` • ${ex.paper}` : ''}
-            </option>
-          ))}
+          {central.map((ex) => {
+            const board = getBoardForExam(ex);
+            const prefix = board ? `[${board.shortName}] ` : '';
+            return (
+              <option key={ex.exam_id} value={ex.exam_id}>
+                {prefix}{ex.title}{showPaper && ex.paper ? ` • ${ex.paper}` : ''}
+              </option>
+            );
+          })}
         </optgroup>
       )}
 
       {stateNames.map((stateName) => (
         <optgroup key={stateName} label={`🗺️ State: ${stateName}`}>
-          {states[stateName].map((ex) => (
-            <option key={ex.exam_id} value={ex.exam_id}>
-              {ex.title}{showPaper && ex.paper ? ` • ${ex.paper}` : ''}
-            </option>
-          ))}
+          {states[stateName].map((ex) => {
+            const board = getBoardForExam(ex);
+            const prefix = board ? `[${board.shortName}] ` : '';
+            return (
+              <option key={ex.exam_id} value={ex.exam_id}>
+                {prefix}{ex.title}{showPaper && ex.paper ? ` • ${ex.paper}` : ''}
+              </option>
+            );
+          })}
         </optgroup>
       ))}
     </select>

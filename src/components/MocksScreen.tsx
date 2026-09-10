@@ -36,7 +36,7 @@ import {
   PatternChangeReport,
   VisualSpecification
 } from '../types.ts';
-import { groupExamsByJurisdiction } from '../utils/examJurisdiction.ts';
+import { getBoardForExam, groupExamsByJurisdiction } from '../utils/examJurisdiction.ts';
 
 interface MocksScreenProps {
   exams: ExamRecord[];
@@ -560,6 +560,16 @@ export const MocksScreen: React.FC<MocksScreenProps> = ({
         {/* Exam Picker Selector */}
         <div className="flex items-center gap-3">
           <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Target Exam:</label>
+          {(() => {
+            const b = selectedExam ? getBoardForExam(selectedExam) : null;
+            if (!b) return null;
+            return (
+              <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-amber-50 text-amber-900 border border-amber-300 text-xs font-bold shrink-0">
+                <span>{b.icon}</span>
+                <span>{b.shortName}</span>
+              </span>
+            );
+          })()}
           <select
             value={selectedExamId}
             onChange={e => setSelectedExamId(e.target.value)}
@@ -567,20 +577,28 @@ export const MocksScreen: React.FC<MocksScreenProps> = ({
           >
             {groupedExams.central.length > 0 && (
               <optgroup label="🏛️ Central / National (All-India)">
-                {groupedExams.central.map(exam => (
-                  <option key={exam.exam_id} value={exam.exam_id}>
-                    {exam.commission}: {exam.title} ({exam.paper})
-                  </option>
-                ))}
+                {groupedExams.central.map(exam => {
+                  const b = getBoardForExam(exam);
+                  const prefix = b ? `[${b.shortName}] ` : '';
+                  return (
+                    <option key={exam.exam_id} value={exam.exam_id}>
+                      {prefix}{exam.commission}: {exam.title} ({exam.paper})
+                    </option>
+                  );
+                })}
               </optgroup>
             )}
             {groupedExams.stateNames.map(stateName => (
               <optgroup key={stateName} label={`🗺️ State: ${stateName}`}>
-                {groupedExams.states[stateName].map(exam => (
-                  <option key={exam.exam_id} value={exam.exam_id}>
-                    {exam.commission}: {exam.title} ({exam.paper})
-                  </option>
-                ))}
+                {groupedExams.states[stateName].map(exam => {
+                  const b = getBoardForExam(exam);
+                  const prefix = b ? `[${b.shortName}] ` : '';
+                  return (
+                    <option key={exam.exam_id} value={exam.exam_id}>
+                      {prefix}{exam.commission}: {exam.title} ({exam.paper})
+                    </option>
+                  );
+                })}
               </optgroup>
             ))}
           </select>
