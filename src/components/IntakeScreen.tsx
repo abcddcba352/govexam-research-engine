@@ -657,23 +657,24 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
   const handleAddPaper = (stageId: string) => {
     setFormStages(prev => prev.map(s => {
       if (s.stage_id !== stageId) return s;
-      const pNum = s.papers.length + 1;
+      const papers = s.papers || [];
+      const pNum = papers.length + 1;
       const newPaper: ExamStagePaper = {
         paper_id: `paper_${Date.now().toString(36)}_${pNum}`,
         paper_number: `Paper-${pNum}`,
-        title: `Paper ${pNum} Subject Domain`,
+        title: `Paper ${pNum}: Subject Domain`,
         type: s.stage_type === 'MAINS' ? 'DESCRIPTIVE' : 'OBJECTIVE',
         total_questions: 150,
         total_marks: 150,
         duration_minutes: 150,
         negative_marking_rate: 0.25,
         is_qualifying: false,
-        sections: ['Core Section 1', 'Core Section 2']
+        sections: ['General Studies', 'Domain Subject']
       };
       return {
         ...s,
-        total_papers: s.papers.length + 1,
-        papers: [...s.papers, newPaper]
+        total_papers: papers.length + 1,
+        papers: [...papers, newPaper]
       };
     }));
   };
@@ -681,10 +682,11 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
   const handleRemovePaper = (stageId: string, paperId: string) => {
     setFormStages(prev => prev.map(s => {
       if (s.stage_id !== stageId) return s;
+      const papers = s.papers || [];
       return {
         ...s,
-        total_papers: Math.max(0, s.papers.length - 1),
-        papers: s.papers.filter(p => p.paper_id !== paperId)
+        total_papers: Math.max(0, papers.length - 1),
+        papers: papers.filter(p => p.paper_id !== paperId)
       };
     }));
   };
@@ -692,9 +694,10 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
   const handleUpdatePaper = (stageId: string, paperId: string, patch: Partial<ExamStagePaper>) => {
     setFormStages(prev => prev.map(s => {
       if (s.stage_id !== stageId) return s;
+      const papers = s.papers || [];
       return {
         ...s,
-        papers: s.papers.map(p => p.paper_id === paperId ? { ...p, ...patch } : p)
+        papers: papers.map(p => p.paper_id === paperId ? { ...p, ...patch } : p)
       };
     }));
   };
@@ -1197,127 +1200,169 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
 
                       {/* Papers List under this Stage */}
                       <div className="p-3 space-y-2.5 bg-slate-50/50">
-                        {stg.papers.map((paper, pIdx) => {
-                          const isFocused = activeFocusedPaperId === paper.paper_id || (formData.paper.includes(paper.title) && formData.stage === stg.stage_name);
-
-                          return (
-                            <div
-                              key={paper.paper_id || pIdx}
-                              className={`p-3 rounded-lg border transition-all text-xs space-y-2 ${
-                                isFocused
-                                  ? 'bg-amber-50/60 border-amber-400 ring-2 ring-amber-400/30'
-                                  : 'bg-white border-slate-200 hover:border-indigo-200'
-                              }`}
+                        {(!stg.papers || stg.papers.length === 0) ? (
+                          <div className="p-4 rounded-lg border border-dashed border-indigo-200 bg-white text-center space-y-2">
+                            <p className="text-xs text-slate-500 font-medium">
+                              No papers added under {stg.stage_name || `Stage ${stgIdx + 1}`} yet.
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => handleAddPaper(stg.stage_id)}
+                              className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-2xs inline-flex items-center gap-1.5 cursor-pointer transition-colors"
                             >
-                              <div className="flex flex-wrap items-center justify-between gap-2">
-                                <div className="flex items-center gap-2 flex-1 min-w-[200px]">
-                                  <input
-                                    type="text"
-                                    value={paper.paper_number}
-                                    onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, { paper_number: e.target.value })}
-                                    placeholder="Paper Number (e.g. Paper-I)"
-                                    className="w-24 font-mono font-bold text-slate-700 bg-slate-100 border border-slate-300 rounded px-2 py-1 text-[11px]"
-                                  />
-                                  <input
-                                    type="text"
-                                    value={paper.title}
-                                    onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, { title: e.target.value })}
-                                    placeholder="Paper Title (e.g. General Studies & Mental Ability)"
-                                    className="flex-1 font-bold text-slate-900 bg-white border border-slate-300 rounded px-2.5 py-1 text-xs focus:ring-1 focus:ring-indigo-500"
-                                  />
-                                </div>
+                              <Plus className="w-3.5 h-3.5" />
+                              <span>+ Add Paper to this Stage</span>
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            {stg.papers.map((paper, pIdx) => {
+                              const isFocused = activeFocusedPaperId === paper.paper_id || (formData.paper.includes(paper.title) && formData.stage === stg.stage_name);
 
-                                <div className="flex items-center gap-1.5">
-                                  <select
-                                    value={paper.type}
-                                    onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, { type: e.target.value as any })}
-                                    className="text-[11px] font-semibold bg-white border border-slate-300 rounded px-2 py-1 text-slate-700"
-                                  >
-                                    <option value="OBJECTIVE">OBJECTIVE (MCQ)</option>
-                                    <option value="DESCRIPTIVE">DESCRIPTIVE (WRITTEN)</option>
-                                    <option value="PHYSICAL_TEST">PHYSICAL TEST</option>
-                                    <option value="SKILL_TEST">SKILL / TYPING</option>
-                                    <option value="INTERVIEW">INTERVIEW</option>
-                                  </select>
+                              return (
+                                <div
+                                  key={paper.paper_id || pIdx}
+                                  className={`p-3 rounded-lg border transition-all text-xs space-y-2 ${
+                                    isFocused
+                                      ? 'bg-amber-50/60 border-amber-400 ring-2 ring-amber-400/30'
+                                      : 'bg-white border-slate-200 hover:border-indigo-200'
+                                  }`}
+                                >
+                                  <div className="flex flex-wrap items-center justify-between gap-2">
+                                    <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+                                      <input
+                                        type="text"
+                                        value={paper.paper_number}
+                                        onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, { paper_number: e.target.value })}
+                                        placeholder="Paper Number (e.g. Paper-I)"
+                                        className="w-24 font-mono font-bold text-slate-700 bg-slate-100 border border-slate-300 rounded px-2 py-1 text-[11px]"
+                                      />
+                                      <input
+                                        type="text"
+                                        value={paper.title}
+                                        onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, { title: e.target.value })}
+                                        placeholder="Paper Title (e.g. General Studies & Mental Ability)"
+                                        className="flex-1 font-bold text-slate-900 bg-white border border-slate-300 rounded px-2.5 py-1 text-xs focus:ring-1 focus:ring-indigo-500"
+                                      />
+                                    </div>
 
-                                  <button
-                                    type="button"
-                                    onClick={() => handleFocusPaper(paper, stg)}
-                                    className={`px-2.5 py-1 rounded text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
-                                      isFocused
-                                        ? 'bg-amber-500 text-white shadow-2xs'
-                                        : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200'
-                                    }`}
-                                    title="Set this paper as active intake blueprint"
-                                  >
-                                    {isFocused ? (
-                                      <>
-                                        <Check className="w-3 h-3" />
-                                        <span>Active Intake Target</span>
-                                      </>
-                                    ) : (
-                                      <span>Focus Paper</span>
-                                    )}
-                                  </button>
+                                    <div className="flex items-center gap-1.5">
+                                      <select
+                                        value={paper.type}
+                                        onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, { type: e.target.value as any })}
+                                        className="text-[11px] font-semibold bg-white border border-slate-300 rounded px-2 py-1 text-slate-700"
+                                      >
+                                        <option value="OBJECTIVE">OBJECTIVE (MCQ)</option>
+                                        <option value="DESCRIPTIVE">DESCRIPTIVE (WRITTEN)</option>
+                                        <option value="PHYSICAL_TEST">PHYSICAL TEST</option>
+                                        <option value="SKILL_TEST">SKILL / TYPING</option>
+                                        <option value="INTERVIEW">INTERVIEW</option>
+                                      </select>
 
-                                  <button
-                                    type="button"
-                                    onClick={() => handleRemovePaper(stg.stage_id, paper.paper_id)}
-                                    className="p-1 text-slate-400 hover:text-rose-600 rounded cursor-pointer"
-                                    title="Delete Paper"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
-                                </div>
-                              </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleFocusPaper(paper, stg)}
+                                        className={`px-2.5 py-1 rounded text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                                          isFocused
+                                            ? 'bg-amber-500 text-white shadow-2xs'
+                                            : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200'
+                                        }`}
+                                        title="Set this paper as active intake blueprint"
+                                      >
+                                        {isFocused ? (
+                                          <>
+                                            <Check className="w-3 h-3" />
+                                            <span>Active Target</span>
+                                          </>
+                                        ) : (
+                                          <span>🎯 Focus Paper</span>
+                                        )}
+                                      </button>
 
-                              {/* Paper Metrics Row */}
-                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 border-t border-slate-100 text-[11px]">
-                                <div>
-                                  <label className="text-[10px] uppercase font-semibold text-slate-500 block">Total Questions</label>
-                                  <input
-                                    type="number"
-                                    value={paper.total_questions ?? ''}
-                                    onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, { total_questions: Number(e.target.value) })}
-                                    className="w-full bg-white border border-slate-200 rounded px-2 py-0.5"
-                                  />
+                                      <button
+                                        type="button"
+                                        onClick={() => handleRemovePaper(stg.stage_id, paper.paper_id)}
+                                        className="p-1 text-slate-400 hover:text-rose-600 rounded cursor-pointer"
+                                        title="Delete Paper"
+                                      >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  {/* Paper Metrics Row */}
+                                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 border-t border-slate-100 text-[11px]">
+                                    <div>
+                                      <label className="text-[10px] uppercase font-semibold text-slate-500 block">Total Questions</label>
+                                      <input
+                                        type="number"
+                                        value={paper.total_questions ?? ''}
+                                        onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, { total_questions: Number(e.target.value) })}
+                                        className="w-full bg-white border border-slate-200 rounded px-2 py-0.5"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-[10px] uppercase font-semibold text-slate-500 block">Total Marks</label>
+                                      <input
+                                        type="number"
+                                        value={paper.total_marks ?? ''}
+                                        onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, { total_marks: Number(e.target.value) })}
+                                        className="w-full bg-white border border-slate-200 rounded px-2 py-0.5"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-[10px] uppercase font-semibold text-slate-500 block">Duration (Mins)</label>
+                                      <input
+                                        type="number"
+                                        value={paper.duration_minutes ?? ''}
+                                        onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, { duration_minutes: Number(e.target.value) })}
+                                        className="w-full bg-white border border-slate-200 rounded px-2 py-0.5"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-[10px] uppercase font-semibold text-slate-500 block">Negative Marking</label>
+                                      <select
+                                        value={paper.negative_marking_rate ?? 0.25}
+                                        onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, { negative_marking_rate: Number(e.target.value) })}
+                                        className="w-full bg-white border border-slate-200 rounded px-1.5 py-0.5 text-[11px]"
+                                      >
+                                        <option value={0.0}>0.00 (No Penalty)</option>
+                                        <option value={0.20}>0.20 (1/5th TS Police)</option>
+                                        <option value={0.25}>0.25 (1/4th Standard)</option>
+                                        <option value={0.33}>0.33 (1/3rd AP/RRB)</option>
+                                        <option value={0.50}>0.50 (1/2 SSC Tier-1)</option>
+                                      </select>
+                                    </div>
+                                  </div>
+
+                                  {/* Paper Sections & Syllabus Input */}
+                                  <div className="pt-1.5 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center gap-1.5 text-[11px]">
+                                    <span className="text-[10px] uppercase font-semibold text-slate-500 shrink-0">Sections / Topics:</span>
+                                    <input
+                                      type="text"
+                                      value={(paper.sections || []).join(', ')}
+                                      onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, {
+                                        sections: e.target.value.split(',').map(s => s.trim()).filter(Boolean)
+                                      })}
+                                      placeholder="e.g. General Studies, Mental Ability, State History, Polity"
+                                      className="flex-1 w-full bg-white border border-slate-200 rounded px-2 py-1 text-slate-800 text-[11px] focus:ring-1 focus:ring-indigo-500"
+                                    />
+                                  </div>
                                 </div>
-                                <div>
-                                  <label className="text-[10px] uppercase font-semibold text-slate-500 block">Total Marks</label>
-                                  <input
-                                    type="number"
-                                    value={paper.total_marks ?? ''}
-                                    onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, { total_marks: Number(e.target.value) })}
-                                    className="w-full bg-white border border-slate-200 rounded px-2 py-0.5"
-                                  />
-                                </div>
-                                <div>
-                                  <label className="text-[10px] uppercase font-semibold text-slate-500 block">Duration (Mins)</label>
-                                  <input
-                                    type="number"
-                                    value={paper.duration_minutes ?? ''}
-                                    onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, { duration_minutes: Number(e.target.value) })}
-                                    className="w-full bg-white border border-slate-200 rounded px-2 py-0.5"
-                                  />
-                                </div>
-                                <div>
-                                  <label className="text-[10px] uppercase font-semibold text-slate-500 block">Negative Marking</label>
-                                  <select
-                                    value={paper.negative_marking_rate ?? 0.25}
-                                    onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, { negative_marking_rate: Number(e.target.value) })}
-                                    className="w-full bg-white border border-slate-200 rounded px-1.5 py-0.5 text-[11px]"
-                                  >
-                                    <option value={0.0}>0.00 (No Penalty)</option>
-                                    <option value={0.20}>0.20 (1/5th TS Police)</option>
-                                    <option value={0.25}>0.25 (1/4th Standard)</option>
-                                    <option value={0.33}>0.33 (1/3rd AP/RRB)</option>
-                                    <option value={0.50}>0.50 (1/2 SSC Tier-1)</option>
-                                  </select>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
+                              );
+                            })}
+
+                            {/* Prominent button to add another paper under this stage */}
+                            <button
+                              type="button"
+                              onClick={() => handleAddPaper(stg.stage_id)}
+                              className="w-full py-2 border border-dashed border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50/50 rounded-lg text-xs font-semibold text-indigo-700 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                            >
+                              <Plus className="w-3.5 h-3.5" />
+                              <span>+ Add Paper to {stg.stage_name || `Stage ${stgIdx + 1}`}</span>
+                            </button>
+                          </>
+                        )}
                       </div>
                     </div>
                   ))}
