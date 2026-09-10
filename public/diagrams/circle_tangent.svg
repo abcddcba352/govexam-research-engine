@@ -1,0 +1,17 @@
+<svg viewBox="0 0 420 260" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#FFFFFF" />
+  <circle cx="150" cy="140" r="80" fill="#F8FAFC" stroke="#0F172A" stroke-width="2.5" />
+  <circle cx="150" cy="140" r="3.5" fill="#0F172A" />
+  <text x="135" y="145" font-family="sans-serif" font-size="14" font-weight="bold" fill="#020617">O</text>
+  <circle cx="360" cy="140" r="3.5" fill="#0F172A" />
+  <text x="370" y="145" font-family="sans-serif" font-size="14" font-weight="bold" fill="#020617">P</text>
+  <circle cx="180" cy="66" r="3.5" fill="#0F172A" />
+  <text x="175" y="52" font-family="sans-serif" font-size="14" font-weight="bold" fill="#020617">T</text>
+  <line x1="150" y1="140" x2="180" y2="66" stroke="#0F172A" stroke-width="2" stroke-dasharray="4 3" />
+  <text x="145" y="98" font-family="sans-serif" font-size="13" font-style="italic" fill="#020617">5 cm</text>
+  <line x1="360" y1="140" x2="180" y2="66" stroke="#0F172A" stroke-width="2.5" />
+  <text x="275" y="95" font-family="sans-serif" font-size="13" font-style="italic" fill="#020617">12 cm</text>
+  <line x1="150" y1="140" x2="360" y2="140" stroke="#0F172A" stroke-width="2" />
+  <text x="250" y="160" font-family="sans-serif" font-size="13" font-style="italic" fill="#020617">OP = ?</text>
+  <path d="M 189 88 L 199 84 L 190 62" fill="none" stroke="#0F172A" stroke-width="1.5" />
+</svg>
