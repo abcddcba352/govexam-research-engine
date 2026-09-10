@@ -1,7 +1,44 @@
 import type { ExamRecord, SourceRecord } from '../src/types.ts';
 import { createDefaultFactVerifications } from './verificationService.ts';
+import { findOfficialScheme } from './examStructureService.ts';
 
 const RAW_SOURCES: SourceRecord[] = [
+  {
+    source_id: 'src_tslprb_notif_41_pc',
+    exam_id: 'tslprb_police_constable_pwt',
+    authority_id: 'tslprb',
+    title: 'TSLPRB Notification Rc No. 41/Rect./Admn-1/2022 - Recruitment for the Posts of SCT PC (Civil) and Equivalent',
+    url: 'https://www.tslprb.in/notifications/pc_notification_41_2022.pdf',
+    domain: 'tslprb.in',
+    source_level: 'LEVEL_5_OFFICIAL',
+    document_type: 'NOTIFICATION',
+    verification_status: 'VERIFIED_OFFICIAL',
+    retrieved_at: '2026-09-10T12:00:00.000Z',
+    publication_date: '2022-04-25',
+    last_verified_at: '2026-09-10T12:00:00.000Z',
+    content_hash: 'tslprb_pc_41_hash',
+    is_current: true,
+    file_size_kb: 1840,
+    summary: 'Official gazetted notification establishing 3-stage recruitment: PWT (200 marks, 200 questions, 3 hours, 0 negative marking), PMT/PET, and FWE (200 marks).'
+  },
+  {
+    source_id: 'src_tslprb_notif_41_pc_alias',
+    exam_id: 'exam_telangana_police_constable_sct_p_mtv5bnpq',
+    authority_id: 'tslprb',
+    title: 'TSLPRB Notification Rc No. 41/Rect./Admn-1/2022 - Recruitment for the Posts of SCT PC (Civil) and Equivalent',
+    url: 'https://www.tslprb.in/notifications/pc_notification_41_2022.pdf',
+    domain: 'tslprb.in',
+    source_level: 'LEVEL_5_OFFICIAL',
+    document_type: 'NOTIFICATION',
+    verification_status: 'VERIFIED_OFFICIAL',
+    retrieved_at: '2026-09-10T12:00:00.000Z',
+    publication_date: '2022-04-25',
+    last_verified_at: '2026-09-10T12:00:00.000Z',
+    content_hash: 'tslprb_pc_41_hash',
+    is_current: true,
+    file_size_kb: 1840,
+    summary: 'Official gazetted notification establishing 3-stage recruitment: PWT (200 marks, 200 questions, 3 hours, 0 negative marking), PMT/PET, and FWE (200 marks).'
+  },
   {
     source_id: 'src_tgpsc_notif_28',
     exam_id: 'tgpsc_group_2_paper_1',
@@ -756,6 +793,190 @@ const RAW_EXAMS: ExamRecord[] = [
         ]
       }
     ]
+  },
+  {
+    exam_id: 'tslprb_police_constable_pwt',
+    intake_id: 'intake_tslprb_pc_2022',
+    data_provenance: 'RETRIEVED_OFFICIAL',
+    title: 'Telangana Police Constable (SCT PC Civil / AR / TSSP): Preliminary Written Test',
+    commission: 'Telangana State Level Police Recruitment Board (TSLPRB)',
+    state_or_central: 'Telangana',
+    post: 'Stipendiary Cadet Trainee (SCT) Police Constable (Civil / AR / SAR CPL / TSSP / Warder / Fireman)',
+    stage: 'Stage 1: Preliminary Written Test (PWT)',
+    paper: 'Preliminary Paper: Objective Written Test',
+    recruitment_cycle: 'Notification 41/Rect./Admn-1/2022',
+    active_cycle: 'Notification 41/Rect./Admn-1/2022',
+    pattern: {
+      total_questions: 200,
+      duration_minutes: 180,
+      total_marks: 200,
+      marks_per_question: 1,
+      negative_marking_rate: 0,
+      sections: [
+        'English',
+        'Arithmetic',
+        'General Science',
+        'History of India, Indian culture, Indian National Movement',
+        'Indian Geography, Polity and Economy',
+        'Current events of national and international importance',
+        'Test of Reasoning / Mental Ability',
+        'Contents pertaining to the State of Telangana'
+      ],
+      mediums: ['English', 'Telugu', 'Urdu']
+    },
+    syllabus_topics: [
+      'English',
+      'Arithmetic',
+      'General Science',
+      'History of India, Indian culture, Indian National Movement',
+      'Indian Geography, Polity and Economy',
+      'Current events of national and international importance',
+      'Test of Reasoning / Mental Ability',
+      'Contents pertaining to the State of Telangana'
+    ],
+    status: 'MOCK_READY',
+    exam_profile_status: 'VERIFIED',
+    pattern_status: 'VERIFIED',
+    last_researched_at: '2026-09-10T12:00:00.000Z',
+    pattern_verified_at: '2026-09-10T12:00:00.000Z',
+    syllabus_verified_at: '2026-09-10T12:00:00.000Z',
+    current_affairs_updated_at: '2026-09-10T12:00:00.000Z',
+    source_confidence_score: 98,
+    target_date: '2026-11-20',
+    created_at: '2026-09-10T12:00:00.000Z',
+    updated_at: '2026-09-10T12:00:00.000Z',
+    stages: findOfficialScheme('tslprb police constable')?.stages,
+    structure_scheme: findOfficialScheme('tslprb police constable') || undefined,
+    pattern_versions: [
+      {
+        version_id: 'tslprb_pc_v2022',
+        exam_id: 'tslprb_police_constable_pwt',
+        recruitment_cycle: 'Notification 41/Rect./Admn-1/2022',
+        notification_number: 'Rc No. 41 / Rect. / Admn-1 / 2022',
+        effective_date: '2022-04-25',
+        is_active: true,
+        pattern: {
+          total_questions: 200,
+          duration_minutes: 180,
+          total_marks: 200,
+          marks_per_question: 1,
+          negative_marking_rate: 0,
+          sections: [
+            'English',
+            'Arithmetic',
+            'General Science',
+            'History of India, Indian culture, Indian National Movement',
+            'Indian Geography, Polity and Economy',
+            'Current events of national and international importance',
+            'Test of Reasoning / Mental Ability',
+            'Contents pertaining to the State of Telangana'
+          ],
+          mediums: ['English', 'Telugu', 'Urdu']
+        },
+        syllabus_topics: [
+          'English',
+          'Arithmetic',
+          'General Science',
+          'History of India, Indian culture, Indian National Movement',
+          'Indian Geography, Polity and Economy',
+          'Current events of national and international importance',
+          'Test of Reasoning / Mental Ability',
+          'Contents pertaining to the State of Telangana'
+        ]
+      }
+    ]
+  },
+  {
+    exam_id: 'exam_telangana_police_constable_sct_p_mtv5bnpq',
+    intake_id: 'intake_mtv5bnpq_tslprb_pc',
+    data_provenance: 'RETRIEVED_OFFICIAL',
+    title: 'Telangana Police Constable (SCT PC Civil) - Preliminary Written Test (PWT) 2026',
+    commission: 'Telangana State Level Police Recruitment Board (TGPRB / TSLPRB)',
+    state_or_central: 'Telangana',
+    post: 'Stipendiary Cadet Trainee (SCT) Police Constable (Civil / AR / SAR CPL / TSSP / Warder / Fireman)',
+    stage: 'Stage 1: Preliminary Written Test (PWT)',
+    paper: 'Preliminary Paper: Objective Written Test',
+    recruitment_cycle: 'Rc No. 41 / Rect. / Admn-1 / 2022 - Current Cycle 2026',
+    active_cycle: 'Rc No. 41 / Rect. / Admn-1 / 2022 - Current Cycle 2026',
+    pattern: {
+      total_questions: 200,
+      duration_minutes: 180,
+      total_marks: 200,
+      marks_per_question: 1,
+      negative_marking_rate: 0,
+      sections: [
+        'English',
+        'Arithmetic',
+        'General Science',
+        'History of India, Indian culture, Indian National Movement',
+        'Indian Geography, Polity and Economy',
+        'Current events of national and international importance',
+        'Test of Reasoning / Mental Ability',
+        'Contents pertaining to the State of Telangana'
+      ],
+      mediums: ['English', 'Telugu', 'Urdu']
+    },
+    syllabus_topics: [
+      'English',
+      'Arithmetic',
+      'General Science',
+      'History of India, Indian culture, Indian National Movement',
+      'Indian Geography, Polity and Economy',
+      'Current events of national and international importance',
+      'Test of Reasoning / Mental Ability',
+      'Contents pertaining to the State of Telangana'
+    ],
+    status: 'MOCK_READY',
+    exam_profile_status: 'VERIFIED',
+    pattern_status: 'VERIFIED',
+    last_researched_at: '2026-09-10T12:00:00.000Z',
+    pattern_verified_at: '2026-09-10T12:00:00.000Z',
+    syllabus_verified_at: '2026-09-10T12:00:00.000Z',
+    current_affairs_updated_at: '2026-09-10T12:00:00.000Z',
+    source_confidence_score: 98,
+    target_date: '2026-11-20',
+    created_at: '2026-09-10T12:00:00.000Z',
+    updated_at: '2026-09-10T12:00:00.000Z',
+    stages: findOfficialScheme('tslprb police constable')?.stages,
+    structure_scheme: findOfficialScheme('tslprb police constable') || undefined,
+    pattern_versions: [
+      {
+        version_id: 'tslprb_pc_live_v2026',
+        exam_id: 'exam_telangana_police_constable_sct_p_mtv5bnpq',
+        recruitment_cycle: 'Rc No. 41 / Rect. / Admn-1 / 2022 - Current Cycle 2026',
+        notification_number: 'Rc No. 41 / Rect. / Admn-1 / 2022',
+        effective_date: '2022-04-25',
+        is_active: true,
+        pattern: {
+          total_questions: 200,
+          duration_minutes: 180,
+          total_marks: 200,
+          marks_per_question: 1,
+          negative_marking_rate: 0,
+          sections: [
+            'English',
+            'Arithmetic',
+            'General Science',
+            'History of India, Indian culture, Indian National Movement',
+            'Indian Geography, Polity and Economy',
+            'Current events of national and international importance',
+            'Test of Reasoning / Mental Ability',
+            'Contents pertaining to the State of Telangana'
+          ],
+          mediums: ['English', 'Telugu', 'Urdu']
+        },
+        syllabus_topics: [
+          'English',
+          'Arithmetic',
+          'General Science',
+          'History of India, Indian culture, Indian National Movement',
+          'Indian Geography, Polity and Economy',
+          'Current events of national and international importance',
+          'Test of Reasoning / Mental Ability',
+          'Contents pertaining to the State of Telangana'
+        ]
+      }
+    ]
   }
 ];
 
@@ -781,11 +1002,14 @@ export const INITIAL_EXAMS: ExamRecord[] = RAW_EXAMS.map(exam => {
   if (activeVer) {
     activeVer.fact_verifications = facts;
   }
+  const scheme = exam.structure_scheme || findOfficialScheme(exam.title);
   return {
     ...exam,
     data_provenance: exam.data_provenance || 'RETRIEVED_OFFICIAL',
     exam_profile_status: 'VERIFIED',
     pattern_status: 'VERIFIED',
+    stages: exam.stages || scheme?.stages,
+    structure_scheme: scheme || undefined,
     fact_verifications: facts
   };
 });

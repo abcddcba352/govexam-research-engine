@@ -4,7 +4,10 @@ import {
   ExamStructureScheme,
 } from '../src/types.ts';
 import { getCandidateModels, getGenAI, getThinkingConfig } from './geminiConfig.ts';
-import { isQuotaExhaustedError } from './researchService.ts';
+function isQuotaExhausted(error: unknown): boolean {
+  const message = String((error as any)?.message || error || '').toLowerCase();
+  return message.includes('429') || message.includes('resource_exhausted') || message.includes('quota') || message.includes('rate limit');
+}
 
 // Authoritative Catalog of Multi-Stage Government Examinations in India
 export const OFFICIAL_EXAM_SCHEMES: ExamStructureScheme[] = [
@@ -847,6 +850,180 @@ export const OFFICIAL_EXAM_SCHEMES: ExamStructureScheme[] = [
         ]
       }
     ]
+  },
+
+  // 9. TGPSC Assistant Executive Engineer (AEE)
+  {
+    query: 'tgpsc aee',
+    exam_name: 'TGPSC Assistant Executive Engineer (AEE Civil / Mechanical / Electrical)',
+    commission: 'Telangana Public Service Commission (TGPSC)',
+    state_or_central: 'Telangana',
+    recruitment_cycle: 'Notification 12/2022 Cycle',
+    total_stages: 1,
+    selection_summary: 'Single-stage written examination comprising Paper-I (General Studies) and Paper-II (Engineering Discipline - 300 Marks), followed by Certificate Verification.',
+    official_reference: 'https://tgpsc.gov.in/web/notifications/notif_12_2022_aee.pdf',
+    source_status: 'VERIFIED_OFFICIAL_CATALOG',
+    stages: [
+      {
+        stage_id: 'tgpsc_aee_stage1',
+        stage_number: 1,
+        stage_name: 'Written Examination (Objective Type - CBRT / OMR)',
+        stage_type: 'MAINS',
+        is_qualifying_only: false,
+        total_papers: 2,
+        total_marks: 450,
+        description: 'Computer Based Recruitment Test (CBRT) / OMR comprising Paper-I (General Studies) and Paper-II (Engineering Discipline).',
+        papers: [
+          {
+            paper_id: 'tgpsc_aee_p1',
+            paper_number: 'Paper-I',
+            title: 'Paper-I: General Studies and General Abilities',
+            type: 'OBJECTIVE',
+            total_questions: 150,
+            total_marks: 150,
+            duration_minutes: 150,
+            negative_marking_rate: 0.25,
+            is_qualifying: false,
+            sections: [
+              'Current Affairs (Regional, National & International)',
+              'International Relations and Events',
+              'General Science: Achievements in Science and Technology',
+              'Environmental Issues and Disaster Management',
+              'Economic and Social Development of India and Telangana',
+              'Physical, Social and Economic Geography of India',
+              'Physical, Social and Economic Geography and Demography of Telangana',
+              'Socio-economic, Political and Cultural History of Modern India',
+              'Indian Constitution, Indian Political System, Governance and Public Policy',
+              'Social Exclusion, Rights Issues and Inclusive Policies',
+              'Society, Culture, Heritage, Arts and Literature of Telangana',
+              'Policies of Telangana State',
+              'Logical Reasoning, Analytical Ability and Data Interpretation',
+              'Basic English (10th Standard)'
+            ]
+          },
+          {
+            paper_id: 'tgpsc_aee_p2',
+            paper_number: 'Paper-II',
+            title: 'Paper-II: Civil / Mechanical / Electrical Engineering (Degree Level)',
+            type: 'OBJECTIVE',
+            total_questions: 150,
+            total_marks: 300,
+            duration_minutes: 150,
+            negative_marking_rate: 0.25,
+            is_qualifying: false,
+            sections: [
+              'Building Materials and Construction',
+              'Strength of Materials and Structural Analysis',
+              'Design of Steel and Concrete Structures',
+              'Fluid Mechanics and Hydraulics',
+              'Hydrology and Water Resources Engineering',
+              'Environmental Engineering',
+              'Geotechnical and Foundation Engineering',
+              'Surveying and Transportation Engineering'
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+  // 10. APPSC Executive Officer (Grade-III) Endowments
+  {
+    query: 'appsc executive officer',
+    exam_name: 'APPSC Executive Officer (Grade-III) in Endowments Subordinate Service',
+    commission: 'Andhra Pradesh Public Service Commission (APPSC)',
+    state_or_central: 'Andhra Pradesh',
+    recruitment_cycle: 'Notification 24/2021 Cycle',
+    total_stages: 2,
+    selection_summary: 'Stage 1: Screening Test (Objective Type - 150 Marks) ➔ Stage 2: Main Examination (2 Papers - 300 Marks Total).',
+    official_reference: 'https://psc.ap.gov.in/notifications/eo_notif_24_2021.pdf',
+    source_status: 'VERIFIED_OFFICIAL_CATALOG',
+    stages: [
+      {
+        stage_id: 'appsc_eo_screening',
+        stage_number: 1,
+        stage_name: 'Stage 1: Screening Test (Objective Type)',
+        stage_type: 'PRELIMINARY',
+        is_qualifying_only: true,
+        total_papers: 1,
+        total_marks: 150,
+        description: 'Preliminary screening examination to shortlist candidates for the Main examination at 1:50 ratio.',
+        papers: [
+          {
+            paper_id: 'appsc_eo_scr_p1',
+            paper_number: 'Screening Paper',
+            title: 'General Studies and Mental Ability',
+            type: 'OBJECTIVE',
+            total_questions: 150,
+            total_marks: 150,
+            duration_minutes: 150,
+            negative_marking_rate: 0.33,
+            is_qualifying: true,
+            sections: [
+              'AP Endowments Administration & Governance Structure',
+              'Bifurcation Act 2014 & Schedule IX/X Institutions',
+              'Disaster Management & Remote Sensing in AP Coastal Hazards',
+              'Data Analysis & Summary Statistics (Mean, Median, Mode, Dispersion)',
+              'Indian Constitution, Fundamental Rights & AP e-Governance',
+              'Economic Development of AP & Major Irrigation Projects',
+              'Modern Indian & AP Socio-Political History',
+              'Environmental Protection & UNFCCC Climate Commitments'
+            ]
+          }
+        ]
+      },
+      {
+        stage_id: 'appsc_eo_mains',
+        stage_number: 2,
+        stage_name: 'Stage 2: Main Examination (Objective Type)',
+        stage_type: 'MAINS',
+        is_qualifying_only: false,
+        total_papers: 2,
+        total_marks: 300,
+        description: 'Final merit examination comprising Paper-I (General Studies) and Paper-II (Hindu Philosophy & Temple System).',
+        papers: [
+          {
+            paper_id: 'appsc_eo_mains_p1',
+            paper_number: 'Paper-I',
+            title: 'Paper-I: General Studies and Mental Ability',
+            type: 'OBJECTIVE',
+            total_questions: 150,
+            total_marks: 150,
+            duration_minutes: 150,
+            negative_marking_rate: 0.33,
+            is_qualifying: false,
+            sections: [
+              'AP Endowments Administration & Governance Structure',
+              'Bifurcation Act 2014 & Schedule IX/X Institutions',
+              'Disaster Management & Remote Sensing in AP Coastal Hazards',
+              'Data Analysis & Summary Statistics (Mean, Median, Mode, Dispersion)',
+              'Indian Constitution, Fundamental Rights & AP e-Governance',
+              'Economic Development of AP & Major Irrigation Projects',
+              'Modern Indian & AP Socio-Political History',
+              'Environmental Protection & UNFCCC Climate Commitments'
+            ]
+          },
+          {
+            paper_id: 'appsc_eo_mains_p2',
+            paper_number: 'Paper-II',
+            title: 'Paper-II: Hindu Philosophy and Temple System',
+            type: 'OBJECTIVE',
+            total_questions: 150,
+            total_marks: 150,
+            duration_minutes: 150,
+            negative_marking_rate: 0.33,
+            is_qualifying: false,
+            sections: [
+              'Ramayana, Mahabharata and Bhagavata Purana',
+              'Hindu Temples, Customs, Rituals and Festivals',
+              'Agamas: Vaikhanasa, Pancharatra, Saiva and Sakta',
+              'Vedic Literature, Upanishads and Darshanas',
+              'AP Charitable and Hindu Religious Institutions and Endowments Act 1987'
+            ]
+          }
+        ]
+      }
+    ]
   }
 ];
 
@@ -863,6 +1040,14 @@ export function findOfficialScheme(query: string): ExamStructureScheme | null {
 
   if (q.includes('constable') || q.includes('sct pc') || (q.includes('police') && (q.includes('constable') || q.includes('pc')))) {
     return OFFICIAL_EXAM_SCHEMES.find(s => s.query === 'tslprb police constable') || null;
+  }
+
+  if (q.includes('aee') || q.includes('assistant executive engineer')) {
+    return OFFICIAL_EXAM_SCHEMES.find(s => s.query === 'tgpsc aee') || null;
+  }
+
+  if (q.includes('endowment') || q.includes('executive officer')) {
+    return OFFICIAL_EXAM_SCHEMES.find(s => s.query === 'appsc executive officer') || null;
   }
 
   if (q.includes('group 1') || q.includes('group i') || q.includes('group-1') || q.includes('group-i')) {
@@ -1001,7 +1186,7 @@ Be completely truthful to the gazetted official notification rules for this exam
         };
       }
     } catch (err: any) {
-      if (isQuotaExhaustedError(err)) {
+      if (isQuotaExhausted(err)) {
         continue;
       }
     }

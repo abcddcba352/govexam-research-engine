@@ -1,5 +1,6 @@
 import type { ExamRecord, ExamPatternVersion, ExamFactVerification } from '../../src/types.ts';
 import { calculateExamProfileStatus, createDefaultFactVerifications } from '../verificationService.ts';
+import { findOfficialScheme } from '../examStructureService.ts';
 
 export function mapPattern(row: any): ExamPatternVersion {
   return {
@@ -23,13 +24,22 @@ export function mapExam(row: any, versions: any[], facts: any[], sources: any[] 
     (!row.active_exam_version_id && rows.length === 1 ? rows[0] : undefined);
   const mapped = active ? mapPattern(active) : undefined;
   const cycle = mapped?.recruitment_cycle || 'Unknown cycle';
+  const scheme = row.structure_scheme || findOfficialScheme(row.title);
+  const topics = (mapped?.syllabus_topics && mapped.syllabus_topics.length > 0)
+    ? mapped.syllabus_topics
+    : (row.syllabus_topics && row.syllabus_topics.length > 0)
+      ? row.syllabus_topics
+      : (scheme?.stages?.[0]?.papers?.[0]?.sections || []);
+
   const record: ExamRecord = {
     exam_id: row.exam_id, intake_id: `intake_${row.exam_id}`, title: row.title,
     commission: row.authority || '', state_or_central: row.state || '', post: row.exam_level || '',
     stage: row.stage_tier || '', paper: row.paper || '', recruitment_cycle: cycle, active_cycle: cycle,
     pattern: mapped?.pattern || { total_questions: 0, total_marks: 0, duration_minutes: 0,
       marks_per_question: 0, negative_marking_rate: 0, sections: [], mediums: [] },
-    syllabus_topics: mapped?.syllabus_topics || [],
+    syllabus_topics: topics,
+    stages: row.stages || scheme?.stages,
+    structure_scheme: scheme || undefined,
     preparation_mode: active?.section_structure?.preparation_mode || 'PRE_NOTIFICATION_PREPARATION',
     status: 'INTAKE_SUBMITTED', exam_profile_status: 'RESEARCH_REQUIRED', pattern_status: 'UNVERIFIED',
     source_confidence_score: 0, created_at: row.created_at, updated_at: row.updated_at,

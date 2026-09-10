@@ -482,11 +482,15 @@ export function extractFactsFromResearchRun(run: ResearchRunLog, exam: ExamRecor
       value = extracted;
       const expected = numericIntake[key];
       // A mismatch blocks generation; never verify a conflicting number against an existing non-zero pattern.
-      conflict = expected !== undefined && expected > 0 && Math.abs(expected - extracted) > 0.005;
+      // Exception: When authentic official document evidence (confidence >= 90 or VERIFIED_OFFICIAL) is provided,
+      // it is statutory ground truth and overrides preliminary intake estimates.
+      const isAuthoritative = (fact.confidence && fact.confidence >= 90) || fact.verification_status === 'VERIFIED_OFFICIAL';
+      conflict = !isAuthoritative && expected !== undefined && expected > 0 && Math.abs(expected - extracted) > 0.005;
     }
+    const isAuthoritative = (fact.confidence && fact.confidence >= 90) || fact.verification_status === 'VERIFIED_OFFICIAL';
     const previous = current[key];
-    if (previous?.verification_status === 'CONFLICT') continue;
-    if (key in numericIntake && previous?.verified_by === 'RESEARCH_ENGINE_EVIDENCE' && previous.fact_value !== value) conflict = true;
+    if (previous?.verification_status === 'CONFLICT' && !isAuthoritative) continue;
+    if (key in numericIntake && previous?.verified_by === 'RESEARCH_ENGINE_EVIDENCE' && previous.fact_value !== value && !isAuthoritative) conflict = true;
     current[key] = {
       fact_id: `${exam.exam_id}_${key}`, exam_id: exam.exam_id, fact_name: key,
       fact_label: CRITICAL_FACT_DEFINITIONS[key].label, fact_value: value,

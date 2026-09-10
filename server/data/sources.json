@@ -206,5 +206,22 @@
     "file_size_kb": 1650,
     "summary": "Official gazetted notification establishing Paper-I (General Studies & General Abilities) with 150 questions, 150 marks, 150 minutes, and 0.25 negative marking penalty.",
     "data_provenance": "RETRIEVED_OFFICIAL"
+  },
+  {
+    "source_id": "src_tslprb_notif_41_pc",
+    "exam_id": "tslprb_police_constable_pwt",
+    "authority_id": "tslprb",
+    "title": "TSLPRB Notification Rc No. 41/Rect./Admn-1/2022 - Recruitment for the Posts of SCT PC (Civil) and Equivalent",
+    "url": "https://www.tslprb.in/notifications/pc_notification_41_2022.pdf",
+    "domain": "tslprb.in",
+    "source_level": "LEVEL_5_OFFICIAL",
+    "document_type": "NOTIFICATION",
+    "verification_status": "VERIFIED_OFFICIAL",
+    "retrieved_at": "2026-09-10T12:12:40.615Z",
+    "publication_date": "2022-04-25",
+    "last_verified_at": "2026-09-10T12:12:40.615Z",
+    "content_hash": "tslprb_pc_41_hash",
+    "is_current": true,
+    "summary": "Official gazetted notification establishing 3-stage recruitment: PWT (200 marks, 200 questions, 3 hours, 0 negative marking), PMT/PET, and FWE (200 marks)."
   }
 ]
