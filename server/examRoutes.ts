@@ -1,6 +1,6 @@
 import type { Express, Request, RequestHandler } from 'express';
 import { withExamWorkflow } from './persistence/examWorkflow.ts';
-import { getExams, getExamById, createExamFromIntake, getSources, saveSource } from './dbService.ts';
+import { getExams, getExamById, createExamFromIntake, getSources, saveSource, updateExamStages } from './dbService.ts';
 import { allowedPublisher, collectCurrentAffairs } from './currentAffairsService.ts';
 import { discoverCurrentAffairs } from './autonomousResearch.ts';
 import { saveAutonomousArticles } from './autonomousPersistence.ts';
@@ -187,5 +187,12 @@ export function registerExamRoutes(app: Express) {
     }
     const structure = await fetchExamStructure(query);
     return { body: { success: true, structure } };
+  }));
+  app.post('/api/exams/:id/stages', examEndpoint(async req => {
+    const { stages, structure_scheme } = req.body || {};
+    if (!Array.isArray(stages)) return { status: 400, body: { error: 'stages must be an array' } };
+    const updatedExam = updateExamStages(req.params.id, stages, structure_scheme);
+    if (!updatedExam) return { status: 404, body: { error: 'Exam not found' } };
+    return { body: { success: true, exam: updatedExam } };
   }));
 }

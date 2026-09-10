@@ -20,6 +20,8 @@ import {
   PatternChangeReport,
   PreparationMode,
   PreparationBasis,
+  ExamStage,
+  ExamStructureScheme,
   STANDARDIZED_DUPLICATE_LAYERS
 } from '../src/types.ts';
 import {
@@ -498,6 +500,23 @@ export function updateExamStatus(
   }
   saveExams(exams);
   return exams[idx];
+}
+
+export function updateExamStages(
+  exam_id: string,
+  stages: ExamStage[],
+  structure_scheme?: ExamStructureScheme
+): ExamRecord | null {
+  const exams = getExams();
+  const exam = exams.find(e => e.exam_id === exam_id);
+  if (!exam) return null;
+  exam.stages = stages;
+  if (structure_scheme) {
+    exam.structure_scheme = structure_scheme;
+  }
+  exam.updated_at = new Date().toISOString();
+  saveExams(exams);
+  return exam;
 }
 
 export interface AuditorFactSignoffPayload {

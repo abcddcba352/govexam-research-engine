@@ -85,29 +85,34 @@ export function renderQuestionDiagram(spec:QuestionDiagram,stem?:string):VisualS
     // Fixed schematic proportions make the drawing read like a printed engineering figure;
     // the only numeric labels come from the question's structured values.
     const angle=spec.angle*Math.PI/180;
-    const leftX=302,leftTop=112,bottomY=318,joinX=362,joinY=278,rightX=505,rightY=92;
-    const outer=`M45 ${leftTop}H${leftX}V258 Q${leftX} ${bottomY} ${leftX+38} ${bottomY} Q${leftX+62} ${bottomY} ${leftX+78} ${bottomY-30} L${rightX} ${rightY} H570`;
-    const fluid=`M${leftX} 244 V258 Q${leftX} 298 ${leftX+38} 298 Q${leftX+51} 298 ${leftX+64} 275 L405 222`;
+    const leftX=255,leftTop=118,bottomY=322,rightX=465,rightY=84;
+    const outer=`M44 ${leftTop}H${leftX}V258 Q${leftX} ${bottomY} ${leftX+40} ${bottomY} Q${leftX+68} ${bottomY} ${leftX+88} ${bottomY-34} L${rightX} ${rightY} H570`;
+    const fluid=`M${leftX} 242 V258 Q${leftX} 300 ${leftX+40} 300 Q${leftX+56} 300 ${leftX+73} 274 L390 220`;
     const arrow=(x1:number,y1:number,x2:number,y2:number)=>line(x1,y1,x2,y2,'stroke="#111" stroke-width="3" marker-end="url(#arrow)"');
-    const dimA=[395,214],dimB=[478,108];
     const datumY=222;
-    body=text(150,58,'Pipe A',24)+text(548,38,'Pipe B',24)+
+    // The dimension line is deliberately offset above the inclined tube, as in a printed engineering plate.
+    const dimA=[345,174],dimB=[445,58];
+    body=text(138,62,'Pipe A',25)+text(515,34,'Pipe B',25)+
       `<path d="${outer}" fill="none" stroke="#111" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>`+
       `<path d="${outer}" fill="none" stroke="#fff" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>`+
       `<path d="${fluid}" fill="none" stroke="#b7b7b7" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>`+
       `<path d="${fluid}" fill="none" stroke="url(#manometerHatch)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>`+
-      `<ellipse cx="45" cy="${leftTop}" rx="17" ry="10" fill="#fff" stroke="#111" stroke-width="2"/>`+
-      `<ellipse cx="${rightX}" cy="${rightY}" rx="17" ry="10" fill="#fff" stroke="#111" stroke-width="2"/>`+
-      arrow(105,112,220,112)+arrow(530,92,570,92)+
-      line(280,datumY,545,datumY,'stroke="#777" stroke-width="1.5" stroke-dasharray="6 5"')+
-      line(395,214,478,108,'stroke="#111" stroke-width="1.6" marker-start="url(#arrow)" marker-end="url(#arrow)"')+
-      ` <g transform="translate(442 151) rotate(${-spec.angle})">${text(0,0,`L = ${spec.length} ${spec.unit}`,17)}</g>`+
-      line(502,rightY,502,datumY,'stroke="#111" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)"')+
-      text(514,165,'hᵥ',17,'start')+
-      `<path d="M402 ${datumY} A42 42 0 0 0 ${402+42*Math.cos(angle)} ${datumY-42*Math.sin(angle)}" fill="none" stroke="#111" stroke-width="2"/>`+
-      text(420,194,`θ = ${spec.angle}°`,15,'start')+
+      `<ellipse cx="44" cy="${leftTop}" rx="18" ry="11" fill="#fff" stroke="#111" stroke-width="2"/>`+
+      `<ellipse cx="${rightX}" cy="${rightY}" rx="18" ry="11" fill="#fff" stroke="#111" stroke-width="2"/>`+
+      `<ellipse cx="570" cy="${rightY}" rx="18" ry="11" fill="#fff" stroke="#111" stroke-width="2"/>`+
+      line(44,leftTop,leftX,leftTop,'stroke="#777" stroke-width="1" stroke-dasharray="6 5"')+
+      line(rightX,rightY,570,rightY,'stroke="#777" stroke-width="1" stroke-dasharray="6 5"')+
+      arrow(95,leftTop,185,leftTop)+arrow(495,rightY,550,rightY)+
+      line(250,datumY,555,datumY,'stroke="#777" stroke-width="1.5" stroke-dasharray="6 5"')+
+      line(dimA[0],dimA[1],dimB[0],dimB[1],'stroke="#111" stroke-width="1.8" marker-start="url(#arrow)" marker-end="url(#arrow)"')+
+      line(345,174,390,220,'stroke="#111" stroke-width="1.2"')+line(445,58,465,84,'stroke="#111" stroke-width="1.2"')+
+      ` <g transform="translate(395 118) rotate(${-spec.angle})">${text(0,0,`L = ${spec.length} ${spec.unit}`,18)}</g>`+
+      line(535,rightY,535,datumY,'stroke="#111" stroke-width="1.8" marker-start="url(#arrow)" marker-end="url(#arrow)"')+
+      text(548,162,'hᵥ',18,'start')+
+      `<path d="M360 ${datumY} A47 47 0 0 0 ${360+47*Math.cos(angle)} ${datumY-47*Math.sin(angle)}" fill="none" stroke="#111" stroke-width="2"/>`+
+      text(382,192,`θ = ${spec.angle}°`,16,'start')+
       // The interface line is perpendicular to the inclined leg; it identifies the measured fluid column.
-      line(394,224,414,204,'stroke="#111" stroke-width="1.5"');
+      line(398,226,418,204,'stroke="#111" stroke-width="1.5"');
     alt=`Inclined manometer between Pipe A and Pipe B. Fluid-column length L = ${spec.length} ${spec.unit}, inclined ${spec.angle} degrees above horizontal; vertical rise labelled h.`;
   }
   const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 360" width="600" height="360"><title>${escape(alt)}</title>${definitions}<rect width="600" height="360" fill="#fff"/><g stroke="#111" stroke-width="2" fill="#111" font-family="Arial, sans-serif"><style>text{stroke:none}</style>${body}</g></svg>`;

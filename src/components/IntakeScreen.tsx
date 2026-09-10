@@ -24,6 +24,7 @@ import {
 import { ExamIntakeInput, ExamRecord, ResearchMode, CriticalFactName, ExamPatternVersion, ExamStage, ExamStagePaper, ExamStructureScheme } from '../types';
 import { FieldVerificationMatrix } from './FieldVerificationMatrix';
 import { RecruitmentCycleManager } from './RecruitmentCycleManager';
+import { ExamStagesManager } from './ExamStagesManager';
 import { AuditorSignoffModal } from './AuditorSignoffModal';
 import { SystemAuditLogsModal } from './SystemAuditLogsModal';
 import {
@@ -376,13 +377,10 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
   // System Audit Logs modal state
   const [auditLogsExam, setAuditLogsExam] = useState<ExamRecord | null>(null);
 
-  // Active sub-panels per exam: 'MATRIX' | 'CYCLES' | 'NONE'
-  const [expandedExamSections, setExpandedExamSections] = useState<Record<string, 'MATRIX' | 'CYCLES' | 'NONE'>>({
-    tgpsc_group_2_paper_1: 'MATRIX',
-    appsc_group_2_screening: 'MATRIX',
-  });
+  // Active sub-panels per exam: 'MATRIX' | 'CYCLES' | 'STAGES' | 'NONE'
+  const [expandedExamSections, setExpandedExamSections] = useState<Record<string, 'MATRIX' | 'CYCLES' | 'STAGES' | 'NONE'>>({});
 
-  const toggleExamSection = (examId: string, section: 'MATRIX' | 'CYCLES') => {
+  const toggleExamSection = (examId: string, section: 'MATRIX' | 'CYCLES' | 'STAGES') => {
     setExpandedExamSections(prev => ({
       ...prev,
       [examId]: prev[examId] === section ? 'NONE' : section
@@ -1853,6 +1851,23 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                       <ChevronDown className="w-3.5 h-3.5 ml-0.5 opacity-70" />
                     )}
                   </button>
+
+                  <button
+                    onClick={() => toggleExamSection(exam.exam_id, 'STAGES')}
+                    className={`px-3 py-1.5 rounded-lg font-semibold border transition-all flex items-center gap-1.5 cursor-pointer ${
+                      expandedExamSections[exam.exam_id] === 'STAGES'
+                        ? 'bg-indigo-700 text-white border-indigo-700 shadow-xs'
+                        : 'bg-white text-indigo-700 border-indigo-300 hover:bg-indigo-50'
+                    }`}
+                  >
+                    <Layers className="w-3.5 h-3.5 text-indigo-500" />
+                    <span>Stages & Papers ({exam.stages?.length || (exam.structure_scheme?.stages?.length ?? 0)} Stages)</span>
+                    {expandedExamSections[exam.exam_id] === 'STAGES' ? (
+                      <ChevronUp className="w-3.5 h-3.5 ml-0.5 opacity-70" />
+                    ) : (
+                      <ChevronDown className="w-3.5 h-3.5 ml-0.5 opacity-70" />
+                    )}
+                  </button>
                 </div>
 
                 <div className="text-[11px] text-slate-500">
@@ -1881,6 +1896,16 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                     exam={exam}
                     onSwitchCycle={(cycle) => handleSwitchCycle(exam.exam_id, cycle)}
                     onAddCycleVersion={(ver) => handleAddCycleVersion(exam.exam_id, ver)}
+                  />
+                </div>
+              )}
+
+              {/* Sub-Panel: Exam Stages & Papers Manager */}
+              {expandedExamSections[exam.exam_id] === 'STAGES' && (
+                <div className="mt-4 animate-in fade-in">
+                  <ExamStagesManager
+                    exam={exam}
+                    onRefreshExams={onRefreshExams}
                   />
                 </div>
               )}

@@ -30,6 +30,7 @@ import {
   getAuditLogs,
   applyAuditorFactSignoff,
   switchExamRecruitmentCycle,
+  updateExamStages,
   getDuplicateLedger,
   checkQuestionDuplicate,
   computeCanonicalQuestionHash,
@@ -315,6 +316,38 @@ export function createApp(): express.Application {
     } catch (err: any) {
       console.error("Error switching exam cycle:", err);
       res.status(500).json({ error: err.message || "Failed to switch cycle" });
+    }
+  });
+
+  // Update selection stages and papers for an exam
+  app.post("/api/exams/:id/stages", (req, res) => {
+    try {
+      const { stages, structure_scheme } = req.body;
+      if (!Array.isArray(stages)) {
+        return res.status(400).json({ error: "stages must be an array" });
+      }
+      const updatedExam = updateExamStages(req.params.id, stages, structure_scheme);
+      if (!updatedExam) {
+        return res.status(404).json({ error: "Exam not found" });
+      }
+
+      // Log stages update in audit trail
+      saveGenerationAuditLog({
+        log_id: `audit_stages_update_${Date.now()}`,
+        audit_type: 'PATTERN_VERIFICATION_AUDIT',
+        action: 'EXAM_STAGES_UPDATED',
+        exam_id: updatedExam.exam_id,
+        exam_title: updatedExam.title,
+        recruitment_cycle: updatedExam.active_cycle || updatedExam.recruitment_cycle,
+        reason: `Updated stages and papers hierarchy (${stages.length} stages, ${stages.reduce((acc, s) => acc + (s.papers?.length || 0), 0)} papers).`,
+        status: 'SUCCESS',
+        created_at: new Date().toISOString(),
+      });
+
+      res.json({ success: true, exam: updatedExam });
+    } catch (err: any) {
+      console.error("Error updating exam stages:", err);
+      res.status(500).json({ error: err.message || "Failed to update stages" });
     }
   });
 

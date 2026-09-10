@@ -877,28 +877,34 @@ export function getBoardForExam(exam: ExamRecord | { commission?: string; title?
   }
 
   // 2. Check State Boards for Telangana
-  if (soc.includes('telangana') || comm.includes('tgpsc') || comm.includes('tspsc') || title.includes('tgpsc')) {
-    return STATE_CONDUCTING_BOARDS['Telangana']?.find(b => b.id === 'tgpsc');
-  }
-  if (comm.includes('tslprb') || (soc.includes('telangana') && title.includes('police'))) {
+  if (comm.includes('tslprb') || comm.includes('tgprb') || title.includes('police') || comm.includes('police')) {
     return STATE_CONDUCTING_BOARDS['Telangana']?.find(b => b.id === 'tslprb');
   }
-  if (comm.includes('treirb') || (soc.includes('telangana') && title.includes('dsc'))) {
+  if (comm.includes('treirb') || title.includes('dsc') || comm.includes('dsc')) {
     return STATE_CONDUCTING_BOARDS['Telangana']?.find(b => b.id === 'tg_education');
   }
-  if (comm.includes('mhsrb') || (soc.includes('telangana') && title.includes('mhsrb'))) {
+  if (comm.includes('mhsrb') || title.includes('mhsrb')) {
     return STATE_CONDUCTING_BOARDS['Telangana']?.find(b => b.id === 'tg_mhsrb');
   }
   if (title.includes('nit warangal') || comm.includes('nit warangal')) {
     return STATE_CONDUCTING_BOARDS['Telangana']?.find(b => b.id === 'tg_nit_warangal');
   }
+  if (comm.includes('tsspdcl') || comm.includes('tsnpdcl') || comm.includes('transco') || comm.includes('genco')) {
+    return STATE_CONDUCTING_BOARDS['Telangana']?.find(b => b.id === 'tg_power');
+  }
+  if (comm.includes('tgpsc') || comm.includes('tspsc') || title.includes('tgpsc') || soc.includes('telangana')) {
+    return STATE_CONDUCTING_BOARDS['Telangana']?.find(b => b.id === 'tgpsc');
+  }
 
   // 3. Check State Boards for Andhra Pradesh
-  if (soc.includes('andhra') || comm.includes('appsc') || title.includes('appsc')) {
-    return STATE_CONDUCTING_BOARDS['Andhra Pradesh']?.find(b => b.id === 'appsc');
-  }
-  if (comm.includes('slprb') || (soc.includes('andhra') && title.includes('police'))) {
+  if (comm.includes('slprb') || (soc.includes('andhra') && (title.includes('police') || comm.includes('police')))) {
     return STATE_CONDUCTING_BOARDS['Andhra Pradesh']?.find(b => b.id === 'slprb_ap');
+  }
+  if (comm.includes('ap dsc') || title.includes('ap dsc')) {
+    return STATE_CONDUCTING_BOARDS['Andhra Pradesh']?.find(b => b.id === 'ap_education');
+  }
+  if (comm.includes('appsc') || title.includes('appsc') || soc.includes('andhra')) {
+    return STATE_CONDUCTING_BOARDS['Andhra Pradesh']?.find(b => b.id === 'appsc');
   }
 
   return undefined;
