@@ -1,5 +1,188 @@
 [
   {
+    "mock_id": "mock_visual_demonstration_ssc_cgl",
+    "exam_id": "ssc_cgl_tier_1",
+    "mock_number": 99,
+    "series_id": "series_ssc_cgl_visual_demo",
+    "title": "SSC CGL Tier-I: Special Visual & Diagrammatic Master Practice Paper",
+    "created_at": "2026-09-10T04:14:02.372Z",
+    "total_questions": 5,
+    "status": "READY_FOR_AUDIT",
+    "generation_status": "GENERATION_SUCCESS",
+    "preparation_mode": "PRE_NOTIFICATION_PREPARATION",
+    "sections": [
+      {
+        "section_id": "sec_quant_reasoning",
+        "section_name": "Quantitative Aptitude & General Intelligence",
+        "total_questions": 5,
+        "marks_per_question": 2,
+        "questions": [
+          {
+            "question_id": "demo_visual_q_1",
+            "mock_id": "mock_visual_demonstration_ssc_cgl",
+            "question_number": 1,
+            "section_name": "Quantitative Aptitude - Geometry",
+            "question_text": "In the given figure, a tangent PT of 12 cm is drawn from an external point P to a circle with center O and radius 5 cm. If the tangent touches the circle at T, what is the length of OP?",
+            "options": [
+              "13 cm",
+              "15 cm",
+              "17 cm",
+              "10 cm"
+            ],
+            "correct_option_index": 0,
+            "explanation": "Since tangent is perpendicular to radius at point of contact (OT ⊥ PT), △OPT is a right-angled triangle. By Pythagoras Theorem: OP² = OT² + PT² = 5² + 12² = 25 + 144 = 169. Hence OP = √169 = 13 cm.",
+            "topic": "Geometry - Circles & Tangents",
+            "difficulty": "MEDIUM",
+            "canonical_hash": "hash_1_1789013642367",
+            "source_reference": "SSC CGL Mathematics - NCERT Class X Geometry Theorem 10.1",
+            "candidate_status": "ACCEPTED",
+            "visual_specification": {
+              "visual_type": "GEOMETRY",
+              "svg_content": "<svg viewBox=\"0 0 420 260\" xmlns=\"http://www.w3.org/2000/svg\" className=\"w-full max-w-md mx-auto\">\n  <defs>\n    <pattern id=\"diagHatch\" width=\"8\" height=\"8\" patternTransform=\"rotate(45 0 0)\" patternUnits=\"userSpaceOnUse\">\n      <line x1=\"0\" y1=\"0\" x2=\"0\" y2=\"8\" stroke=\"#64748B\" stroke-width=\"1.5\" />\n    </pattern>\n  </defs>\n  <!-- Background -->\n  <rect width=\"100%\" height=\"100%\" fill=\"#FFFFFF\" />\n  \n  <!-- Circle -->\n  <circle cx=\"150\" cy=\"140\" r=\"80\" fill=\"#F8FAFC\" stroke=\"#0F172A\" stroke-width=\"2.5\" />\n  <circle cx=\"150\" cy=\"140\" r=\"3.5\" fill=\"#0F172A\" />\n  <text x=\"135\" y=\"145\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"14\" font-weight=\"bold\" fill=\"#020617\">O</text>\n\n  <!-- External Point P -->\n  <circle cx=\"360\" cy=\"140\" r=\"3.5\" fill=\"#0F172A\" />\n  <text x=\"370\" y=\"145\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"14\" font-weight=\"bold\" fill=\"#020617\">P</text>\n\n  <!-- Tangent Point T -->\n  <circle cx=\"180\" cy=\"66\" r=\"3.5\" fill=\"#0F172A\" />\n  <text x=\"175\" y=\"52\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"14\" font-weight=\"bold\" fill=\"#020617\">T</text>\n\n  <!-- Line OT (Radius) -->\n  <line x1=\"150\" y1=\"140\" x2=\"180\" y2=\"66\" stroke=\"#0F172A\" stroke-width=\"2\" stroke-dasharray=\"4 3\" />\n  <text x=\"150\" y=\"98\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"13\" font-style=\"italic\" fill=\"#020617\">5 cm</text>\n\n  <!-- Line PT (Tangent) -->\n  <line x1=\"360\" y1=\"140\" x2=\"180\" y2=\"66\" stroke=\"#0F172A\" stroke-width=\"2.5\" />\n  <text x=\"275\" y=\"95\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"13\" font-style=\"italic\" fill=\"#020617\">12 cm</text>\n\n  <!-- Line OP (Secant / Hypotenuse) -->\n  <line x1=\"150\" y1=\"140\" x2=\"360\" y2=\"140\" stroke=\"#0F172A\" stroke-width=\"2\" />\n  <text x=\"250\" y=\"160\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"13\" font-style=\"italic\" fill=\"#020617\">OP</text>\n\n  <!-- Right Angle Symbol at T (OT perpendicular to PT) -->\n  <path d=\"M 189 88 L 199 84 L 190 62\" fill=\"none\" stroke=\"#0F172A\" stroke-width=\"1.5\" />\n</svg>",
+              "alt_text": "Geometry diagram showing circle with center O, radius OT, and tangent PT from external point P.",
+              "is_grayscale": true,
+              "figure_caption": "Figure: Circle with Tangent PT from Point P",
+              "answer_dependency": true,
+              "dimensions": {
+                "width": 420,
+                "height": 260
+              }
+            }
+          },
+          {
+            "question_id": "demo_visual_q_2",
+            "mock_id": "mock_visual_demonstration_ssc_cgl",
+            "question_number": 2,
+            "section_name": "Quantitative Aptitude - Geometry",
+            "question_text": "In right-angled triangle ABC, ∠B = 90°. If AB = 6 cm and BC = 8 cm, an altitude BD is drawn perpendicular to hypotenuse AC. Calculate the length of hypotenuse AC.",
+            "options": [
+              "10 cm",
+              "12 cm",
+              "14 cm",
+              "9 cm"
+            ],
+            "correct_option_index": 0,
+            "explanation": "In △ABC right-angled at B, by Pythagoras Theorem: AC² = AB² + BC² = 6² + 8² = 36 + 64 = 100. Therefore, AC = 10 cm.",
+            "topic": "Geometry - Triangles",
+            "difficulty": "MEDIUM",
+            "canonical_hash": "hash_2_1789013642369",
+            "source_reference": "State PSC & SSC CGL Higher Mathematics - Triangle Geometry",
+            "candidate_status": "ACCEPTED",
+            "visual_specification": {
+              "visual_type": "GEOMETRY",
+              "svg_content": "<svg viewBox=\"0 0 400 260\" xmlns=\"http://www.w3.org/2000/svg\" className=\"w-full max-w-md mx-auto\">\n  <rect width=\"100%\" height=\"100%\" fill=\"#FFFFFF\" />\n\n  <!-- Triangle ABC -->\n  <polygon points=\"80,50 80,200 320,200\" fill=\"#F8FAFC\" stroke=\"#0F172A\" stroke-width=\"2.5\" />\n\n  <!-- Right Angle mark at B -->\n  <rect x=\"80\" y=\"180\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"#0F172A\" stroke-width=\"1.5\" />\n\n  <!-- Vertex Points and Labels -->\n  <circle cx=\"80\" cy=\"50\" r=\"3.5\" fill=\"#0F172A\" />\n  <text x=\"75\" y=\"38\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"15\" font-weight=\"bold\" fill=\"#020617\">A</text>\n\n  <circle cx=\"80\" cy=\"200\" r=\"3.5\" fill=\"#0F172A\" />\n  <text x=\"60\" y=\"215\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"15\" font-weight=\"bold\" fill=\"#020617\">B</text>\n\n  <circle cx=\"320\" cy=\"200\" r=\"3.5\" fill=\"#0F172A\" />\n  <text x=\"330\" y=\"215\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"15\" font-weight=\"bold\" fill=\"#020617\">C</text>\n\n  <!-- Side Labels -->\n  <text x=\"50\" y=\"130\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"13\" font-style=\"italic\" fill=\"#020617\">6 cm</text>\n  <text x=\"195\" y=\"222\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"13\" font-style=\"italic\" fill=\"#020617\">8 cm</text>\n  <text x=\"215\" y=\"115\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"13\" font-style=\"italic\" fill=\"#020617\">AC</text>\n\n  \n  <!-- Altitude BD perpendicular to AC -->\n  <line x1=\"80\" y1=\"200\" x2=\"160\" y2=\"100\" stroke=\"#0F172A\" stroke-width=\"2\" stroke-dasharray=\"4 3\" />\n  <circle cx=\"160\" cy=\"100\" r=\"3\" fill=\"#0F172A\" />\n  <text x=\"165\" y=\"92\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"14\" font-weight=\"bold\" fill=\"#020617\">D</text>\n  \n</svg>",
+              "alt_text": "Geometry diagram of right-angled triangle ABC with vertices labeled.",
+              "is_grayscale": true,
+              "figure_caption": "Figure: Right-Angled Triangle ABC",
+              "answer_dependency": true,
+              "dimensions": {
+                "width": 400,
+                "height": 260
+              }
+            }
+          },
+          {
+            "question_id": "demo_visual_q_3",
+            "mock_id": "mock_visual_demonstration_ssc_cgl",
+            "question_number": 3,
+            "section_name": "General Intelligence & Reasoning",
+            "question_text": "In a survey of 100 students, refer to the Venn diagram representing students who play Cricket (Set A) and Football (Set B). What does the shaded region A ∩ B signify?",
+            "options": [
+              "Students who play both Cricket and Football",
+              "Students who play only Cricket",
+              "Students who play only Football",
+              "Students who play neither sport"
+            ],
+            "correct_option_index": 0,
+            "explanation": "In standard set theory and Venn diagram notation, the intersection region A ∩ B represents the subset of elements that belong concurrently to both Set A and Set B.",
+            "topic": "Logical Reasoning - Venn Diagrams",
+            "difficulty": "MEDIUM",
+            "canonical_hash": "hash_3_1789013642371",
+            "source_reference": "Standard Analytical Reasoning - Categorical Logic",
+            "candidate_status": "ACCEPTED",
+            "visual_specification": {
+              "visual_type": "VENN",
+              "svg_content": "<svg viewBox=\"0 0 420 240\" xmlns=\"http://www.w3.org/2000/svg\" className=\"w-full max-w-md mx-auto\">\n  <defs>\n    <pattern id=\"hatch2\" width=\"6\" height=\"6\" patternTransform=\"rotate(45 0 0)\" patternUnits=\"userSpaceOnUse\">\n      <line x1=\"0\" y1=\"0\" x2=\"0\" y2=\"6\" stroke=\"#0F172A\" stroke-width=\"1.5\" />\n    </pattern>\n  </defs>\n  <rect width=\"100%\" height=\"100%\" fill=\"#FFFFFF\" />\n  <!-- Universal Box -->\n  <rect x=\"20\" y=\"15\" width=\"380\" height=\"210\" fill=\"none\" stroke=\"#0F172A\" stroke-width=\"2\" rx=\"6\" />\n  <text x=\"35\" y=\"40\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"14\" font-weight=\"bold\" fill=\"#020617\">U</text>\n\n  <!-- Left Circle A -->\n  <circle cx=\"165\" cy=\"120\" r=\"75\" fill=\"#F8FAFC\" stroke=\"#0F172A\" stroke-width=\"2.5\" />\n  <!-- Right Circle B -->\n  <circle cx=\"255\" cy=\"120\" r=\"75\" fill=\"none\" stroke=\"#0F172A\" stroke-width=\"2.5\" />\n\n  <!-- Shaded Intersection -->\n  <text x=\"110\" y=\"80\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"14\" font-weight=\"bold\" fill=\"#020617\">Set A</text>\n  <text x=\"270\" y=\"80\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"14\" font-weight=\"bold\" fill=\"#020617\">Set B</text>\n  <text x=\"210\" y=\"125\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"12\" font-style=\"italic\" fill=\"#64748B\" text-anchor=\"middle\">A ∩ B</text>\n</svg>",
+              "alt_text": "Venn diagram representing overlapping categorical sets with shaded intersection.",
+              "is_grayscale": true,
+              "figure_caption": "Figure: 2-Set Venn Diagram (A ∩ B)",
+              "answer_dependency": true,
+              "dimensions": {
+                "width": 420,
+                "height": 240
+              }
+            }
+          },
+          {
+            "question_id": "demo_visual_q_4",
+            "mock_id": "mock_visual_demonstration_ssc_cgl",
+            "question_number": 4,
+            "section_name": "Quantitative Aptitude - Data Interpretation",
+            "question_text": "Study the following bar chart representing the annual production of motor vehicles (in thousands) from 2019 to 2023. In which year was the vehicle production the highest?",
+            "options": [
+              "2022 (90,000 units)",
+              "2023 (80,000 units)",
+              "2020 (75,000 units)",
+              "2021 (60,000 units)"
+            ],
+            "correct_option_index": 0,
+            "explanation": "From the bar chart data: 2019 = 55k, 2020 = 75k, 2021 = 60k, 2022 = 90k, 2023 = 80k. The maximum peak corresponds to the year 2022 with 90,000 units.",
+            "topic": "Data Interpretation - Bar Graph",
+            "difficulty": "MEDIUM",
+            "canonical_hash": "hash_4_1789013642372",
+            "source_reference": "Quantitative Aptitude - Commission Data Interpretation Standards",
+            "candidate_status": "ACCEPTED",
+            "visual_specification": {
+              "visual_type": "BAR_CHART",
+              "svg_content": "<svg viewBox=\"0 0 440 260\" xmlns=\"http://www.w3.org/2000/svg\" className=\"w-full max-w-md mx-auto\">\n  <rect width=\"100%\" height=\"100%\" fill=\"#FFFFFF\" />\n  <text x=\"220\" y=\"24\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"13\" font-weight=\"bold\" fill=\"#020617\" text-anchor=\"middle\">Performance & Production Statistics</text>\n  \n      <line x1=\"60\" y1=\"210\" x2=\"400\" y2=\"210\" stroke=\"#E2E8F0\" stroke-width=\"1\" stroke-dasharray=\"3 3\" />\n      <text x=\"52\" y=\"214\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"10\" fill=\"#64748B\" text-anchor=\"end\">0</text>\n    \n      <line x1=\"60\" y1=\"170\" x2=\"400\" y2=\"170\" stroke=\"#E2E8F0\" stroke-width=\"1\" stroke-dasharray=\"3 3\" />\n      <text x=\"52\" y=\"174\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"10\" fill=\"#64748B\" text-anchor=\"end\">25</text>\n    \n      <line x1=\"60\" y1=\"130\" x2=\"400\" y2=\"130\" stroke=\"#E2E8F0\" stroke-width=\"1\" stroke-dasharray=\"3 3\" />\n      <text x=\"52\" y=\"134\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"10\" fill=\"#64748B\" text-anchor=\"end\">50</text>\n    \n      <line x1=\"60\" y1=\"90\" x2=\"400\" y2=\"90\" stroke=\"#E2E8F0\" stroke-width=\"1\" stroke-dasharray=\"3 3\" />\n      <text x=\"52\" y=\"94\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"10\" fill=\"#64748B\" text-anchor=\"end\">75</text>\n    \n      <line x1=\"60\" y1=\"50\" x2=\"400\" y2=\"50\" stroke=\"#E2E8F0\" stroke-width=\"1\" stroke-dasharray=\"3 3\" />\n      <text x=\"52\" y=\"54\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"10\" fill=\"#64748B\" text-anchor=\"end\">100</text>\n    \n  <!-- Axes -->\n  <line x1=\"60\" y1=\"35\" x2=\"60\" y2=\"210\" stroke=\"#0F172A\" stroke-width=\"2\" />\n  <line x1=\"60\" y1=\"210\" x2=\"415\" y2=\"210\" stroke=\"#0F172A\" stroke-width=\"2\" />\n  \n      <rect x=\"76\" y=\"122\" width=\"36\" height=\"88\" fill=\"#0F172A\" stroke=\"#0F172A\" stroke-width=\"1.5\" rx=\"2\" />\n      <text x=\"94\" y=\"116\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"11\" font-weight=\"bold\" fill=\"#020617\" text-anchor=\"middle\">55</text>\n      <text x=\"94\" y=\"228\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"11\" fill=\"#020617\" text-anchor=\"middle\">2019</text>\n    \n      <rect x=\"144\" y=\"90\" width=\"36\" height=\"120\" fill=\"#E2E8F0\" stroke=\"#0F172A\" stroke-width=\"1.5\" rx=\"2\" />\n      <text x=\"162\" y=\"84\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"11\" font-weight=\"bold\" fill=\"#020617\" text-anchor=\"middle\">75</text>\n      <text x=\"162\" y=\"228\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"11\" fill=\"#020617\" text-anchor=\"middle\">2020</text>\n    \n      <rect x=\"212\" y=\"114\" width=\"36\" height=\"96\" fill=\"#0F172A\" stroke=\"#0F172A\" stroke-width=\"1.5\" rx=\"2\" />\n      <text x=\"230\" y=\"108\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"11\" font-weight=\"bold\" fill=\"#020617\" text-anchor=\"middle\">60</text>\n      <text x=\"230\" y=\"228\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"11\" fill=\"#020617\" text-anchor=\"middle\">2021</text>\n    \n      <rect x=\"280\" y=\"66\" width=\"36\" height=\"144\" fill=\"#E2E8F0\" stroke=\"#0F172A\" stroke-width=\"1.5\" rx=\"2\" />\n      <text x=\"298\" y=\"60\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"11\" font-weight=\"bold\" fill=\"#020617\" text-anchor=\"middle\">90</text>\n      <text x=\"298\" y=\"228\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"11\" fill=\"#020617\" text-anchor=\"middle\">2022</text>\n    \n      <rect x=\"348\" y=\"82\" width=\"36\" height=\"128\" fill=\"#0F172A\" stroke=\"#0F172A\" stroke-width=\"1.5\" rx=\"2\" />\n      <text x=\"366\" y=\"76\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"11\" font-weight=\"bold\" fill=\"#020617\" text-anchor=\"middle\">80</text>\n      <text x=\"366\" y=\"228\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"11\" fill=\"#020617\" text-anchor=\"middle\">2023</text>\n    \n  <text transform=\"rotate(-90)\" x=\"-130\" y=\"18\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"10\" fill=\"#64748B\" text-anchor=\"middle\">Units in Thousands</text>\n  <text x=\"230\" y=\"252\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"11\" fill=\"#64748B\" text-anchor=\"middle\">Fiscal Years</text>\n</svg>",
+              "alt_text": "Data Interpretation bar chart showing production statistics across five fiscal years.",
+              "is_grayscale": true,
+              "figure_caption": "Figure: Production Statistics (in Thousands) 2019-2023",
+              "answer_dependency": true,
+              "dimensions": {
+                "width": 440,
+                "height": 260
+              }
+            }
+          },
+          {
+            "question_id": "demo_visual_q_5",
+            "mock_id": "mock_visual_demonstration_ssc_cgl",
+            "question_number": 5,
+            "section_name": "General Intelligence & Reasoning",
+            "question_text": "Which of the following represents the correct mirror image of the given letter-digit combination across mirror line MN?",
+            "options": [
+              "Lateral inversion with reversed glyph ordering",
+              "Vertical inversion with inverted glyphs",
+              "Unchanged orientation",
+              "Rotated 90 degrees clockwise"
+            ],
+            "correct_option_index": 0,
+            "explanation": "A vertical mirror line MN induces lateral inversion where left and right components are interchanged while maintaining vertical uprightness.",
+            "topic": "Non-Verbal Reasoning - Reflection",
+            "difficulty": "MEDIUM",
+            "canonical_hash": "hash_5_1789013642372",
+            "source_reference": "Staff Selection Commission Non-Verbal Reasoning Guidelines",
+            "candidate_status": "ACCEPTED",
+            "visual_specification": {
+              "visual_type": "REASONING_FIGURE",
+              "svg_content": "<svg viewBox=\"0 0 380 180\" xmlns=\"http://www.w3.org/2000/svg\" className=\"w-full max-w-md mx-auto\">\n  <rect width=\"100%\" height=\"100%\" fill=\"#FFFFFF\" />\n  <!-- Original Box -->\n  <rect x=\"30\" y=\"35\" width=\"130\" height=\"90\" fill=\"#F8FAFC\" stroke=\"#0F172A\" stroke-width=\"2\" rx=\"4\" />\n  <text x=\"95\" y=\"88\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"28\" font-weight=\"bold\" fill=\"#020617\" text-anchor=\"middle\">the given letter</text>\n  <text x=\"95\" y=\"145\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"11\" font-weight=\"bold\" fill=\"#64748B\" text-anchor=\"middle\">Object</text>\n\n  <!-- Mirror Line MN -->\n  <line x1=\"190\" y1=\"20\" x2=\"190\" y2=\"160\" stroke=\"#0F172A\" stroke-width=\"2.5\" stroke-dasharray=\"5 3\" />\n  <text x=\"190\" y=\"15\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"12\" font-weight=\"bold\" fill=\"#020617\" text-anchor=\"middle\">M</text>\n  <text x=\"190\" y=\"175\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"12\" font-weight=\"bold\" fill=\"#020617\" text-anchor=\"middle\">N</text>\n\n  <!-- Question Mark / Mirror Target Box -->\n  <rect x=\"220\" y=\"35\" width=\"130\" height=\"90\" fill=\"#F8FAFC\" stroke=\"#0F172A\" stroke-width=\"2\" stroke-dasharray=\"4 2\" rx=\"4\" />\n  <text x=\"285\" y=\"90\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"36\" font-weight=\"bold\" fill=\"#94A3B8\" text-anchor=\"middle\">?</text>\n  <text x=\"285\" y=\"145\" font-family=\"system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif\" font-size=\"11\" font-weight=\"bold\" fill=\"#64748B\" text-anchor=\"middle\">Mirror Image</text>\n</svg>",
+              "alt_text": "Non-verbal reasoning diagram showing object the given letter and mirror line MN.",
+              "is_grayscale": true,
+              "figure_caption": "Figure: Mirror Reflection across Line MN",
+              "answer_dependency": true,
+              "dimensions": {
+                "width": 380,
+                "height": 180
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "duplicates_prevented_count": 0
+  },
+  {
     "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3",
     "exam_id": "tgpsc_group_2_paper_1",
     "exam_title": "TGPSC Group-II Services: Paper I (General Studies & General Abilities)",
