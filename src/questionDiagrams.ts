@@ -86,7 +86,7 @@ export function renderQuestionDiagram(spec:QuestionDiagram,stem?:string):VisualS
     // the only numeric labels come from the question's structured values.
     const angle=spec.angle*Math.PI/180;
     const leftX=302,leftTop=112,bottomY=318,joinX=362,joinY=278,rightX=505,rightY=92;
-    const outer=`M${leftX} ${leftTop}V258 Q${leftX} ${bottomY} ${leftX+38} ${bottomY} Q${leftX+62} ${bottomY} ${leftX+78} ${bottomY-30} L${rightX} ${rightY} H570`;
+    const outer=`M45 ${leftTop}H${leftX}V258 Q${leftX} ${bottomY} ${leftX+38} ${bottomY} Q${leftX+62} ${bottomY} ${leftX+78} ${bottomY-30} L${rightX} ${rightY} H570`;
     const fluid=`M${leftX} 244 V258 Q${leftX} 298 ${leftX+38} 298 Q${leftX+51} 298 ${leftX+64} 275 L405 222`;
     const arrow=(x1:number,y1:number,x2:number,y2:number)=>line(x1,y1,x2,y2,'stroke="#111" stroke-width="3" marker-end="url(#arrow)"');
     const dimA=[395,214],dimB=[478,108];
@@ -96,7 +96,7 @@ export function renderQuestionDiagram(spec:QuestionDiagram,stem?:string):VisualS
       `<path d="${outer}" fill="none" stroke="#fff" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>`+
       `<path d="${fluid}" fill="none" stroke="#b7b7b7" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>`+
       `<path d="${fluid}" fill="none" stroke="url(#manometerHatch)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>`+
-      `<ellipse cx="${leftX}" cy="${leftTop}" rx="17" ry="10" fill="#fff" stroke="#111" stroke-width="2"/>`+
+      `<ellipse cx="45" cy="${leftTop}" rx="17" ry="10" fill="#fff" stroke="#111" stroke-width="2"/>`+
       `<ellipse cx="${rightX}" cy="${rightY}" rx="17" ry="10" fill="#fff" stroke="#111" stroke-width="2"/>`+
       arrow(105,112,220,112)+arrow(530,92,570,92)+
       line(280,datumY,545,datumY,'stroke="#777" stroke-width="1.5" stroke-dasharray="6 5"')+
