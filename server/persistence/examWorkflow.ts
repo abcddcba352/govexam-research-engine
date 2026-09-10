@@ -1,12 +1,26 @@
 import { examContext } from '../examContext.ts';
 import { getPersistenceBackend, getRepositoryRegistry } from './index.ts';
 
+const transientReadError = (error: unknown) => /SUPABASE_.*(QUERY|UPsert)|fetch failed|network|timeout|timed out|\b5(?:02|03|04)\b|connection reset|resource limit/i.test(String((error as any)?.message || error));
+
+async function readWorkflowSnapshot(repository: ReturnType<typeof getRepositoryRegistry>) {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      return await Promise.all([repository.exams.getExams(), repository.sources.getSources()]);
+    } catch (error) {
+      lastError = error;
+      if (attempt === 2 || !transientReadError(error)) throw error;
+      await new Promise(resolve => setTimeout(resolve, attempt === 0 ? 150 : 500));
+    }
+  }
+  throw lastError;
+}
+
 export async function withExamWorkflow<T>(work: () => T | Promise<T>): Promise<T> {
   if (getPersistenceBackend() !== 'DATABASE') return work();
   const repository = getRepositoryRegistry();
-  const [exams, sources] = await Promise.all([
-    repository.exams.getExams(), repository.sources.getSources(),
-  ]);
+  const [exams, sources] = await readWorkflowSnapshot(repository);
   const before = new Map(exams.map(exam => [exam.exam_id, JSON.stringify(exam)]));
   const sourceIds = new Set(sources.map(source => source.source_id));
   return examContext.run({ exams, sources }, async () => {

@@ -9,6 +9,21 @@ import type { SubjectPublisher } from './subjectPublishers.ts';
 
 export function subjectLinks(html:string,url:string,publisher:SubjectPublisher):DiscoveryLink[] {
   if(publisher.mode==='REFERENCE') return [{url,title:publisher.name,publisher:url}];
+  if(publisher.id==='mea') {
+    const found:DiscoveryLink[]=[]; const host=new URL(url).hostname.replace(/^www\./,'');
+    for(const m of html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)) {
+      try {
+        const href=attributes(m[1]).href;if(!href) continue;const link=new URL(href,url);
+        if(link.hostname.replace(/^www\./,'')!==host || !/^\/press-releases\?dtl\/\d+/i.test(link.pathname+link.search)) continue;
+        const title=textFromHtml(m[2]).replace(/\s+/g,' ').trim();
+        if(title.length<20 || (publisher.title_filter&&!publisher.title_filter.test(title)) || found.some(x=>x.url===link.href)) continue;
+        const context=html.slice(Math.max(0,m.index-900),m.index);
+        const publication_date=parsePublicationDate(context.match(/<span\b[^>]*class=["'][^"']*date[^"']*["'][^>]*>([^<]+)<\/span>/i)?.[1]);
+        found.push({url:link.href,title,publisher:url,publication_date});
+      } catch {/* Reject malformed destinations. */}
+    }
+    return found.slice(0,50);
+  }
   if(publisher.mode!=='ICC_NEWS') return parsePublisherLinks(html,url).filter(l=>!publisher.title_filter||publisher.title_filter.test(l.title));
   const found:DiscoveryLink[]=[];
   for(const m of html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)) {
@@ -26,7 +41,15 @@ export async function discoverSubjectLinks(publisher:SubjectPublisher,fetcher:ty
   if(publisher.mode==='UNAVAILABLE') throw Error(publisher.note);
   if(publisher.mode==='REFERENCE') return subjectLinks('',publisher.url,publisher);
   const page=await readPublic(publisher.url,{fetcher,maxBytes:1_000_000,timeoutMs:8000,allowUrl:allowedPublisher});
-  const links=subjectLinks(page.text(),page.url,publisher);
+  let discoveryText=page.text();
+  let discoveryUrl=page.url;
+  if(publisher.id==='mea') {
+    const listing=new URL('/FrontEnd/FetchPublicationListingData',page.url);
+    listing.searchParams.set('publicationId','51'); listing.searchParams.set('page','1'); listing.searchParams.set('PageSize','20'); listing.searchParams.set('PLngId','1');
+    const response=await readPublic(listing.href,{fetcher,maxBytes:1_000_000,timeoutMs:8000,allowUrl:allowedPublisher});
+    discoveryText=response.text(); discoveryUrl=page.url;
+  }
+  const links=subjectLinks(discoveryText,discoveryUrl,publisher);
   if(!links.length) throw Error('NO_READABLE_LINKS: publisher coverage is incomplete.');
   // Favor results/records and substantive scheme changes over previews or praise.
   const priority=(title:string)=>(/\b(record|champion|winner|won|medal|ranking|award|guideline|eligibility|cabinet|scheme)\b/i.test(title)?3:0)+(/\bindia\b/i.test(title)?1:0)-(/preview|praise|excited|speech/i.test(title)?2:0);
@@ -69,12 +92,43 @@ export function extractSpecialEvidence(html:string,url:string,publisher:SubjectP
     if(!about) throw Error('PM-KISAN scheme description was not found.');
     return {title:'PM-KISAN: scheme description and exclusions',text:textFromHtml(about+' '+(exclusions||''))};
   }
+  if(publisher.id==='mea') {
+    const body=contentBlock(html,/<div\b[^>]*class=["'][^"']*pressReleaseContent[^"']*["'][^>]*>/i,'div');
+    if(!body) throw Error('MEA press-release detail was not found.');
+    const title=textFromHtml(body.match(/<h2\b[^>]*class=["'][^"']*titleText[^"']*["'][^>]*>([\s\S]*?)<\/h2>/i)?.[1]||publisher.name);
+    const rawDate=body.match(/<span\b[^>]*class=["'][^"']*date[^"']*["'][^>]*>([^<]+)<\/span>/i)?.[1];
+    const text=textFromHtml(body.replace(/<(nav|header|footer|script|style)\b[^>]*>[\s\S]*?<\/\1>/gi,' '));
+    return {title,text,publication_date:parsePublicationDate(rawDate)};
+  }
+  if(['moefcc','ndma','culture-ministry'].includes(publisher.id)) {
+    // These are reference pages, so deliberately strip navigation and select
+    // the publisher's content container before accepting any text. A broad
+    // body fallback is intentionally avoided: menus and cookie banners must
+    // never become evidence.
+    const selectors:Record<string,RegExp[]>={
+      moefcc:[/<div\b[^>]*class=["'][^"']*page-content[^"']*["'][^>]*>/i,/<div\b[^>]*class=["'][^"']*contentArea[^"']*["'][^>]*>/i],
+      ndma:[/<div\b[^>]*id=["']main-content["'][^>]*>/i,/<div\b[^>]*class=["'][^"']*about-content[^"']*["'][^>]*>/i],
+      'culture-ministry':[/<div\b[^>]*id=["']content["'][^>]*>/i,/<div\b[^>]*class=["'][^"']*view-content[^"']*["'][^>]*>/i],
+    };
+    const block=selectors[publisher.id].map(selector=>contentBlock(html,selector,'div')||contentBlock(html,selector,'main')).find(Boolean);
+    if(!block) throw Error('Reference content block was not found.');
+    const text=textFromHtml(block.replace(/<(nav|header|footer|script|style)\b[^>]*>[\s\S]*?<\/\1>/gi,' '));
+    if(text.length<160) throw Error('Reference page returned no substantive content.');
+    return {title:publisher.name,text:text.slice(0,30000)};
+  }
   return undefined;
 }
 export async function collectSubjectEvidence(publisher:SubjectPublisher,url:string,fetcher:typeof fetch=fetch):Promise<ResearchEvidence> {
   let article;
-  if(['icc','pmkisan','fide','pmindia-schemes','india-geography','telangana-profile','ap-district-profile'].includes(publisher.id)) {
-    const page=await readPublic(url,{fetcher,maxBytes:1_000_000,timeoutMs:8000,allowUrl:allowedPublisher});
+  if(['icc','pmkisan','fide','pmindia-schemes','india-geography','telangana-profile','ap-district-profile','moefcc','ndma','culture-ministry','mea'].includes(publisher.id)) {
+    const sourceTimeout=publisher.id==='ndma'?20000:8000;
+    let page=await readPublic(url,{fetcher,maxBytes:1_000_000,timeoutMs:sourceTimeout,allowUrl:allowedPublisher});
+    if(publisher.id==='mea') {
+      const id=`${new URL(page.url).pathname}${new URL(page.url).search}`.match(/\?dtl\/(\d+)/i)?.[1];
+      if(!id) throw Error('MEA press-release detail id was not found.');
+      const detail=new URL('/FrontEnd/FetchPublicationDetailData',page.url);detail.searchParams.set('pkid',id);detail.searchParams.set('languageId','1');
+      page=await readPublic(detail.href,{fetcher,maxBytes:1_000_000,timeoutMs:sourceTimeout,allowUrl:allowedPublisher});
+    }
     if(new URL(page.url).hostname.replace(/^www\./,'')!==new URL(publisher.url).hostname.replace(/^www\./,'')) throw Error('Publisher redirected to a different authority.');
     const extracted=extractSpecialEvidence(page.text(),page.url,publisher)!;
     article={...extracted,url:page.url,requested_url:url,retrieved_at:new Date().toISOString(),content_hash:''};

@@ -190,7 +190,9 @@ export default function App() {
           setErrorMsg("The AI quota is unavailable. Direct, PDF, archive, PYQ, and source-discovery results are still shown; unsupported fields remain blocked.");
           return;
         }
-        throw new Error("Research execution failed on server");
+        const errData = await runRes.json().catch(() => ({} as any));
+        const errMsg = errData.error || (runRes.status === 503 ? "The research service is temporarily unavailable. Please retry." : `Research execution failed on server (HTTP ${runRes.status})`);
+        throw new Error(errMsg);
       }
 
       const runData: ResearchRunLog = await runRes.json();

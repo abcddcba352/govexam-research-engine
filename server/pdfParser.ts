@@ -3,7 +3,105 @@
  * Parses official notification and syllabus PDFs published by government exam commissions.
  */
 
+import zlib from 'node:zlib';
+
 let PDFParseClass: any = null;
+
+function unescapePdfStr(str: string): string {
+  return str
+    .replace(/\\n/g, '\n')
+    .replace(/\\r/g, '\r')
+    .replace(/\\t/g, '\t')
+    .replace(/\\b/g, '\b')
+    .replace(/\\f/g, '\f')
+    .replace(/\\\(/g, '(')
+    .replace(/\\\)/g, ')')
+    .replace(/\\\\/g, '\\')
+    .replace(/\\([0-7]{1,3})/g, (_, oct) => {
+      const code = parseInt(oct, 8);
+      return code === 0 ? '' : String.fromCharCode(code);
+    })
+    .replace(/\0/g, '')
+    .replace(/\\u0000/g, '');
+}
+
+/**
+ * Ultra-fast native stream PDF text extraction.
+ * Extracts font strings and decompresses Flate streams in ~1-3ms CPU time,
+ * completely avoiding heavy Canvas/DOMMatrix polyfills and CPU exhaustion.
+ */
+export function fastExtractPdfText(buffer: ArrayBuffer | Uint8Array | Buffer): ParsedPdfResult | null {
+  try {
+    const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+    const latin1 = Buffer.from(bytes).toString('latin1');
+
+    const pageMatches = latin1.match(/\/Type\s*\/Page\b/g);
+    const page_count = pageMatches ? pageMatches.length : 1;
+
+    let extractedText = '';
+
+    const streamRegex = /stream\r?\n([\s\S]*?)\r?\nendstream/g;
+    let match: RegExpExecArray | null;
+    let streamCount = 0;
+
+    while ((match = streamRegex.exec(latin1)) !== null && streamCount < 100 && extractedText.length < 250000) {
+      streamCount++;
+      const streamData = match[1];
+      let decompressed = streamData;
+
+      const objHeader = latin1.substring(Math.max(0, match.index - 400), match.index);
+      if (/\/Filter\s*(?:\[\s*)?\/FlateDecode/i.test(objHeader)) {
+        try {
+          const rawBuf = Buffer.from(streamData, 'latin1');
+          decompressed = zlib.inflateSync(rawBuf).toString('latin1');
+        } catch {
+          try {
+            const rawBuf = Buffer.from(streamData, 'latin1');
+            decompressed = zlib.inflateRawSync(rawBuf).toString('latin1');
+          } catch {
+            // Keep streamData as is
+          }
+        }
+      }
+
+      // 1. Extract array strings: [(str1) 12 (str2)] TJ
+      const tjArrayRegex = /\[([\s\S]*?)\]\s*TJ/g;
+      let tjMatch: RegExpExecArray | null;
+      while ((tjMatch = tjArrayRegex.exec(decompressed)) !== null) {
+        const inner = tjMatch[1];
+        const strMatches = inner.match(/\((?:[^\\)]|\\.)*\)/g);
+        if (strMatches) {
+          const line = strMatches.map(s => unescapePdfStr(s.slice(1, -1))).join('');
+          if (line.trim()) extractedText += line + ' ';
+        }
+      }
+
+      // 2. Direct strings: (string) Tj or ' string or " string
+      const tjDirectRegex = /\(((?:[^\\)]|\\.)*)\)\s*(?:Tj|'|")/g;
+      let dirMatch: RegExpExecArray | null;
+      while ((dirMatch = tjDirectRegex.exec(decompressed)) !== null) {
+        const line = unescapePdfStr(dirMatch[1]);
+        if (line.trim()) extractedText += line + '\n';
+      }
+    }
+
+    const cleaned = extractedText
+      .replace(/\0/g, '')
+      .replace(/\\u0000/g, '')
+      .replace(/\r\n/g, '\n')
+      .replace(/\t/g, ' ')
+      .replace(/ +/g, ' ')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+
+    if (cleaned.length >= 20) {
+      return { text: cleaned, page_count, success: true };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
 
 function ensureWorkerDomMatrix() {
   if (typeof (globalThis as any).DOMMatrix !== 'undefined') return;
@@ -54,6 +152,30 @@ export interface ParsedPdfResult {
  * Extracts clean structured text from a binary PDF buffer
  */
 export async function extractPdfText(buffer: ArrayBuffer | Uint8Array | Buffer): Promise<ParsedPdfResult> {
+  // 1. First, attempt ultra-fast stream extraction (~1-2ms CPU time, zero canvas/browser polyfills)
+  const fast = fastExtractPdfText(buffer);
+  if (fast && fast.success) {
+    return fast;
+  }
+
+  // 2. Guard against heavy pdfjs-dist execution inside Cloudflare Workers
+  // Cloudflare Workers has a strict 50ms CPU limit. In this environment, pdfjs-dist
+  // takes >1800ms of CPU time to parse fonts/canvas and will trigger an immediate Worker crash (503).
+  const isCloudflare = typeof (globalThis as any).WebSocketPair !== 'undefined' ||
+    process.env.APP_ENV === 'staging' ||
+    process.env.ENVIRONMENT === 'staging' ||
+    Boolean(process.env.CF_PAGES || process.env.WORKERS_ENV) ||
+    !process.versions?.node;
+
+  if (isCloudflare) {
+    return {
+      text: '',
+      page_count: 0,
+      success: false,
+      error: 'PDF_REQUIRES_OCR_OR_UNSUPPORTED_ENCODING',
+    };
+  }
+
   let parser: any;
   try {
     const Cls: any = await getPDFParseClass();

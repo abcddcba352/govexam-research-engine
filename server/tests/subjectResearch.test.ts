@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildCoverage,subjectsForExam } from '../../src/researchCoverage.ts';
 import { getSubjectPublisher } from '../subjectPublishers.ts';
-import { subjectLinks,collectSubjectEvidence,evidenceSource,extractSpecialEvidence } from '../subjectResearch.ts';
+import { subjectLinks,discoverSubjectLinks,collectSubjectEvidence,evidenceSource,extractSpecialEvidence } from '../subjectResearch.ts';
 import { runCloudResearch,emptyResearchState,choosePublisher } from '../cloudResearch.ts';
 import { allowedPublisher } from '../currentAffairsService.ts';
 const exam:any={exam_id:'ssc',syllabus_topics:['Constitutional amendments'],pattern:{sections:['General Awareness (25 Qs / 50 Marks)','Quantitative Aptitude (25 Qs / 50 Marks)','English Comprehension']}};
@@ -32,6 +32,31 @@ test('PM-KISAN extraction retains scheme and exclusions without portal navigatio
  const html=`<nav>Login and view beneficiary personal details</nav><div id="About"><h2>PM-KISAN Scheme</h2><div>${text}</div></div><div id="SchemeExclusion">Excluded categories must be reviewed.</div>`;
  const e=await collectSubjectEvidence(getSubjectPublisher('pmkisan')!,'https://www.pmkisan.gov.in/',(async()=>new Response(html)) as typeof fetch);
  assert.ok(e.text.includes('Excluded'));assert.ok(!e.text.includes('Login'));assert.equal(e.publication_date,undefined);assert.equal(e.kind,'REFERENCE');
+});
+test('official reference adapters keep navigation out of environment, polity and history evidence',async()=>{
+ const pages:any={
+  moefcc:`<header>Menu</header><div class="page-content"><h1>Environment policy</h1><p>Protected areas and biodiversity conservation are administered under the national environmental framework. The ministry publishes policy material on forests, wildlife, climate action, pollution control and sustainable development for public reference.</p></div><footer>Contact</footer>`,
+  ndma:`<nav>Home Login</nav><div id="main-content"><div class="about-content"><h1>Disaster management</h1><p>Preparedness, mitigation and coordinated response reduce disaster risk and vulnerability. National guidance covers risk assessment, early warning, resilient infrastructure, emergency response and recovery planning across hazards.</p></div></div>`,
+  'culture-ministry':`<div id="content"><nav>Navigation</nav><h1>Indian cultural heritage</h1><p>Official cultural institutions preserve tangible and intangible heritage through documented programmes. The ministry maintains reference material about museums, performing arts, literature, monuments, festivals and cultural institutions for public education.</p></div>`,
+ };
+ for(const id of Object.keys(pages)) {
+  const publisher=getSubjectPublisher(id)!;
+  const e=await collectSubjectEvidence(publisher,publisher.url,(async()=>new Response(pages[id],{headers:{'content-type':'text/html'}})) as typeof fetch);
+  assert.ok(e.text.length>100);assert.ok(!/Menu|Login|Navigation|Contact/.test(e.text));assert.equal(e.kind,'REFERENCE');assert.equal(e.publication_date,undefined);
+ }
+});
+test('MEA discovery accepts only first-party press-release detail links',()=>{
+ const publisher=getSubjectPublisher('mea')!;
+ const html=`<a href="/press-releases?dtl/34086/">India and partner countries sign a bilateral agreement</a><a href="/press-releases">Archive</a><a href="https://evil.example/press-releases?dtl/1">Foreign</a>`;
+ assert.deepEqual(subjectLinks(html,publisher.url,publisher).map(l=>l.url),['https://www.mea.gov.in/press-releases?dtl/34086/']);
+});
+test('MEA collection follows the bounded detail endpoint and keeps the publication date',async()=>{
+ const publisher=getSubjectPublisher('mea')!;
+ const listing=`<a href="/press-releases?dtl/41754/visit">Bilateral visit and international talks</a>`;
+ const detail=`<div class="pressReleaseContent"><span class="date">09 September, 2026</span><h2 class="titleText">Bilateral visit and international talks</h2><div class="description"><p>Officials held international talks and recorded the announced visit schedule for public reference.</p></div></div>`;
+ const fetcher=(async(url:any)=>new Response(String(url).includes('FetchPublicationListingData')?listing:detail,{headers:{'content-type':'text/html'}})) as typeof fetch;
+ const links=await discoverSubjectLinks(publisher,fetcher);const e=await collectSubjectEvidence(publisher,links[0].url,fetcher);
+ assert.equal(e.publication_date,'2026-09-09');assert.ok(e.text.includes('international talks'));assert.equal(e.kind,'CURRENT');
 });
 test('scheme and FIDE article dates cannot come from related article cards',()=>{
  const pm='<h1>PMINDIA</h1><div class="content-block"><h2>New scheme guidelines</h2><span class="date">08 Sep, 2026</span><p>Scheme text</p></div><span class="list-date">10 Sep, 2026</span>';

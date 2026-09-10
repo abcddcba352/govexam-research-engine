@@ -35,6 +35,23 @@ import {
 import { getSupabaseClient } from '../supabaseClient.ts';
 import { computeCanonicalQuestionHash } from '../../dbService.ts';
 
+export function sanitizePgData<T>(data: T): T {
+  if (typeof data === 'string') {
+    return data.replace(/\0/g, '').replace(/\\u0000/g, '') as any;
+  }
+  if (Array.isArray(data)) {
+    return data.map(sanitizePgData) as any;
+  }
+  if (data && typeof data === 'object' && !(data instanceof Date)) {
+    const clean: any = {};
+    for (const [k, v] of Object.entries(data)) {
+      clean[k] = sanitizePgData(v);
+    }
+    return clean;
+  }
+  return data;
+}
+
 export class SupabaseExamRepository implements ExamRepository {
   async getExams(): Promise<ExamRecord[]> {
     const db = getSupabaseClient();
@@ -97,13 +114,13 @@ export class SupabaseExamRepository implements ExamRepository {
     // 4. Save fact verifications
     const facts = Object.values(exam.fact_verifications || {});
     if (facts.length) {
-      const { error: factError } = await db.from('exam_fact_verifications').upsert(facts.map(v => ({
+      const { error: factError } = await db.from('exam_fact_verifications').upsert(sanitizePgData(facts.map(v => ({
         verification_id: v.fact_id, exam_id: v.exam_id, exam_pattern_version_id: active?.version_id,
         fact_name: v.fact_name, fact_value: v.fact_value, source_id: v.source_id || null,
         document_id: v.document_id || null, evidence_text: v.evidence_text, evidence_locator: v.page_or_section,
         verification_status: v.verification_status, confidence: v.confidence,
         applicable_cycle: v.applicable_cycle, verified_by: v.verified_by || null, verified_at: v.verified_at || null,
-      })));
+      }))));
       if (factError) throw new Error('SUPABASE_FACT_UPSERT_FAILED: ' + factError.message);
     }
   }
@@ -263,7 +280,7 @@ export class SupabaseSourceRepository implements SourceRepository {
 
   async saveSource(source: SourceRecord): Promise<void> {
     const supabase = getSupabaseClient();
-    const { error } = await supabase.from('sources').upsert({
+    const payload = sanitizePgData({
       source_id: source.source_id,
       exam_id: source.exam_id,
       authority_name: source.domain,
@@ -280,6 +297,7 @@ export class SupabaseSourceRepository implements SourceRepository {
       content_hash: source.content_hash,
       metadata: { collected_article: source.collected_article, research_document: source.research_document, research_evidence: source.research_evidence, is_current: source.is_current }
     });
+    const { error } = await supabase.from('sources').upsert(payload);
     if (error) throw new Error(`SUPABASE_SOURCE_UPSERT_FAILED: ${error.message}`);
   }
 

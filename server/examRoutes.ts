@@ -22,10 +22,15 @@ export function examEndpoint(work: (req: Request) => Reply | Promise<Reply>): Re
       res.status(reply.status || 200).json(reply.body);
     } catch (error: any) {
       console.error('[EXAM_WORKFLOW_FAILED]', error);
+      const detail = String(error?.message || error || '');
+      const retryable = /SUPABASE_|fetch failed|network|timeout|timed out|\b5(?:02|03|04)\b|connection reset|resource limit/i.test(detail);
       res.status(isQuotaExhaustedError(error) ? 429 : 503).json({
         error: isQuotaExhaustedError(error)
           ? 'AI quota is unavailable. Research and generation remain incomplete.'
-          : 'The examination workflow could not complete. No successful result was recorded. Please retry.',
+          : retryable
+            ? 'The research service is temporarily unavailable. No successful result was recorded; please retry.'
+            : 'The examination workflow could not complete. No successful result was recorded. Please retry.',
+        retryable,
       });
     }
   };
