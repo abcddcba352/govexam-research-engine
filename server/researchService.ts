@@ -123,15 +123,39 @@ export function matchAuthority(query: string): OfficialSourceRegistryRecord | nu
   const registry = getRegistry();
   const q = query.toLowerCase();
 
+  // 1. Direct ID match first
+  for (const reg of registry) {
+    if (q.includes(reg.authority_id.toLowerCase())) return reg;
+  }
+
+  // 2. Specific Police Authorities
+  if (q.includes('tslprb') || q.includes('tgprb') || (q.includes('telangana') && (q.includes('police') || q.includes('constable') || q.includes('sct pc') || q.includes('si ')))) {
+    const tslprb = registry.find(r => r.authority_id === 'tslprb');
+    if (tslprb) return tslprb;
+  }
+  if (q.includes('slprb') || (q.includes('andhra') && (q.includes('police') || q.includes('constable')))) {
+    const apPolice = registry.find(r => r.authority_id === 'police_recruitment');
+    if (apPolice) return apPolice;
+  }
+  if (q.includes('police') || q.includes('constable') || q.includes('sub inspector')) {
+    const police = registry.find(r => r.authority_id === 'police_recruitment');
+    if (police) return police;
+  }
+
+  // 3. Teacher / DSC Authorities
+  if (q.includes('teacher') || q.includes('dsc') || q.includes('treirb') || q.includes('ctet') || q.includes('tet')) {
+    const teacher = registry.find(r => r.authority_id === 'teacher_recruitment');
+    if (teacher) return teacher;
+  }
+
+  // 4. State PSCs and Central Commissions
   for (const reg of registry) {
     const id = reg.authority_id.toLowerCase();
     const name = reg.authority_name.toLowerCase();
-    const state = reg.state.toLowerCase();
     
-    if (q.includes(id)) return reg;
     if (name.includes(q) || q.includes(name)) return reg;
-    if (id === 'tgpsc' && (q.includes('tgpsc') || q.includes('tspsc') || q.includes('telangana'))) return reg;
-    if (id === 'appsc' && (q.includes('appsc') || q.includes('andhra'))) return reg;
+    if (id === 'tgpsc' && (q.includes('tgpsc') || q.includes('tspsc') || (q.includes('telangana') && !q.includes('police') && !q.includes('constable') && !q.includes('dsc')))) return reg;
+    if (id === 'appsc' && (q.includes('appsc') || (q.includes('andhra') && !q.includes('police') && !q.includes('constable') && !q.includes('dsc')))) return reg;
     if (id === 'tnpsc' && (q.includes('tnpsc') || q.includes('tamil nadu') || q.includes('tamilnadu'))) return reg;
     if (id === 'kerala_psc' && (q.includes('kerala psc') || q.includes('kpsc kerala') || q.includes('keralapsc'))) return reg;
     if (id === 'kpsc' && (q.includes('kpsc') || q.includes('karnataka'))) return reg;
@@ -143,8 +167,6 @@ export function matchAuthority(query: string): OfficialSourceRegistryRecord | nu
     if (id === 'mpsc' && (q.includes('mpsc') || q.includes('maharashtra'))) return reg;
     if (id === 'rpsc' && (q.includes('rpsc') || q.includes('ras') || q.includes('rajasthan'))) return reg;
     if (id === 'assam_psc' && (q.includes('assam') || q.includes('apsc'))) return reg;
-    if (id === 'police_recruitment' && (q.includes('police') || q.includes('constable') || q.includes('si ') || q.includes('sub inspector'))) return reg;
-    if (id === 'teacher_recruitment' && (q.includes('teacher') || q.includes('tet') || q.includes('ctet') || q.includes('dsc') || q.includes('trb'))) return reg;
   }
 
   return null;
@@ -241,7 +263,9 @@ export async function executeResearch(payload: ResearchRequestPayload, dependenc
   const exam_query = requestedExam ? buildExamResearchQuery(requestedExam) : payload.exam_query.trim();
   const startedAt = new Date().toISOString();
   const startTimeMs = Date.now();
-  const matchedAuthority = matchAuthority(exam_query);
+  const matchedAuthority = requestedExam
+    ? (matchAuthority(`${requestedExam.commission} ${requestedExam.title}`) || matchAuthority(exam_query))
+    : matchAuthority(exam_query);
   const identification: ExamIdentification = requestedExam ? {
     commission: requestedExam.commission, state_or_central: requestedExam.state_or_central,
     exam: requestedExam.title, post: requestedExam.post, stage: requestedExam.stage,
