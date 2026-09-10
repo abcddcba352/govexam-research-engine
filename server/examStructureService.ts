@@ -236,6 +236,121 @@ export const OFFICIAL_EXAM_SCHEMES: ExamStructureScheme[] = [
     ]
   },
 
+  // TSLPRB Police Constable
+  {
+    query: 'tslprb police constable',
+    exam_name: 'TSLPRB Police Constable (SCT PC Civil / AR / SAR CPL / TSSP / Warder / Fireman)',
+    commission: 'Telangana State Level Police Recruitment Board (TSLPRB)',
+    state_or_central: 'Telangana',
+    recruitment_cycle: 'Current Recruitment Cycle',
+    total_stages: 3,
+    selection_summary: 'Stage 1: Preliminary Written Test (PWT - 200 Marks) ➔ Stage 2: Physical Measurement Test & Physical Efficiency Test (PMT/PET - Qualifying) ➔ Stage 3: Final Written Examination (FWE - 200 Merit Marks).',
+    official_reference: 'https://www.tslprb.in/notifications/pc_scheme.pdf',
+    source_status: 'VERIFIED_OFFICIAL_CATALOG',
+    stages: [
+      {
+        stage_id: 'tslprb_pc_stage1',
+        stage_number: 1,
+        stage_name: 'Stage 1: Preliminary Written Test (PWT)',
+        stage_type: 'PRELIMINARY',
+        is_qualifying_only: true,
+        total_papers: 1,
+        total_marks: 200,
+        description: 'Screening test comprising 200 objective questions for 200 marks. 3 Hours duration. Qualifying in nature to proceed to Physical tests.',
+        papers: [
+          {
+            paper_id: 'tslprb_pc_pwt_paper',
+            paper_number: 'Preliminary Paper',
+            title: 'Syllabus for Preliminary Written Test (Objective Type)',
+            type: 'OBJECTIVE',
+            total_questions: 200,
+            total_marks: 200,
+            duration_minutes: 180,
+            negative_marking_rate: 0,
+            is_qualifying: true,
+            language_mediums: ['English', 'Telugu', 'Urdu'],
+            sections: [
+              'English',
+              'Arithmetic',
+              'General Science',
+              'History of India, Indian culture, Indian National Movement',
+              'Indian Geography, Polity and Economy',
+              'Current events of national and international importance',
+              'Test of Reasoning / Mental Ability',
+              'Contents pertaining to the State of Telangana'
+            ],
+            syllabus_highlights: [
+              'English Grammar & Vocabulary',
+              'Arithmetic & Quantitative Skills',
+              'General Science (Everyday observation)',
+              'History of India & National Movement',
+              'Indian Geography, Polity & Economy',
+              'National & International Current Affairs',
+              'Reasoning & Mental Ability',
+              'Telangana Movement & Statehood'
+            ]
+          }
+        ]
+      },
+      {
+        stage_id: 'tslprb_pc_stage2',
+        stage_number: 2,
+        stage_name: 'Stage 2: Physical Measurement Test & Physical Efficiency Test (PMT / PET)',
+        stage_type: 'PHYSICAL_TEST',
+        is_qualifying_only: true,
+        total_papers: 0,
+        total_marks: 0,
+        description: 'Physical Measurement Test (Height & Chest) and Physical Efficiency Test (1600m Run for Men, 800m Run for Women, Long Jump, Shot Put). Qualifying only.',
+        papers: []
+      },
+      {
+        stage_id: 'tslprb_pc_stage3',
+        stage_number: 3,
+        stage_name: 'Stage 3: Final Written Examination (FWE)',
+        stage_type: 'MAINS',
+        is_qualifying_only: false,
+        total_papers: 1,
+        total_marks: 200,
+        description: 'Final merit examination for 200 marks (200 objective multiple choice questions, 3 hours duration). Determines final selection ranking.',
+        papers: [
+          {
+            paper_id: 'tslprb_pc_fwe_paper',
+            paper_number: 'Final Written Paper',
+            title: 'Final Written Examination (Objective Type)',
+            type: 'OBJECTIVE',
+            total_questions: 200,
+            total_marks: 200,
+            duration_minutes: 180,
+            negative_marking_rate: 0,
+            is_qualifying: false,
+            language_mediums: ['English', 'Telugu', 'Urdu'],
+            sections: [
+              'English',
+              'Arithmetic',
+              'General Science',
+              'History of India, Indian culture, Indian National Movement',
+              'Indian Geography, Polity and Economy',
+              'Current events of national and international importance',
+              'Test of Reasoning / Mental Ability',
+              'Personality test (Ethics, Gender Sensitivity, Weaker Sections)',
+              'Contents pertaining to the State of Telangana'
+            ],
+            syllabus_highlights: [
+              'English Comprehension & Grammar',
+              'Arithmetic & Reasoning',
+              'General Science',
+              'History of India & National Movement',
+              'Indian Polity & Economy',
+              'Current Events',
+              'Ethics & Social Sensitivity',
+              'Telangana History & Culture'
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
   // 3. TSLPRB Police Sub-Inspector (SI)
   {
     query: 'tslprb police si',
@@ -740,20 +855,16 @@ export const OFFICIAL_EXAM_SCHEMES: ExamStructureScheme[] = [
  */
 export function findOfficialScheme(query: string): ExamStructureScheme | null {
   const q = query.toLowerCase().trim();
-  
-  // Exact or contains match on catalog
-  for (const scheme of OFFICIAL_EXAM_SCHEMES) {
-    if (q.includes(scheme.query) || scheme.query.includes(q)) {
-      return scheme;
-    }
-    const nameTokens = scheme.exam_name.toLowerCase().split(/\s+/);
-    const matches = nameTokens.filter(t => t.length > 2 && q.includes(t));
-    if (matches.length >= 2) {
-      return scheme;
-    }
+
+  // 1. Specific keywords
+  if (q.includes('police si') || q.includes('sub inspector') || (q.includes('police') && (q.includes('si') || q.includes('sub-inspector')))) {
+    return OFFICIAL_EXAM_SCHEMES.find(s => s.query === 'tslprb police si') || null;
   }
 
-  // Check specific keywords
+  if (q.includes('constable') || q.includes('sct pc') || (q.includes('police') && (q.includes('constable') || q.includes('pc')))) {
+    return OFFICIAL_EXAM_SCHEMES.find(s => s.query === 'tslprb police constable') || null;
+  }
+
   if (q.includes('group 1') || q.includes('group i') || q.includes('group-1') || q.includes('group-i')) {
     if (q.includes('appsc') || q.includes('andhra')) {
       const g1Appsc = OFFICIAL_EXAM_SCHEMES.find(s => s.query.includes('appsc'));
@@ -769,10 +880,6 @@ export function findOfficialScheme(query: string): ExamStructureScheme | null {
     return OFFICIAL_EXAM_SCHEMES.find(s => s.query === 'tgpsc group 2') || null;
   }
 
-  if (q.includes('police si') || q.includes('sub inspector') || q.includes('tslprb') || (q.includes('police') && q.includes('si'))) {
-    return OFFICIAL_EXAM_SCHEMES.find(s => s.query === 'tslprb police si') || null;
-  }
-
   if (q.includes('ssc cgl') || q.includes('cgl')) {
     return OFFICIAL_EXAM_SCHEMES.find(s => s.query === 'ssc cgl') || null;
   }
@@ -783,6 +890,13 @@ export function findOfficialScheme(query: string): ExamStructureScheme | null {
 
   if (q.includes('ntpc') || (q.includes('railway') && q.includes('rrb'))) {
     return OFFICIAL_EXAM_SCHEMES.find(s => s.query === 'rrb ntpc') || null;
+  }
+
+  // 2. Exact or contains match on catalog
+  for (const scheme of OFFICIAL_EXAM_SCHEMES) {
+    if (q.includes(scheme.query) || scheme.query.includes(q)) {
+      return scheme;
+    }
   }
 
   return null;

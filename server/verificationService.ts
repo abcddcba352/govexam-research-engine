@@ -464,9 +464,13 @@ export function extractFactsFromResearchRun(run: ResearchRunLog, exam: ExamRecor
     if (key in listIntake) {
       const expected = listIntake[key] || [];
       const quote = normalizeEvidence(fact.evidence_text);
-      const isOfficialVerified = fact.source_url.startsWith('cache://') || fact.verified_by === 'OFFICIAL_COMMISSION_GAZETTE';
+      const isOfficialVerified = fact.source_url.startsWith('cache://') || fact.source_url.startsWith('file://') || fact.verified_by === 'OFFICIAL_COMMISSION_GAZETTE';
       if (!isOfficialVerified) {
-        if (!expected.length || (!/syllabus|section|curriculum|paper/i.test(fact.evidence_text) && !expected.some(item => quote.includes(normalizeEvidence(item).split(' ')[0])))) continue;
+        if (!expected.length) {
+          if (!/syllabus|section|curriculum|paper|scheme/i.test(fact.evidence_text)) continue;
+        } else if (!/syllabus|section|curriculum|paper|scheme/i.test(fact.evidence_text) && !expected.some(item => quote.includes(normalizeEvidence(item).split(' ')[0]))) {
+          continue;
+        }
       }
     }
     if (key in numericIntake) {

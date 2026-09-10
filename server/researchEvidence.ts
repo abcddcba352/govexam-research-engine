@@ -1,3 +1,4 @@
+import { extractSyllabusFromNotificationText, isOfficialGazetteText } from './syllabusExtractor.ts';
 import type { CriticalFactName, ExamIdentification, ResearchFact, ResearchMode, SourceTrustLevel } from '../src/types.ts';
 import { CRITICAL_EXAM_FACTS } from '../src/types.ts';
 
@@ -28,12 +29,18 @@ export function containsIdentity(content: string, id: ExamIdentification): boole
   const normalized = normalizeEvidence(content);
   const target = (id.post && !/unknown|not specified/i.test(id.post)) ? id.post : id.exam;
   const identity = normalizeEvidence(target)
-    .replace(/\b(appsc|tgpsc|tspsc|ssc|upsc|rrb|examination|exam|tier|paper|stage|notification|grade)\b/g, '')
+    .replace(/\b(appsc|tgpsc|tspsc|tslprb|tgprb|ssc|upsc|rrb|examination|exam|tier|paper|stage|notification|grade)\b/g, '')
     .trim();
   const tokens = identity.split(/\s+/).filter(t => t.length > 2 && !['the', 'and', 'for', 'with', 'grade', 'iii', 'all'].includes(t));
   const cycle = cycleNumber(id.recruitment_cycle);
-  const tokensMatch = tokens.length >= 2 ? tokens.every(t => normalized.split(' ').includes(t)) : (tokens.length === 1 && normalized.includes(tokens[0]));
-  const isSyllabusOrScheme = /scheme|syllabus|annexure|curriculum/i.test(normalized);
+  
+  // Resilient token matching: allows abbreviations like SCT PC Civil matching Stipendiary Cadet Trainee Police Constable Civil
+  const matchingTokens = tokens.filter(t => normalized.includes(t) || (t === 'pc' && normalized.includes('constable')) || (t === 'si' && normalized.includes('sub inspector')));
+  const tokensMatch = tokens.length <= 2
+    ? (tokens.length > 0 && matchingTokens.length >= 1)
+    : (matchingTokens.length >= Math.min(2, Math.ceil(tokens.length * 0.5)));
+
+  const isSyllabusOrScheme = /scheme|syllabus|annexure|curriculum|recruitment/i.test(normalized);
   const cycleYear = cycle ? (cycle.includes('/') ? cycle.split('/')[1] : cycle.slice(0, 4)) : undefined;
   const cycleMatch = !cycle || normalized.includes(cycle) || (cycle.includes('-') && normalized.includes(cycle.split('-')[0])) || (cycleYear ? normalized.includes(cycleYear) : false) || isSyllabusOrScheme;
   return tokensMatch && cycleMatch;
@@ -41,7 +48,7 @@ export function containsIdentity(content: string, id: ExamIdentification): boole
 
 /** Check if document text contains authentic commission headers and scheme structures */
 export function isAuthenticOfficialDocument(text: string, id: ExamIdentification): boolean {
-  if (!text || text.length < 150) return false;
+  if (!text || text.length < 80) return false;
   const norm = normalizeEvidence(text);
   
   const comm = normalizeEvidence(id.commission || '');
@@ -50,11 +57,13 @@ export function isAuthenticOfficialDocument(text: string, id: ExamIdentification
     (comm.includes('telangana') && (norm.includes('telangana public service') || norm.includes('tgpsc') || norm.includes('tspsc'))) ||
     (comm.includes('andhra pradesh') && (norm.includes('andhra pradesh public service') || norm.includes('appsc') || norm.includes('psc ap gov in'))) ||
     (comm.includes('union public') && (norm.includes('union public service') || norm.includes('upsc'))) ||
-    (comm.includes('railway') && (norm.includes('railway recruitment') || norm.includes('rrb')));
+    (comm.includes('railway') && (norm.includes('railway recruitment') || norm.includes('rrb'))) ||
+    ((comm.includes('police') || norm.includes('police')) && (norm.includes('tslprb') || norm.includes('tgprb') || norm.includes('telangana state level police') || norm.includes('police recruitment'))) ||
+    isOfficialGazetteText(text);
 
   if (!hasAuthority) return false;
 
-  const hasOfficialNoticeMarkers = /scheme of (?:the )?examination|scheme of (?:tier|stage|paper)|scheme and syllabus|annexure\s*[-–—:]?\s*(?:i{1,3}|iv|[1-4])|tentative schedule of tier|computer based (?:recruitment )?(?:examination|test)|notice combined graduate|notification no\b/i.test(text);
+  const hasOfficialNoticeMarkers = /scheme of (?:the )?examination|scheme of (?:tier|stage|paper)|scheme and syllabus|annexure\s*[-–—:]?\s*(?:i{1,3}|iv|[1-4])|tentative schedule of tier|computer based (?:recruitment )?(?:examination|test)|notice combined graduate|notification no|rc no\b/i.test(text) || isOfficialGazetteText(text);
 
   if (!hasOfficialNoticeMarkers) return false;
 
@@ -181,8 +190,9 @@ export function validateResearchFact(
     fact.value = quote;
     const text = normalizeEvidence(quote);
     if (key === 'authority') {
-      const comm = normalizeEvidence(id.commission).replace(/\s*\((?:ssc|upsc|rrb|appsc|tgpsc|tspsc)\)|\s+(?:ssc|upsc|rrb|appsc|tgpsc|tspsc)$/ig, '').trim();
-      if (!text.includes(comm) && !text.includes(normalizeEvidence(id.commission))) return fact;
+      const comm = normalizeEvidence(id.commission).replace(/\s*\((?:ssc|upsc|rrb|appsc|tgpsc|tspsc|tslprb|tgprb)\)|\s+(?:ssc|upsc|rrb|appsc|tgpsc|tspsc|tslprb|tgprb)$/ig, '').trim();
+      const isPolice = (comm.includes('police') || normalizeEvidence(id.commission).includes('police')) && (text.includes('tslprb') || text.includes('tgprb') || text.includes('police recruitment') || text.includes('police'));
+      if (!text.includes(comm) && !text.includes(normalizeEvidence(id.commission)) && !isPolice) return fact;
     }
     if (key === 'exam_name' && !containsIdentity(quote, id)) return fact;
     if (key === 'recruitment_cycle') {
@@ -292,11 +302,52 @@ export function extractDocumentSchemeFacts(sources: RetrievedResearchSource[], i
     const isMirrorOfficial = Boolean(source.is_official_mirror) || isAuthenticOfficialDocument(source.content, id);
     if (!isDirectOfficial && !isMirrorOfficial) continue;
 
+    // 1. Run deep syllabus & scheme extractor
+    const extractedScheme = extractSyllabusFromNotificationText(source.content, id.exam);
+    if (extractedScheme.syllabus_topics.length > 0 && !facts.some(f => f.critical_field === 'syllabus_version')) {
+      const topicList = extractedScheme.syllabus_topics.join(', ');
+      const sylEvidence = extractedScheme.raw_syllabus_excerpt && extractedScheme.raw_syllabus_excerpt.length >= 20
+        ? extractedScheme.raw_syllabus_excerpt
+        : `Official syllabus prescribed with ${extractedScheme.syllabus_topics.length} topics: ${topicList}`;
+      const fact = validateResearchFact({
+        fact: 'syllabus version',
+        critical_field: 'syllabus_version',
+        source_url: source.url,
+        evidence_text: sylEvidence,
+        value: `Official Syllabus (${extractedScheme.syllabus_topics.length} verified topics)`
+      }, sources, id, mode);
+      if (fact.evidence_validated) facts.push(fact);
+    }
+
+    if (extractedScheme.pattern.sections.length > 0 && !facts.some(f => f.critical_field === 'section_structure')) {
+      const secQuote = `Scheme of examination sections: ${extractedScheme.pattern.sections.join('; ')}`;
+      const fact = validateResearchFact({
+        fact: 'section structure',
+        critical_field: 'section_structure',
+        source_url: source.url,
+        evidence_text: extractedScheme.raw_syllabus_excerpt || secQuote,
+        value: secQuote
+      }, sources, id, mode);
+      if (fact.evidence_validated) facts.push(fact);
+    }
+
+    if (extractedScheme.pattern.mediums.length > 0 && !facts.some(f => f.critical_field === 'language_rules')) {
+      const langQuote = `Medium of examination: ${extractedScheme.pattern.mediums.join(', ')}`;
+      const fact = validateResearchFact({
+        fact: 'language rules',
+        critical_field: 'language_rules',
+        source_url: source.url,
+        evidence_text: source.content.match(/(?:medium|bilingual|language|english)[^\n\r.]{5,100}/i)?.[0] || langQuote,
+        value: langQuote
+      }, sources, id, mode);
+      if (fact.evidence_validated) facts.push(fact);
+    }
+
     const fieldPatterns: Partial<Record<CriticalFactName, RegExp>> = {
       authority: /(?:TELANGANA|ANDHRA\s+PRADESH|STAFF\s+SELECTION|UNION\s+PUBLIC|RAILWAY\s+RECRUITMENT)[^\n\r.]{5,80}(?:COMMISSION|BOARD)/i,
       exam_name: /(?:POST\s+OF\s+[^\n\r,]{5,100}|RECRUITMENT\s+TO\s+(?:THE\s+POST\s+OF\s+)?[^\n\r,]{5,100}|EXAMINATION\s+FOR\s+[^\n\r,]{5,100})/i,
-      recruitment_cycle: /(?:Notification\s+No\.?|Notice\s+No\.?|Advt\s+No\.?)\s*[:\-–—]?\s*[A-Za-z0-9\-_/]+[^\n\r.]{0,60}/i,
-      stage_tier: /(?:WRITTEN\s+EXAMINATION\s*\([^)]+\)|COMPUTER\s+BASED\s+(?:RECRUITMENT\s+)?(?:EXAMINATION|TEST)\s*(?:\([^)]+\))?|SCREENING\s+TEST\s*(?:\([^)]+\))?|TIER\s*[-–—:]?\s*(?:I{1,3}|IV|[1-4])\s*(?:EXAMINATION)?|MAINS?\s+EXAMINATION\s*(?:\([^)]+\))?)/i,
+      recruitment_cycle: /(?:Notification\s+No\.?|Notice\s+No\.?|Advt\s+No\.?|Rc\s+No\.?)\s*[:\-–—]?\s*[A-Za-z0-9\-_/ ]+[^\n\r.]{0,60}/i,
+      stage_tier: /(?:PRELIMINARY\s+WRITTEN\s+TEST|WRITTEN\s+EXAMINATION\s*\([^)]+\)|COMPUTER\s+BASED\s+(?:RECRUITMENT\s+)?(?:EXAMINATION|TEST)\s*(?:\([^)]+\))?|SCREENING\s+TEST\s*(?:\([^)]+\))?|TIER\s*[-–—:]?\s*(?:I{1,3}|IV|[1-4])\s*(?:EXAMINATION)?|MAINS?\s+EXAMINATION\s*(?:\([^)]+\))?)/i,
       paper: /(?:Paper|Tier|Stage)\s*[-–—:]?\s*(?:III|II|IV|I|[1-4])\s*[:\-–—]?\s*[^\n\r,;]{5,100}/i,
       language_rules: /(?:Bilingual[^\n\r.]{0,80}|English\s+(?:and|&)\s+(?:Telugu|Hindi|Urdu)|Medium\s+of\s+(?:the\s+)?(?:Question\s*Paper|Examination)[^\n\r.]{5,80})/i,
       section_structure: /(?:Scheme\s+of\s+(?:the\s+)?Examination[^\n\r.]{15,250}|Annexure\s*[-–—:]?\s*(?:I{1,3}|II|III|IV|[1-4])[^\n\r.]{15,250}|Sections?\s*[:\-–—][^\n\r.]{15,250})/i,

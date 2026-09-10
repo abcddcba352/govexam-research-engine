@@ -1,3 +1,5 @@
+import { extractSyllabusFromNotificationText } from './syllabusExtractor.ts';
+import { extractPdfText } from './pdfParser.ts';
 import type { Express, Request, RequestHandler } from 'express';
 import { withExamWorkflow } from './persistence/examWorkflow.ts';
 import { getExams, getExamById, createExamFromIntake, getSources, saveSource, updateExamStages } from './dbService.ts';
@@ -188,6 +190,39 @@ export function registerExamRoutes(app: Express) {
     const structure = await fetchExamStructure(query);
     return { body: { success: true, structure } };
   }));
+  app.post('/api/research/extract-document', examEndpoint(async req => {
+    let text = typeof req.body?.document_text === 'string' ? req.body.document_text.trim() : '';
+    const pdfBase64 = typeof req.body?.pdf_base64 === 'string' ? req.body.pdf_base64.trim() : '';
+    const docName = typeof req.body?.document_name === 'string' ? req.body.document_name.trim() : 'Official Document';
+    const examQuery = typeof req.body?.exam_query === 'string' ? req.body.exam_query.trim() : '';
+
+    if (!text && pdfBase64) {
+      try {
+        const buffer = Buffer.from(pdfBase64, 'base64');
+        const pdfResult = await extractPdfText(buffer);
+        if (pdfResult && pdfResult.text) {
+          text = pdfResult.text;
+        }
+      } catch (err: any) {
+        console.warn('PDF base64 extraction failed:', err);
+      }
+    }
+
+    if (!text) {
+      return { status: 400, body: { error: 'Please provide official notification text or upload a PDF document.' } };
+    }
+
+    const extracted = extractSyllabusFromNotificationText(text, examQuery);
+    return {
+      body: {
+        success: true,
+        extracted,
+        document_name: docName,
+        character_count: text.length
+      }
+    };
+  }));
+
   app.post('/api/exams/:id/stages', examEndpoint(async req => {
     const { stages, structure_scheme } = req.body || {};
     if (!Array.isArray(stages)) return { status: 400, body: { error: 'stages must be an array' } };

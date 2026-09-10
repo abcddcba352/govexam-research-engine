@@ -49,3 +49,16 @@ await test('fetchExamStructure returns cached official scheme synchronously or f
   assert.equal(result.stages[0].papers.length, 4);
   assert.equal(result.stages[0].total_marks, 600);
 });
+
+await test('TSLPRB Police Constable structure returns 3 stages with 8 PWT syllabus sections and 200 questions', () => {
+  const scheme = findOfficialScheme('Telangana Police Constable (SCT PC Civil)');
+  assert.ok(scheme, 'TSLPRB Police Constable scheme should be found');
+  assert.equal(scheme.total_stages, 3);
+  assert.ok(scheme.stages[0].stage_name.includes('Preliminary Written Test'));
+  assert.equal(scheme.stages[0].papers[0].total_questions, 200);
+  assert.equal(scheme.stages[0].papers[0].total_marks, 200);
+  assert.equal(scheme.stages[0].papers[0].duration_minutes, 180);
+  assert.equal(scheme.stages[0].papers[0].sections.length, 8);
+  assert.ok(scheme.stages[0].papers[0].sections.some(s => s.includes('Arithmetic')));
+  assert.ok(scheme.stages[0].papers[0].sections.some(s => s.includes('State of Telangana')));
+});

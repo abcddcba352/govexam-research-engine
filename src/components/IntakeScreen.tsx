@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import {
+  UploadCloud,
+  Loader2,
   Building2,
   FileCheck2,
   PlusCircle,
@@ -555,6 +557,124 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
   };
 
 
+  // Official Document Syllabus Extraction State
+  const [showDocExtractor, setShowDocExtractor] = useState<boolean>(false);
+  const [docText, setDocText] = useState<string>('');
+  const [docName, setDocName] = useState<string>('');
+  const [isExtractingDoc, setIsExtractingDoc] = useState<boolean>(false);
+  const [docExtractError, setDocExtractError] = useState<string | null>(null);
+  const [docExtractSuccess, setDocExtractSuccess] = useState<string | null>(null);
+
+  const handleExtractFromDocument = async (customText?: string, base64?: string, filename?: string) => {
+    setIsExtractingDoc(true);
+    setDocExtractError(null);
+    setDocExtractSuccess(null);
+    try {
+      const textToUse = customText !== undefined ? customText : docText;
+      const nameToUse = filename || docName || 'Official Notification Document';
+      const payload: any = {
+        document_text: textToUse,
+        document_name: nameToUse,
+        exam_query: formData.title || ''
+      };
+      if (base64) payload.pdf_base64 = base64;
+
+      const res = await fetch('/api/research/extract-document', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to extract from document');
+      }
+
+      if (data.extracted) {
+        const ext = data.extracted;
+        setFormData(prev => ({
+          ...prev,
+          title: ext.exam_name || prev.title,
+          commission: ext.authority || prev.commission,
+          recruitment_cycle: ext.recruitment_cycle || prev.recruitment_cycle,
+          stage: ext.primary_stage_name || prev.stage,
+          paper: ext.primary_paper_name || prev.paper,
+          total_questions: ext.pattern.total_questions || prev.total_questions,
+          duration_minutes: ext.pattern.duration_minutes || prev.duration_minutes,
+          marks_per_question: ext.pattern.marks_per_question || prev.marks_per_question,
+          negative_marking_rate: ext.pattern.negative_marking_rate ?? prev.negative_marking_rate,
+          sections: ext.pattern.sections.length > 0 ? ext.pattern.sections : prev.sections,
+          syllabus_topics: ext.syllabus_topics.length > 0 ? ext.syllabus_topics : prev.syllabus_topics,
+          mediums: ext.pattern.mediums.length > 0 ? ext.pattern.mediums : prev.mediums,
+          notes: `Official notification extracted: ${data.document_name} (${ext.syllabus_topics.length} syllabus topics). Confidence: ${ext.confidence}%`,
+          structure_scheme: {
+            query: ext.exam_name,
+            exam_name: ext.exam_name,
+            commission: ext.authority,
+            state_or_central: prev.state_or_central,
+            recruitment_cycle: ext.recruitment_cycle,
+            total_stages: ext.stages.length,
+            selection_summary: `Selection comprising ${ext.stages.length} stages extracted from official notification.`,
+            source_status: ext.is_official_gazette ? 'VERIFIED_OFFICIAL_CATALOG' : 'LIVE_AI_RETRIEVED',
+            stages: ext.stages
+          }
+        }));
+
+        if (ext.stages && ext.stages.length > 0) {
+          setFormStages(ext.stages);
+        }
+        if (ext.pattern.sections.length > 0) {
+          setRawSections(ext.pattern.sections.join('\n'));
+        }
+        if (ext.syllabus_topics.length > 0) {
+          setRawTopics(ext.syllabus_topics.join('\n'));
+        }
+        if (ext.pattern.mediums.length > 0) {
+          setRawMediums(ext.pattern.mediums.join(', '));
+        }
+
+        setDocExtractSuccess(`Extracted ${ext.syllabus_topics.length} syllabus topics and ${ext.stages.length} stages from ${data.document_name || 'document'}!`);
+      }
+    } catch (err: any) {
+      setDocExtractError(err.message || 'Failed to extract syllabus from document');
+    } finally {
+      setIsExtractingDoc(false);
+    }
+  };
+
+  const handleDocFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setDocName(file.name);
+    setDocExtractError(null);
+    setDocExtractSuccess(null);
+
+    if (file.name.toLowerCase().endsWith('.pdf')) {
+      setIsExtractingDoc(true);
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const arrayBuffer = event.target?.result as ArrayBuffer;
+        if (arrayBuffer) {
+          const bytes = new Uint8Array(arrayBuffer);
+          let binary = '';
+          for (let i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCharCode(bytes[i]);
+          }
+          const base64 = btoa(binary);
+          await handleExtractFromDocument('', base64, file.name);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const text = event.target?.result as string;
+        setDocText(text || '');
+        await handleExtractFromDocument(text || '', undefined, file.name);
+      };
+      reader.readAsText(file);
+    }
+  };
+
   // Multi-Stage & Multi-Paper Hierarchy State
   const [formStages, setFormStages] = useState<ExamStage[]>([]);
   const [isAutoDetecting, setIsAutoDetecting] = useState<boolean>(false);
@@ -870,6 +990,82 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
               )}
             </div>
           )}
+
+
+          {/* Document Extractor Banner & Drawer */}
+          <div className="mb-5 bg-gradient-to-r from-indigo-50/80 via-sky-50/60 to-emerald-50/50 border border-indigo-200/80 rounded-2xl p-4 shadow-2xs">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-indigo-600" />
+                  <h4 className="text-xs font-bold text-slate-800">
+                    Extract Official Syllabus & Pattern Directly from Document / PDF
+                  </h4>
+                </div>
+                <p className="text-[11px] text-slate-600 mt-0.5">
+                  Have an official gazette or recruitment notification? Upload the PDF or paste the text to automatically extract all syllabus topics, question counts, marks, and stages.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <label className="cursor-pointer px-3 py-1.5 bg-white border border-indigo-300 hover:border-indigo-400 text-indigo-700 font-bold rounded-lg text-xs shadow-2xs inline-flex items-center gap-1.5 transition-all">
+                  {isExtractingDoc ? <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-600" /> : <UploadCloud className="w-3.5 h-3.5 text-indigo-600" />}
+                  <span>Upload Notification (.pdf, .txt)</span>
+                  <input
+                    type="file"
+                    accept=".pdf,.txt,.md,.json"
+                    onChange={handleDocFileUpload}
+                    className="hidden"
+                  />
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowDocExtractor(!showDocExtractor)}
+                  className="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold cursor-pointer transition-colors shadow-2xs"
+                >
+                  {showDocExtractor ? 'Close' : 'Paste Text'}
+                </button>
+              </div>
+            </div>
+
+            {docExtractSuccess && (
+              <div className="mt-3 p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 font-medium flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{docExtractSuccess}</span>
+              </div>
+            )}
+
+            {docExtractError && (
+              <div className="mt-3 p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 font-medium flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                <span>{docExtractError}</span>
+              </div>
+            )}
+
+            {showDocExtractor && (
+              <div className="mt-3 pt-3 border-t border-indigo-100 space-y-3">
+                <textarea
+                  rows={4}
+                  placeholder="Paste official notification text, scheme of examination table, or syllabus annexure here..."
+                  value={docText}
+                  onChange={e => setDocText(e.target.value)}
+                  className="w-full p-2.5 bg-white rounded-lg border border-slate-300 font-mono text-[11px] focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800"
+                />
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] text-slate-500 font-mono">{docText.length} characters</span>
+                  <button
+                    type="button"
+                    onClick={() => handleExtractFromDocument()}
+                    disabled={isExtractingDoc || !docText.trim()}
+                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white rounded-lg font-bold text-xs inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+                  >
+                    {isExtractingDoc ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                    <span>Extract Syllabus & Pre-fill Form</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {/* Title */}
