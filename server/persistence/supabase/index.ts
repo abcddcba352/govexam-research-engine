@@ -216,6 +216,19 @@ export class SupabaseExamRepository implements ExamRepository {
 }
 
 export class SupabaseSourceRepository implements SourceRepository {
+  async getResearchSources(examId:string,limit=200):Promise<SourceRecord[]> {
+    const client=getSupabaseClient();const half=Math.min(100,Math.max(1,Math.ceil(limit/2)));
+    const pages=await Promise.all([
+      client.from('sources').select('*').eq('exam_id',examId).order('retrieved_at',{ascending:false}).limit(half),
+      client.from('sources').select('*').is('exam_id',null).order('retrieved_at',{ascending:false}).limit(half),
+    ]);
+    for(const page of pages)if(page.error)throw Error(`SUPABASE_SOURCE_QUERY_FAILED: ${page.error.message}`);
+    return pages.flatMap(p=>p.data||[]).map((s:any)=>({source_id:s.source_id,exam_id:s.exam_id,title:s.title,url:s.source_url,
+      domain:s.official_domain,source_level:s.source_level,document_type:s.source_type,verification_status:s.verification_status,
+      data_provenance:s.data_provenance,retrieved_at:s.retrieved_at,publication_date:s.publication_date,content_hash:s.content_hash,
+      last_verified_at:s.last_verified_at,collected_article:s.metadata?.collected_article,research_evidence:s.metadata?.research_evidence,
+      research_document:s.metadata?.research_document,is_current:s.metadata?.is_current??false}));
+  }
   async getSources(examId?: string): Promise<SourceRecord[]> {
     const supabase = getSupabaseClient();
     // Read all pages rather than silently treating the REST row limit as the
@@ -1192,7 +1205,8 @@ export class SupabaseMockRepository implements MockRepository {
       source_reference: q.question_quality_audit?.source_reference,
       source_lineage: q.question_quality_audit?.source_lineage,
       current_affairs_evidence: q.question_quality_audit?.current_affairs_evidence,
-      cognitive_level: q.question_quality_audit?.cognitive_level
+      cognitive_level: q.question_quality_audit?.cognitive_level,
+      visual_specification: q.question_quality_audit?.visual_specification
     }));
 
     return {
@@ -1349,7 +1363,7 @@ export class SupabaseMockRepository implements MockRepository {
         repair_count: q.repair_attempts || 0,
         replacement_count: q.replacement_attempts || 0,
         option_quality_audit: q.option_quality_audit || null,
-        question_quality_audit: { ...((q as any).question_quality_audit || q.audit_result || {}), source_reference: q.source_reference, source_lineage: q.source_lineage, current_affairs_evidence: q.current_affairs_evidence, cognitive_level: q.cognitive_level },
+        question_quality_audit: { ...((q as any).question_quality_audit || q.audit_result || {}), source_reference: q.source_reference, source_lineage: q.source_lineage, current_affairs_evidence: q.current_affairs_evidence, cognitive_level: q.cognitive_level, visual_specification: q.visual_specification },
         updated_at: new Date().toISOString()
       }));
 

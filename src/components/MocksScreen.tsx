@@ -1,3 +1,5 @@
+import { QuestionGrayscaleVisual } from './QuestionGrayscaleVisual.tsx';
+export { QuestionGrayscaleVisual } from './QuestionGrayscaleVisual.tsx';
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   BookOpen,
@@ -42,6 +44,7 @@ interface MocksScreenProps {
   exams: ExamRecord[];
   initialExamId?: string;
   onNavigateToLedger: () => void;
+  onNavigateToBank?: (examId:string) => void;
   onLaunchResearch?: (query: string, mode: any) => void;
 }
 
@@ -81,36 +84,11 @@ interface ReadinessInfo {
   };
 }
 
-export const QuestionGrayscaleVisual: React.FC<{ visual?: VisualSpecification }> = ({ visual }) => {
-  if (!visual || (!visual.svg_content && !visual.image_url)) return null;
-
-  return (
-    <div className="my-3 flex flex-col items-center justify-center p-3 bg-white border border-slate-200 rounded-lg shadow-2xs max-w-lg mx-auto print:border-slate-800 print:shadow-none print:my-2 print:p-1.5">
-      {visual.svg_content ? (
-        <div 
-          className="w-full flex items-center justify-center overflow-hidden [&>svg]:max-h-64 [&>svg]:w-auto [&>svg]:mx-auto print:[&>svg]:max-h-48"
-          dangerouslySetInnerHTML={{ __html: visual.svg_content }} 
-        />
-      ) : visual.image_url ? (
-        <img 
-          src={visual.image_url} 
-          alt={visual.alt_text || 'Examination Diagram'} 
-          className="max-h-64 object-contain filter grayscale contrast-125 mx-auto print:max-h-48" 
-        />
-      ) : null}
-      {visual.figure_caption && (
-        <div className="text-[11px] font-mono text-slate-600 font-semibold mt-1 text-center border-t border-slate-100 pt-1 w-full print:text-slate-900 print:border-slate-400">
-          {visual.figure_caption}
-        </div>
-      )}
-    </div>
-  );
-};
-
 export const MocksScreen: React.FC<MocksScreenProps> = ({
   exams,
   initialExamId,
   onNavigateToLedger,
+  onNavigateToBank,
   onLaunchResearch,
 }) => {
   const [selectedExamId, setSelectedExamId] = useState<string>(
@@ -528,6 +506,7 @@ export const MocksScreen: React.FC<MocksScreenProps> = ({
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-16">
+      {onNavigateToBank&&<div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-indigo-200 bg-indigo-50 p-4 print:hidden"><p className="text-sm text-indigo-950">Build full, subject or topic papers from checked questions in the cloud.</p><button type="button" onClick={()=>onNavigateToBank(selectedExamId)} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white">Open question bank & paper builder</button></div>}
       {/* Printable Paper Header (only visible on print) */}
       <div className="hidden print:block mb-8 text-center border-b-2 border-slate-900 pb-4">
         <h1 className="text-xl font-bold uppercase tracking-wider text-slate-950">
@@ -539,8 +518,8 @@ export const MocksScreen: React.FC<MocksScreenProps> = ({
         <div className="flex justify-between items-center text-xs text-slate-600 mt-3 pt-2 border-t border-slate-300 font-mono">
           <span>PAPER CODE: {activeMock?.mock_id || 'MOCK-MASTER'}</span>
           <span>TOTAL QUESTIONS: {allQuestions.length}</span>
-          <span>DURATION: {selectedExam?.pattern.duration_minutes} MINS</span>
-          <span>MAX MARKS: {selectedExam?.pattern.total_marks}</span>
+          <span>DURATION: {activeMock?.duration_minutes ?? selectedExam?.pattern.duration_minutes} MINS</span>
+          <span>MAX MARKS: {activeMock?.total_marks ?? selectedExam?.pattern.total_marks}</span>
         </div>
       </div>
 

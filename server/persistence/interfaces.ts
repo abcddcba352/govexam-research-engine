@@ -27,6 +27,7 @@ export interface ExamRepository {
 
 export interface SourceRepository {
   getSources(examId?: string): Promise<SourceRecord[]>;
+  getResearchSources?(examId:string,limit?:number):Promise<SourceRecord[]>;
   getSourceById(sourceId: string): Promise<SourceRecord | null>;
   saveSource(source: SourceRecord): Promise<void>;
   findSourceByContentHash(contentHash: string): Promise<SourceRecord | null>;

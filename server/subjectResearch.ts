@@ -9,6 +9,20 @@ import type { SubjectPublisher } from './subjectPublishers.ts';
 
 export function subjectLinks(html:string,url:string,publisher:SubjectPublisher):DiscoveryLink[] {
   if(publisher.mode==='REFERENCE') return [{url,title:publisher.name,publisher:url}];
+  if(publisher.mode==='HTML_NEWS') {
+    const links:DiscoveryLink[]=[];
+    for(const m of html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)) {
+      try {
+        const href=attributes(m[1]).href;if(!href)continue;const link=new URL(href,url);link.hash='';
+        if(link.hostname!==new URL(url).hostname||!publisher.path_prefix||!link.pathname.startsWith(publisher.path_prefix)||!/\/20\d{2}\//.test(link.pathname))continue;
+        const title=textFromHtml(m[2]).replace(/\s+/g,' ').trim();
+        if(title.length<20||links.some(l=>l.url===link.href))continue;
+        links.push({url:link.href,title,publisher:url});
+        if(links.length===30)break;
+      }catch{/* Malformed links are not collection jobs. */}
+    }
+    return links;
+  }
   if(publisher.id==='mea') {
     const found:DiscoveryLink[]=[]; const host=new URL(url).hostname.replace(/^www\./,'');
     for(const m of html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)) {
@@ -40,7 +54,7 @@ export function subjectLinks(html:string,url:string,publisher:SubjectPublisher):
 export async function discoverSubjectLinks(publisher:SubjectPublisher,fetcher:typeof fetch=fetch) {
   if(publisher.mode==='UNAVAILABLE') throw Error(publisher.note);
   if(publisher.mode==='REFERENCE') return subjectLinks('',publisher.url,publisher);
-  const page=await readPublic(publisher.url,{fetcher,maxBytes:1_000_000,timeoutMs:8000,allowUrl:allowedPublisher});
+  const page=await readPublic(publisher.url,{fetcher,maxBytes:publisher.tier==='SECONDARY'?2_500_000:1_000_000,timeoutMs:8000,allowUrl:allowedPublisher});
   let discoveryText=page.text();
   let discoveryUrl=page.url;
   if(publisher.id==='mea') {
@@ -56,6 +70,24 @@ export async function discoverSubjectLinks(publisher:SubjectPublisher,fetcher:ty
   return links.sort((a,b)=>priority(b.title)-priority(a.title));
 }
 export function extractSpecialEvidence(html:string,url:string,publisher:SubjectPublisher):{title:string;text:string;publication_date?:string}|undefined {
+  if(publisher.tier) {
+    for(const m of html.matchAll(/<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
+      try {
+        const raw=JSON.parse(m[1]);const nodes=Array.isArray(raw)?raw:[raw,...(raw['@graph']||[])];
+        const article=nodes.find((n:any)=>/Article/.test(String(n['@type']))&&typeof n.articleBody==='string');
+        if(article?.url&&new URL(article.url,url).hostname!==new URL(url).hostname)continue;
+        if(article?.articleBody.length>100)return {title:article.headline||publisher.name,text:textFromHtml(article.articleBody),publication_date:parsePublicationDate(article.datePublished)};
+      }catch{/* Fall back only to explicit article/chapter containers. */}
+    }
+    const body=contentBlock(html,/<article\b[^>]*>/i,'article')||
+      contentBlock(html,/<div\b[^>]*data-type=["']page["'][^>]*>/i,'div')||
+      contentBlock(html,/<div\b[^>]*class=["'][^"']*entry-content[^"']*["'][^>]*>/i,'div');
+    if(!body)throw Error('Readable article/chapter content unavailable; the page shell is not evidence.');
+    const text=textFromHtml(body.replace(/<(nav|header|footer|script|style)\b[^>]*>[\s\S]*?<\/\1>/gi,' '));
+    const meta=[...html.matchAll(/<meta\b([^>]*)>/gi)].map(m=>attributes(m[1]));
+    const date=meta.find(m=>m.property==='article:published_time'||m.itemprop==='datePublished')?.content;
+    return {title:textFromHtml(html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1]||publisher.name),text,publication_date:parsePublicationDate(date)};
+  }
   if(['india-geography','telangana-profile','ap-district-profile'].includes(publisher.id)) {
     const selector=publisher.id==='india-geography'?/<div\b[^>]*class=["']dark:text-white["'][^>]*>\s*(?=<p)/i
       :publisher.id==='telangana-profile'?/<div\b[^>]*id=["']MSOZoneCell_WebPartWPQ2["'][^>]*>/i
@@ -120,9 +152,9 @@ export function extractSpecialEvidence(html:string,url:string,publisher:SubjectP
 }
 export async function collectSubjectEvidence(publisher:SubjectPublisher,url:string,fetcher:typeof fetch=fetch):Promise<ResearchEvidence> {
   let article;
-  if(['icc','pmkisan','fide','pmindia-schemes','india-geography','telangana-profile','ap-district-profile','moefcc','ndma','culture-ministry','mea'].includes(publisher.id)) {
+  if(publisher.tier||['icc','pmkisan','fide','pmindia-schemes','india-geography','telangana-profile','ap-district-profile','moefcc','ndma','culture-ministry','mea'].includes(publisher.id)) {
     const sourceTimeout=publisher.id==='ndma'?20000:8000;
-    let page=await readPublic(url,{fetcher,maxBytes:1_000_000,timeoutMs:sourceTimeout,allowUrl:allowedPublisher});
+    let page=await readPublic(url,{fetcher,maxBytes:publisher.tier==='SECONDARY'?2_500_000:1_000_000,timeoutMs:sourceTimeout,allowUrl:allowedPublisher});
     if(publisher.id==='mea') {
       const id=`${new URL(page.url).pathname}${new URL(page.url).search}`.match(/\?dtl\/(\d+)/i)?.[1];
       if(!id) throw Error('MEA press-release detail id was not found.');
@@ -135,13 +167,14 @@ export async function collectSubjectEvidence(publisher:SubjectPublisher,url:stri
   } else article=await retrieveArticle(url,fetcher);
   if(!article.text || article.text.length<100 || !article.title) throw Error('Readable subject evidence is missing.');
   const text=article.text.slice(0,30000);
-  const subjects=publisher.id==='pib'?publisher.subjects.filter(id=>SUBJECTS.find(s=>s.id===id)!.terms.test(article.title+' '+text)):publisher.subjects;
+  const jurisdiction=publisher.id==='telangana-today'&&!/\b(telangana|hyderabad|warangal|nizamabad|karimnagar|khammam|adilabad)\b/i.test(article.title+' '+text)?undefined:publisher.jurisdiction;
+  const subjects=publisher.id==='pib'||publisher.tier==='SECONDARY'?publisher.subjects.filter(id=>id==='state'?Boolean(jurisdiction):SUBJECTS.find(s=>s.id===id)!.terms.test(article.title+' '+text)):publisher.subjects;
   if(!subjects.length) throw Error('Article did not match this publisher’s configured subjects.');
-  return {...article,text,content_hash:createHash('sha256').update(text).digest('hex'),publisher_id:publisher.id,subjects,kind:publisher.kind,jurisdiction:publisher.jurisdiction,verification:'REVIEW_REQUIRED'};
+  return {...article,text,content_hash:createHash('sha256').update(text).digest('hex'),publisher_id:publisher.id,subjects,kind:publisher.kind,jurisdiction,verification:'REVIEW_REQUIRED'};
 }
 export function evidenceSource(evidence:ResearchEvidence):SourceRecord {
   return {source_id:'research_'+evidence.content_hash, title:evidence.title,url:evidence.url,domain:new URL(evidence.url).hostname,
-    source_level:['icc','fide'].includes(evidence.publisher_id)?'LEVEL_2_SECONDARY':'LEVEL_4_GOVERNMENT',
+    source_level:['icc','fide','telangana-today','tnie-telangana','tnie-ap','openstax-biology','openstax-percent'].includes(evidence.publisher_id)?'LEVEL_2_SECONDARY':'LEVEL_4_GOVERNMENT',
     document_type:'SECONDARY',verification_status:'UNVERIFIED',is_current:false,retrieved_at:evidence.retrieved_at,
     publication_date:evidence.publication_date,research_evidence:evidence};
 }

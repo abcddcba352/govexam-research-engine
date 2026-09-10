@@ -198,6 +198,7 @@ export function getThinkingConfig(level: ThinkingLevelSetting) {
 let cachedGenAI: GoogleGenAI | null = null;
 
 export function getGenAI(): GoogleGenAI {
+  if(process.env.AI_PROVIDER==='cloudflare')throw new Error('Cloudflare free mode is active. Gemini calls and paid fallback are disabled; use Direct Web research and the cloud question bank.');
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error('GEMINI_API_KEY environment variable is required.');

@@ -231,7 +231,9 @@ export interface ResearchDependencies {
 
 // 2. Perform Research based on Mode
 export async function executeResearch(payload: ResearchRequestPayload, dependencies: ResearchDependencies = {}): Promise<ResearchRunLog> {
-  const { research_mode, user_provided_urls = [], uploaded_document_text, uploaded_document_name } = payload;
+  const { user_provided_urls = [], uploaded_document_text, uploaded_document_name } = payload;
+  const freeCloud=process.env.AI_PROVIDER==='cloudflare';
+  const research_mode=freeCloud?'DIRECT_WEB':payload.research_mode;
   if (!['DIRECT_WEB', 'HYBRID', 'GOOGLE_API'].includes(research_mode)) throw new Error('Unsupported research mode');
   const examsAtStart = getExams();
   const requestedExam = payload.exam_id ? examsAtStart.find(e => e.exam_id === payload.exam_id) : undefined;
@@ -329,6 +331,7 @@ export async function executeResearch(payload: ResearchRequestPayload, dependenc
     }
   };
   const runModel = async (prompt: string, search: boolean) => {
+    if(freeCloud){modelsUnavailable=true;return null;}
     const models = getCandidateModels();
     for (const [index, model] of models.entries()) {
       if (quotaModels.has(model)) continue;

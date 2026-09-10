@@ -2,9 +2,10 @@ import React,{useEffect,useState,useMemo} from 'react';
 import type { ExamRecord } from '../types.ts';
 import type { ResearchEvidence } from '../researchCoverage.ts';
 import { groupExamsByJurisdiction } from '../utils/examJurisdiction.ts';
+import { FreeEngineDesk } from './FreeEngineDesk.tsx';
 
-export function ResearchCoverageDesk({exams}:{exams:ExamRecord[]}) {
-  const [examId,setExamId]=useState('');const [cutoff,setCutoff]=useState(new Date().toISOString().slice(0,10));
+export function ResearchCoverageDesk({exams,initialExamId}:{exams:ExamRecord[];initialExamId?:string}) {
+  const [examId,setExamId]=useState(initialExamId||'');const [cutoff,setCutoff]=useState(new Date().toISOString().slice(0,10));
   const [data,setData]=useState<any>();const [schedule,setSchedule]=useState<any>();const [error,setError]=useState('');
   const [notice,setNotice]=useState('');const [busy,setBusy]=useState(false);const [revision,setRevision]=useState(0);
   useEffect(()=>{
@@ -66,6 +67,7 @@ export function ResearchCoverageDesk({exams}:{exams:ExamRecord[]}) {
     </div>
     {error&&<p role="alert" className="rounded-lg bg-red-50 p-4 text-sm text-red-700">{error}</p>}
     {notice&&<p role="status" className="rounded-lg bg-emerald-50 p-4 text-sm text-emerald-800">{notice}</p>}
+    <FreeEngineDesk examId={examId} cutoff={cutoff}/>
     {data&&<>
       <div className="grid gap-3 sm:grid-cols-3">{[['Sources to review',data.evidence_count],['Topics without evidence',data.topics_without_evidence],['Question verification','Not assessed']].map(([label,value])=><div key={label} className="rounded-xl border bg-white p-4"><p className="text-xs text-slate-500">{label}</p><p className="mt-1 text-xl font-bold">{value}</p></div>)}</div>
       <div className="overflow-x-auto rounded-xl border bg-white"><table className="w-full text-left text-sm"><caption className="p-4 text-left font-bold">Subject coverage</caption><thead className="bg-slate-50"><tr>{['Subject','Retrieved sources','Missing dates','Remaining work'].map(h=><th key={h} className="px-4 py-3">{h}</th>)}</tr></thead><tbody>{data.subjects.map((s:any)=><tr key={s.id} className="border-t"><td className="px-4 py-3 font-medium">{s.name}</td><td className="px-4 py-3">{s.evidence_count}</td><td className="px-4 py-3">{s.missing_dates}</td><td className="px-4 py-3 text-amber-700">{s.evidence_count?'Verify relevance, dates and claims':'Collect supporting evidence'}</td></tr>)}</tbody></table></div>

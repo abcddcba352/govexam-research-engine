@@ -14,6 +14,7 @@ import { buildCoverage, subjectsForExam, evidenceEligible } from '../src/researc
 import { SUBJECT_PUBLISHERS, getSubjectPublisher, publisherApplies } from './subjectPublishers.ts';
 import { discoverSubjectLinks, collectSubjectEvidence, evidenceSource } from './subjectResearch.ts';
 import { fetchExamStructure } from './examStructureService.ts';
+import { currentArticlePool, evidencePool } from './evidencePool.ts';
 
 type Reply = { status?: number; body: unknown };
 export function examEndpoint(work: (req: Request) => Reply | Promise<Reply>): RequestHandler {
@@ -42,7 +43,9 @@ export function registerExamRoutes(app: Express) {
     const exam=getExamById(req.params.examId);if(!exam) return {status:404,body:{error:'Examination not found.'}};
     const cutoff=req.query.cutoff_date||new Date().toISOString().slice(0,10);
     if(!validDate(cutoff)||cutoff>new Date().toISOString().slice(0,10)) return {status:400,body:{error:'Invalid cutoff date.'}};
-    const coverage=buildCoverage(exam,getSources(),cutoff);
+    const sources=getSources();
+    const normalized=evidencePool(exam,sources,cutoff).map(e=>({...sources.find(s=>s.source_id===e.source_id)!,research_evidence:e}));
+    const coverage=buildCoverage(exam,normalized,cutoff);
     return {body:{...coverage,publishers:SUBJECT_PUBLISHERS.filter(p=>publisherApplies(p,exam))
       .map(({title_filter,...p})=>p)}};
   }));
@@ -81,9 +84,7 @@ export function registerExamRoutes(app: Express) {
     if(!exam) return {status:404,body:{error:'Examination not found.'}};
     const cutoff=req.query.cutoff_date ?? new Date().toISOString().slice(0,10);
     if(!validDate(cutoff) || cutoff>new Date().toISOString().slice(0,10)) return {status:400,body:{error:'Invalid cutoff date.'}};
-    const articles=getSources(exam.exam_id).filter(s=>s.exam_id===exam.exam_id).flatMap(s=>s.collected_article?[s.collected_article]:[])
-      .map(a=>({...a,...rankArticle(a.title+' '+a.text,currentAffairsTopics(exam),a.publication_date,cutoff)}))
-      .sort((a,b)=>b.priority_score-a.priority_score);
+    const articles=currentArticlePool(exam,getSources(),cutoff);
     return {body:{articles}};
   }));
   app.post('/api/current-affairs/collect', examEndpoint(async req => {
@@ -164,6 +165,7 @@ export function registerExamRoutes(app: Express) {
     return { body: await executeResearch(payload) };
   }));
   app.post('/api/mocks/generate', examEndpoint(async req => {
+    if(process.env.AI_PROVIDER==='cloudflare')return {status:409,body:{error:'Open Syllabus Coverage → Question bank & paper builder. Queue questions, review evidence and answers, then assemble the checked paper. No unchecked paper was generated.'}};
     const { exam_id, blueprint_id, question_count, difficulty, preparation_mode } = req.body || {};
     let target = exam_id;
     if (!target && blueprint_id) target = (await getRepositoryRegistry().blueprints.getBlueprintById(blueprint_id))?.exam_id;

@@ -32,6 +32,7 @@ import {
   getExecutionEnvironment,
   validatePersistenceConfiguration
 } from './persistence/repository.ts';
+import { findOfficialScheme } from './examStructureService.ts';
 
 const DATA_DIR = path.join(process.cwd(), 'server', 'data');
 const EXAMS_FILE = path.join(DATA_DIR, 'exams.json');
@@ -460,6 +461,8 @@ export function createExamFromIntake(input: ExamIntakeInput): ExamRecord {
     source_confidence_score: 0,
     target_date: input.target_date,
     preparation_mode: input.preparation_mode || 'PRE_NOTIFICATION_PREPARATION',
+    stages: input.stages || findOfficialScheme(input.title)?.stages,
+    structure_scheme: input.structure_scheme || findOfficialScheme(input.title) || undefined,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
   };

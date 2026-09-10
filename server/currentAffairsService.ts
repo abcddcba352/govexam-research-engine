@@ -2,12 +2,21 @@ import crypto from 'node:crypto';
 import type { ExamRecord } from '../src/types.ts';
 import { normalize, rankArticle, currentAffairsTopics, checkCurrentAffairsDates, validDate, parsePublicationDate, type CollectedArticle, type CurrentAffairsEvidence } from '../src/currentAffairs.ts';
 
+export function publisherCategory(raw:string):'PRIMARY'|'SECONDARY'|'EDUCATIONAL'|'UNKNOWN' {
+  try {
+    const host=new URL(raw).hostname.replace(/^www\./,'');
+    if(['telanganatoday.com','newindianexpress.com'].includes(host))return 'SECONDARY';
+    if(host==='openstax.org')return 'EDUCATIONAL';
+    return allowedPublisher(raw)?'PRIMARY':'UNKNOWN';
+  }catch{return 'UNKNOWN';}
+}
+
 export function allowedPublisher(raw: string): boolean {
   try {
     const u = new URL(raw);
     return u.protocol === 'https:' && !u.username && !u.password && (!u.port || u.port === '443') &&
       (u.hostname.endsWith('.gov.in') || u.hostname.endsWith('.nic.in') ||
-        ['rbi.org.in', 'isro.gov.in', 'who.int', 'worldbank.org', 'imf.org', 'un.org', 'icc-cricket.com', 'fide.com'].some(h => u.hostname === h || u.hostname === 'www.'+h || (!['icc-cricket.com','fide.com'].includes(h) && u.hostname.endsWith('.' + h))));
+        ['rbi.org.in', 'isro.gov.in', 'who.int', 'worldbank.org', 'imf.org', 'un.org', 'icc-cricket.com', 'fide.com','telanganatoday.com','newindianexpress.com','openstax.org'].some(h => u.hostname === h || u.hostname === 'www.'+h || (['rbi.org.in','who.int','worldbank.org','imf.org','un.org'].includes(h) && u.hostname.endsWith('.' + h))));
   } catch { return false; }
 }
 
@@ -99,7 +108,7 @@ export async function collectCurrentAffairs(exam: ExamRecord, urls: string[], cu
 export function validateArticleEvidence(evidence: CurrentAffairsEvidence | undefined, articles: CollectedArticle[], cutoff: string, answer: string) {
   const errors = checkCurrentAffairsDates(evidence, cutoff);
   const article = evidence && articles.find(a => a.url === evidence.source_url);
-  if (!article || !allowedPublisher(article.url)) errors.push('The cited article was not retrieved from a primary publisher.');
+  if (!article || publisherCategory(article.url)!=='PRIMARY') errors.push('The cited article was not retrieved from a primary publisher; secondary reporting requires the corroborated question-bank workflow.');
   if (article && evidence) {
     if (!article.matched_topics.length) errors.push('The source does not match this paper’s syllabus.');
     if (article.publication_date !== evidence.publication_date) errors.push('Publication date does not match the retrieved article.');

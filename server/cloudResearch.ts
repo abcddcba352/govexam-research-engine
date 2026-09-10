@@ -21,7 +21,7 @@ export function choosePublisher(state:CloudResearchState,exams:ExamRecord[],sour
   const evidence=sources.flatMap(s=>s.research_evidence?[s.research_evidence]:[]).filter(e=>evidenceEligible(e,new Date(now).toISOString().slice(0,10)));
   const candidates=SUBJECT_PUBLISHERS.filter(p=>p.mode!=='UNAVAILABLE'&&exams.some(e=>publisherApplies(p,e))&&(state.publishers[p.id]?.next_due||0)<=now);
   const gapScore=(p:SubjectPublisher)=>p.subjects.filter(s=>scope.has(s)).reduce((sum,s)=>sum+1/(1+evidence.filter(e=>e.subjects.includes(s)).length),0)/p.subjects.length;
-  return candidates.sort((a,b)=>gapScore(b)-gapScore(a)||(state.publishers[a.id]?.checked_at||'').localeCompare(state.publishers[b.id]?.checked_at||''))[0];
+  return candidates.sort((a,b)=>gapScore(b)-gapScore(a)||Number(b.kind==='CURRENT')-Number(a.kind==='CURRENT')||Number(Boolean(a.tier))-Number(Boolean(b.tier))||(state.publishers[a.id]?.checked_at||'').localeCompare(state.publishers[b.id]?.checked_at||''))[0];
 }
 export async function runCloudResearch(store:ResearchStateStore,scheduledTime:number,options:{
   fetcher?:typeof fetch; repository?:ReturnType<typeof getRepositoryRegistry>;
@@ -45,7 +45,7 @@ export async function runCloudResearch(store:ResearchStateStore,scheduledTime:nu
       state.publishers[publisher.id]={...previous,checked_at:stamp,status:'EVIDENCE_SAVED',detail:exists?'Unchanged evidence reused.':'Source evidence saved; review required.',saved:(previous?.saved||0)+(exists?0:1)};
       state.last_action=`${publisher.name}: ${exists?'reused':'saved'} article`;
     } else {
-      const [exams,sources]=await Promise.all([repository.exams.getExams(),repository.sources.getSources()]);
+      const [exams,sources]=await Promise.all([repository.exams.getExams(),repository.sources.getResearchSources?repository.sources.getResearchSources('',200):repository.sources.getSources()]);
       const publisher=choosePublisher(state,exams,sources,now);
       if(publisher) {
         state.last_action=`Checking ${publisher.name}`;

@@ -34,7 +34,8 @@ import { validatePersistenceConfiguration } from './persistence/repository.ts';
  */
 export function evaluatePreparationBasis(
   examId: string,
-  requestedMode?: PreparationMode
+  requestedMode?: PreparationMode,
+  options:{persist?:boolean}={}
 ): {
   basis: PreparationBasis;
   readiness: MockReadinessCheckResult;
@@ -363,7 +364,7 @@ export function evaluatePreparationBasis(
 
   // Persist the preparation basis record
   try {
-    savePreparationBasis(basis);
+  if(options.persist!==false)savePreparationBasis(basis);
   } catch (e) {
     console.error('Failed to persist preparation basis:', e);
   }
@@ -447,7 +448,7 @@ export function evaluatePreparationBasis(
  * The absence of a FUTURE recruitment notification must NOT prevent candidates/admins from preparing mock tests.
  * In PRE_NOTIFICATION_PREPARATION mode, mocks are permitted if a verified historical preparation basis exists.
  */
-export function canGenerateMock(examId: string, requestedMode?: PreparationMode): MockReadinessCheckResult {
-  const result = evaluatePreparationBasis(examId, requestedMode);
+export function canGenerateMock(examId: string, requestedMode?: PreparationMode,options:{persist?:boolean}={}): MockReadinessCheckResult {
+  const result = evaluatePreparationBasis(examId, requestedMode,options);
   return result.readiness;
 }

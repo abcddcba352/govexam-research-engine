@@ -42,6 +42,7 @@ import {
 } from './questionValidationService.ts';
 import { getExamIntelligence, getPreviousPapers, getPYQQuestions } from './pyqService.ts';
 import { detectAndGenerateDiagram } from './autonomousDiagramService.ts';
+import { currentArticlePool } from './evidencePool.ts';
 
 const MAX_ATTEMPTS = 3;
 const BATCH_SIZE = 5;
@@ -236,6 +237,9 @@ export async function generateMockTestForExam(
   difficulty: 'Standard' | 'Hard' | 'Previous Year Pattern' = 'Standard',
   blueprintIdParam?: string
 ): Promise<MockTestRecord> {
+  if(process.env.AI_PROVIDER==='cloudflare' && getPersistenceBackend()!=='JSON_FIXTURE') {
+    throw new Error('Use Syllabus Coverage → Question bank to queue and review questions, then assemble a paper. The free cloud engine does not generate unchecked papers synchronously.');
+  }
   let exam: ExamRecord;
   let blueprint_id: string | undefined = blueprintIdParam;
   let targetCount = desiredQuestionCount;
@@ -349,22 +353,14 @@ export async function generateMockTestForExam(
   if (currentSlots.length && prepMode === 'ACTIVE_NOTIFICATION') {
     const cutoff = blueprint?.current_affairs_cutoff;
     if (!validDate(cutoff)) throw new Error('Current-affairs generation requires a valid cutoff date.');
-    const urls = getSources(exam.exam_id).filter(source => source.collected_article).map(source => source.url).slice(0, 10);
-    const collection = await collectCurrentAffairs(exam, urls, cutoff);
-    currentArticles = collection.articles.filter(article => validDate(article.publication_date) && article.status === 'REVIEW_REQUIRED');
+    currentArticles = currentArticlePool(exam,getSources(),cutoff);
     const uncovered = currentSlots.filter(slot => !currentArticles.some(article => article.matched_topics.includes(slot.topic)));
     if (uncovered.length) throw new Error('Collect dated primary sources for these current-affairs topics before generation: ' + [...new Set(uncovered.map(slot => slot.topic))].join('; '));
   } else if (currentSlots.length) {
     const cutoff = blueprint?.current_affairs_cutoff;
-    if (validDate(cutoff)) {
-      const urls = getSources(exam.exam_id).filter(source => source.collected_article).map(source => source.url).slice(0, 10);
-      if (urls.length > 0) {
-        try {
-          const collection = await collectCurrentAffairs(exam, urls, cutoff);
-          currentArticles = collection.articles.filter(article => validDate(article.publication_date) && article.status === 'REVIEW_REQUIRED');
-        } catch (e) {}
-      }
-    }
+    if(!validDate(cutoff))throw new Error('Current-affairs slots require a valid cutoff in every preparation mode.');
+    currentArticles=currentArticlePool(exam,getSources(),cutoff);
+    if(currentSlots.some(slot=>!currentArticles.some(article=>article.matched_topics.includes(slot.topic))))throw new Error('Current-affairs evidence is incomplete. No paper was generated.');
   }
 
   // Filter existing mocks specifically for this preparation mode to preserve series separation
@@ -602,7 +598,7 @@ STRICT SPECIFICATION RULES:
                 generation_model_id: model
               };
 
-              if (isCurrentSlot(slot) && (prepMode === 'ACTIVE_NOTIFICATION' || currentArticles.length > 0)) {
+              if (isCurrentSlot(slot)) {
                 const check = validateArticleEvidence(qCandidate.current_affairs_evidence, currentArticles, blueprint.current_affairs_cutoff!, qCandidate.options[qCandidate.correct_option_index]);
                 if (!check.valid) throw new Error('Current-affairs evidence incomplete for Q' + slot.question_number + ': ' + check.errors.join('; '));
                 const evidence = qCandidate.current_affairs_evidence!;
@@ -618,21 +614,7 @@ STRICT SPECIFICATION RULES:
                 if (qCandidate.audit_result.overall_status !== 'PASS' || qCandidate.audit_result.fact_status !== 'SUPPORTED')
                   throw new Error('Independent current-affairs verification did not pass for Q' + slot.question_number + '. No completed paper was saved.');
               } else {
-                qCandidate.source_lineage = [{
-                  source_url: `https://psc.ap.gov.in/notifications/${exam.exam_id}`,
-                  source_title: matchedItem.source_reference || slot.source_requirement || 'Official Commission Prescribed Syllabus',
-                  publication_date: '2021-12-28',
-                  retrieved_at: new Date().toISOString(),
-                  evidence_snippet: matchedItem.explanation || slot.core_concept_target,
-                  fact_verified_at: new Date().toISOString()
-                }];
-                qCandidate.audit_result = {
-                  overall_status: 'PASS',
-                  source_status: 'PASS',
-                  answer_status: 'PASS',
-                  fact_status: 'SUPPORTED',
-                  audit_notes: `Static syllabus concept verified against official blueprint target: ${slot.core_concept_target}`
-                } as any;
+                throw new Error('Static question verification requires a reviewed evidence record or validated mathematical template. Use the question bank workflow; blueprint labels are not answer evidence.');
               }
               if (!qCandidate.source_lineage?.length || qCandidate.audit_result?.fact_status !== 'SUPPORTED') {
                 throw new Error('Question ' + slot.question_number + ' lacks retrieved answer evidence and independent verification. No completed paper was saved.');
@@ -691,6 +673,7 @@ STRICT SPECIFICATION RULES:
       }
     }
   } else {
+    throw new Error('Ad-hoc generation without verified question evidence is disabled. Use the question bank for subject and topic practice.');
     // =========================================================================
     // PATH B: FALLBACK STANDARD GENERATION (When no blueprint is provided)
     // =========================================================================

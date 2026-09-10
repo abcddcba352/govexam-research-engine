@@ -16,9 +16,12 @@ import {
   CheckCircle2,
   Lock,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Trash2,
+  Plus,
+  Check
 } from 'lucide-react';
-import { ExamIntakeInput, ExamRecord, ResearchMode, CriticalFactName, ExamPatternVersion } from '../types';
+import { ExamIntakeInput, ExamRecord, ResearchMode, CriticalFactName, ExamPatternVersion, ExamStage, ExamStagePaper, ExamStructureScheme } from '../types';
 import { FieldVerificationMatrix } from './FieldVerificationMatrix';
 import { RecruitmentCycleManager } from './RecruitmentCycleManager';
 import { AuditorSignoffModal } from './AuditorSignoffModal';
@@ -523,6 +526,22 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
         message: `Preset loaded as identification shortcut only. PATTERN_STATUS is marked UNVERIFIED. Official syllabus and negative marking must be verified via the Research Engine before generating mock tests.`,
         examTitle: preset.data.title
       });
+    // Auto-detect stages for preset
+    void (async () => {
+      try {
+        const res = await fetch('/api/research/exam-structure', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: preset.data.title })
+        });
+        if (res.ok) {
+          const d = await res.json();
+          if (d.structure?.stages) {
+            setFormStages(d.structure.stages);
+          }
+        }
+      } catch (err) {}
+    })();
       if (preset.tier === 'CENTRAL') {
         setFormJurisdictionType('CENTRAL');
       } else {
@@ -535,6 +554,153 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
   const handleOpenVerifyModal = (exam: ExamRecord, fact?: { key: CriticalFactName; label: string; currentValue: any }) => {
     setVerifyingExam(exam);
     setTargetFact(fact || null);
+  };
+
+
+  // Multi-Stage & Multi-Paper Hierarchy State
+  const [formStages, setFormStages] = useState<ExamStage[]>([]);
+  const [isAutoDetecting, setIsAutoDetecting] = useState<boolean>(false);
+  const [activeFocusedPaperId, setActiveFocusedPaperId] = useState<string>('');
+
+  const handleAutoDetectStructure = async () => {
+    const q = (formData.title || `${formData.commission} ${formData.post}`).trim();
+    if (!q) {
+      alert('Please enter Examination Title or Commission first to auto-detect its stages and papers.');
+      return;
+    }
+    setIsAutoDetecting(true);
+    try {
+      const res = await fetch('/api/research/exam-structure', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: q })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.structure && Array.isArray(data.structure.stages)) {
+          setFormStages(data.structure.stages);
+          setFormData(prev => ({
+            ...prev,
+            structure_scheme: data.structure,
+            recruitment_cycle: data.structure.recruitment_cycle || prev.recruitment_cycle
+          }));
+
+          const firstStage = data.structure.stages[0];
+          const firstPaper = firstStage?.papers?.[0];
+          if (firstStage && firstPaper) {
+            handleFocusPaper(firstPaper, firstStage);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Failed to auto-detect structure in intake:', err);
+    } finally {
+      setIsAutoDetecting(false);
+    }
+  };
+
+  const handleFocusPaper = (paper: ExamStagePaper, stage: ExamStage) => {
+    setActiveFocusedPaperId(paper.paper_id);
+    setFormData(prev => ({
+      ...prev,
+      stage: stage.stage_name,
+      paper: `${paper.paper_number}: ${paper.title}`,
+      total_questions: paper.total_questions || prev.total_questions || 100,
+      duration_minutes: paper.duration_minutes || prev.duration_minutes || 120,
+      marks_per_question: (paper.total_marks && paper.total_questions) ? Number((paper.total_marks / paper.total_questions).toFixed(2)) : 1,
+      negative_marking_rate: paper.negative_marking_rate ?? prev.negative_marking_rate ?? 0.25,
+      sections: paper.sections && paper.sections.length > 0 ? paper.sections : prev.sections,
+      syllabus_topics: paper.syllabus_highlights && paper.syllabus_highlights.length > 0 ? paper.syllabus_highlights : prev.syllabus_topics
+    }));
+    if (paper.sections && paper.sections.length > 0) {
+      setRawSections(paper.sections.join('\n'));
+    }
+    if (paper.syllabus_highlights && paper.syllabus_highlights.length > 0) {
+      setRawTopics(paper.syllabus_highlights.join('\n'));
+    }
+    if (paper.language_mediums && paper.language_mediums.length > 0) {
+      setRawMediums(paper.language_mediums.join(', '));
+    }
+  };
+
+  const handleAddStage = () => {
+    const stageNum = formStages.length + 1;
+    const newStage: ExamStage = {
+      stage_id: `stage_${Date.now().toString(36)}_${stageNum}`,
+      stage_number: stageNum,
+      stage_name: `Stage ${stageNum}: ${stageNum === 1 ? 'Preliminary Test' : stageNum === 2 ? 'Mains Written Examination' : 'Interview / Physical Test'}`,
+      stage_type: stageNum === 1 ? 'PRELIMINARY' : stageNum === 2 ? 'MAINS' : 'INTERVIEW',
+      is_qualifying_only: stageNum === 1,
+      total_papers: 1,
+      papers: [
+        {
+          paper_id: `paper_${Date.now().toString(36)}_1`,
+          paper_number: 'Paper-I',
+          title: 'General Studies & Abilities',
+          type: 'OBJECTIVE',
+          total_questions: 150,
+          total_marks: 150,
+          duration_minutes: 150,
+          negative_marking_rate: 0.25,
+          is_qualifying: false,
+          sections: ['General Studies', 'General Ability', 'Basic Science & Current Affairs']
+        }
+      ]
+    };
+    setFormStages(prev => [...prev, newStage]);
+  };
+
+  const handleRemoveStage = (stageId: string) => {
+    setFormStages(prev => prev.filter(s => s.stage_id !== stageId));
+  };
+
+  const handleAddPaper = (stageId: string) => {
+    setFormStages(prev => prev.map(s => {
+      if (s.stage_id !== stageId) return s;
+      const pNum = s.papers.length + 1;
+      const newPaper: ExamStagePaper = {
+        paper_id: `paper_${Date.now().toString(36)}_${pNum}`,
+        paper_number: `Paper-${pNum}`,
+        title: `Paper ${pNum} Subject Domain`,
+        type: s.stage_type === 'MAINS' ? 'DESCRIPTIVE' : 'OBJECTIVE',
+        total_questions: 150,
+        total_marks: 150,
+        duration_minutes: 150,
+        negative_marking_rate: 0.25,
+        is_qualifying: false,
+        sections: ['Core Section 1', 'Core Section 2']
+      };
+      return {
+        ...s,
+        total_papers: s.papers.length + 1,
+        papers: [...s.papers, newPaper]
+      };
+    }));
+  };
+
+  const handleRemovePaper = (stageId: string, paperId: string) => {
+    setFormStages(prev => prev.map(s => {
+      if (s.stage_id !== stageId) return s;
+      return {
+        ...s,
+        total_papers: Math.max(0, s.papers.length - 1),
+        papers: s.papers.filter(p => p.paper_id !== paperId)
+      };
+    }));
+  };
+
+  const handleUpdatePaper = (stageId: string, paperId: string, patch: Partial<ExamStagePaper>) => {
+    setFormStages(prev => prev.map(s => {
+      if (s.stage_id !== stageId) return s;
+      return {
+        ...s,
+        papers: s.papers.map(p => p.paper_id === paperId ? { ...p, ...patch } : p)
+      };
+    }));
+  };
+
+  const handleUpdateStage = (stageId: string, patch: Partial<ExamStage>) => {
+    setFormStages(prev => prev.map(s => s.stage_id === stageId ? { ...s, ...patch } : s));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -556,6 +722,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
         sections: rawSections.split('\n').map(s => s.trim()).filter(Boolean),
         syllabus_topics: rawTopics.split('\n').map(s => s.trim()).filter(Boolean),
         mediums: rawMediums.split(',').map(s => s.trim()).filter(Boolean),
+        stages: formStages.length > 0 ? formStages : undefined,
       };
 
       const res = await fetch('/api/intake/create', {
@@ -905,24 +1072,276 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
               />
             </div>
 
-            {/* Stage */}
+            {/* Hierarchical Stages & Papers Architecture */}
+            <div className="md:col-span-2 rounded-xl border border-indigo-200 bg-indigo-50/30 p-4 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-indigo-100">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-900 uppercase tracking-wider">
+                    <Layers className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Selection Stages & Papers Hierarchy</span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Define all selection stages (Prelims, Mains, Physical/Interview) and all papers under each stage so the system can discover, research, and audit every paper.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleAutoDetectStructure}
+                    disabled={isAutoDetecting || !formData.title.trim()}
+                    className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-2xs transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
+                    title="Automatically look up official gazetted stages and all papers for this exam"
+                  >
+                    {isAutoDetecting ? (
+                      <>
+                        <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Auto-Detecting...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                        <span>⚡ Auto-Detect Stages & Papers</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleAddStage}
+                    className="px-3 py-1.5 rounded-lg bg-white border border-indigo-300 hover:bg-indigo-50 text-indigo-700 font-bold text-xs shadow-2xs transition-all flex items-center gap-1 cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add Stage</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Stages List */}
+              {formStages.length === 0 ? (
+                <div className="bg-white rounded-xl border border-dashed border-indigo-200 p-5 text-center space-y-2">
+                  <p className="text-xs text-slate-600">
+                    No multi-stage scheme loaded yet. Click <strong>⚡ Auto-Detect Stages & Papers</strong> or <strong>Add Stage</strong> to configure the multi-paper tree.
+                  </p>
+                  <div className="flex justify-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleAddStage}
+                      className="text-xs px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 font-semibold hover:bg-indigo-100 border border-indigo-200 cursor-pointer"
+                    >
+                      + Add Stage 1 (e.g. Prelims / Mains)
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {formStages.map((stg, stgIdx) => (
+                    <div key={stg.stage_id || stgIdx} className="bg-white rounded-xl border border-indigo-100 shadow-2xs overflow-hidden">
+                      {/* Stage Header */}
+                      <div className="p-3 bg-indigo-50/70 border-b border-indigo-100 flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex items-center gap-2 flex-1 min-w-[240px]">
+                          <span className="w-6 h-6 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0">
+                            {stgIdx + 1}
+                          </span>
+                          <input
+                            type="text"
+                            value={stg.stage_name}
+                            onChange={e => handleUpdateStage(stg.stage_id, { stage_name: e.target.value })}
+                            placeholder="Stage Name (e.g. Stage 1: Preliminary Test)"
+                            className="text-xs font-bold text-slate-900 bg-white border border-slate-300 rounded px-2.5 py-1 flex-1 focus:ring-1 focus:ring-indigo-500"
+                          />
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <select
+                            value={stg.stage_type}
+                            onChange={e => handleUpdateStage(stg.stage_id, { stage_type: e.target.value as any })}
+                            className="text-[11px] font-semibold bg-white border border-slate-300 rounded px-2 py-1 text-slate-700"
+                          >
+                            <option value="PRELIMINARY">PRELIMINARY / SCREENING</option>
+                            <option value="MAINS">MAINS WRITTEN</option>
+                            <option value="INTERVIEW">INTERVIEW / PERSONALITY</option>
+                            <option value="PHYSICAL_TEST">PHYSICAL EFFICIENCY (PET/PMT)</option>
+                            <option value="SKILL_TEST">SKILL / TYPING TEST</option>
+                          </select>
+
+                          <label className="flex items-center gap-1 text-[11px] font-medium text-slate-600 bg-white border border-slate-200 rounded px-2 py-1 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={Boolean(stg.is_qualifying_only)}
+                              onChange={e => handleUpdateStage(stg.stage_id, { is_qualifying_only: e.target.checked })}
+                              className="rounded text-indigo-600"
+                            />
+                            <span>Qualifying Only</span>
+                          </label>
+
+                          <button
+                            type="button"
+                            onClick={() => handleAddPaper(stg.stage_id)}
+                            className="text-[11px] font-bold px-2 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700 transition-colors flex items-center gap-1 cursor-pointer"
+                          >
+                            <Plus className="w-3 h-3" />
+                            <span>Add Paper</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveStage(stg.stage_id)}
+                            className="text-[11px] p-1 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded transition-colors cursor-pointer"
+                            title="Delete Stage"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Papers List under this Stage */}
+                      <div className="p-3 space-y-2.5 bg-slate-50/50">
+                        {stg.papers.map((paper, pIdx) => {
+                          const isFocused = activeFocusedPaperId === paper.paper_id || (formData.paper.includes(paper.title) && formData.stage === stg.stage_name);
+
+                          return (
+                            <div
+                              key={paper.paper_id || pIdx}
+                              className={`p-3 rounded-lg border transition-all text-xs space-y-2 ${
+                                isFocused
+                                  ? 'bg-amber-50/60 border-amber-400 ring-2 ring-amber-400/30'
+                                  : 'bg-white border-slate-200 hover:border-indigo-200'
+                              }`}
+                            >
+                              <div className="flex flex-wrap items-center justify-between gap-2">
+                                <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+                                  <input
+                                    type="text"
+                                    value={paper.paper_number}
+                                    onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, { paper_number: e.target.value })}
+                                    placeholder="Paper Number (e.g. Paper-I)"
+                                    className="w-24 font-mono font-bold text-slate-700 bg-slate-100 border border-slate-300 rounded px-2 py-1 text-[11px]"
+                                  />
+                                  <input
+                                    type="text"
+                                    value={paper.title}
+                                    onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, { title: e.target.value })}
+                                    placeholder="Paper Title (e.g. General Studies & Mental Ability)"
+                                    className="flex-1 font-bold text-slate-900 bg-white border border-slate-300 rounded px-2.5 py-1 text-xs focus:ring-1 focus:ring-indigo-500"
+                                  />
+                                </div>
+
+                                <div className="flex items-center gap-1.5">
+                                  <select
+                                    value={paper.type}
+                                    onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, { type: e.target.value as any })}
+                                    className="text-[11px] font-semibold bg-white border border-slate-300 rounded px-2 py-1 text-slate-700"
+                                  >
+                                    <option value="OBJECTIVE">OBJECTIVE (MCQ)</option>
+                                    <option value="DESCRIPTIVE">DESCRIPTIVE (WRITTEN)</option>
+                                    <option value="PHYSICAL_TEST">PHYSICAL TEST</option>
+                                    <option value="SKILL_TEST">SKILL / TYPING</option>
+                                    <option value="INTERVIEW">INTERVIEW</option>
+                                  </select>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => handleFocusPaper(paper, stg)}
+                                    className={`px-2.5 py-1 rounded text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                                      isFocused
+                                        ? 'bg-amber-500 text-white shadow-2xs'
+                                        : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200'
+                                    }`}
+                                    title="Set this paper as active intake blueprint"
+                                  >
+                                    {isFocused ? (
+                                      <>
+                                        <Check className="w-3 h-3" />
+                                        <span>Active Intake Target</span>
+                                      </>
+                                    ) : (
+                                      <span>Focus Paper</span>
+                                    )}
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemovePaper(stg.stage_id, paper.paper_id)}
+                                    className="p-1 text-slate-400 hover:text-rose-600 rounded cursor-pointer"
+                                    title="Delete Paper"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Paper Metrics Row */}
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 border-t border-slate-100 text-[11px]">
+                                <div>
+                                  <label className="text-[10px] uppercase font-semibold text-slate-500 block">Total Questions</label>
+                                  <input
+                                    type="number"
+                                    value={paper.total_questions ?? ''}
+                                    onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, { total_questions: Number(e.target.value) })}
+                                    className="w-full bg-white border border-slate-200 rounded px-2 py-0.5"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-[10px] uppercase font-semibold text-slate-500 block">Total Marks</label>
+                                  <input
+                                    type="number"
+                                    value={paper.total_marks ?? ''}
+                                    onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, { total_marks: Number(e.target.value) })}
+                                    className="w-full bg-white border border-slate-200 rounded px-2 py-0.5"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-[10px] uppercase font-semibold text-slate-500 block">Duration (Mins)</label>
+                                  <input
+                                    type="number"
+                                    value={paper.duration_minutes ?? ''}
+                                    onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, { duration_minutes: Number(e.target.value) })}
+                                    className="w-full bg-white border border-slate-200 rounded px-2 py-0.5"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-[10px] uppercase font-semibold text-slate-500 block">Negative Marking</label>
+                                  <select
+                                    value={paper.negative_marking_rate ?? 0.25}
+                                    onChange={e => handleUpdatePaper(stg.stage_id, paper.paper_id, { negative_marking_rate: Number(e.target.value) })}
+                                    className="w-full bg-white border border-slate-200 rounded px-1.5 py-0.5 text-[11px]"
+                                  >
+                                    <option value={0.0}>0.00 (No Penalty)</option>
+                                    <option value={0.20}>0.20 (1/5th TS Police)</option>
+                                    <option value={0.25}>0.25 (1/4th Standard)</option>
+                                    <option value={0.33}>0.33 (1/3rd AP/RRB)</option>
+                                    <option value={0.50}>0.50 (1/2 SSC Tier-1)</option>
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Selected Active Stage & Paper Summary */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                Examination Stage
+                Active Target Stage
               </label>
               <input
                 type="text"
                 value={formData.stage}
                 onChange={e => setFormData({ ...formData, stage: e.target.value })}
-                placeholder="e.g. Written Examination (Objective)"
+                placeholder="e.g. Stage 1: Preliminary Test"
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
             </div>
 
-            {/* Paper */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                Specific Paper Specification
+                Active Target Paper
               </label>
               <input
                 type="text"

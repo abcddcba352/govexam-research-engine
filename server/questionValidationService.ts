@@ -1,4 +1,5 @@
 import { checkCurrentAffairsDates } from '../src/currentAffairs.ts';
+import { questionVisualIssues } from '../src/questionDiagrams.ts';
 import crypto from 'crypto';
 import {
   MockQuestion,
@@ -95,9 +96,7 @@ export function validateQuestionStructure(
   }
 
   // Visual requirement check
-  if (slot.visual_requirement && !q.visual_specification && !textLower.includes('diagram') && !textLower.includes('table') && !textLower.includes('chart') && !textLower.includes('|')) {
-    errors.push('Slot explicitly requires a visual or tabular specification, but none was provided.');
-  }
+  errors.push(...questionVisualIssues(q,slot.visual_requirement,slot.visual_type));
 
   return {
     passed: errors.length === 0,

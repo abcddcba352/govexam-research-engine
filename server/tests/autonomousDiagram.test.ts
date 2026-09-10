@@ -1,129 +1,71 @@
-import { test } from 'node:test';
-import assert from 'node:assert';
-import {
-  generateCircleTangentDiagram,
-  generateRightTriangleDiagram,
-  generateVennDiagram,
-  generateGrayscaleBarChart,
-  generateMirrorPatternDiagram,
-  detectAndGenerateDiagram
-} from '../autonomousDiagramService.ts';
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {diagramIssues,renderQuestionDiagram,questionVisualIssues,type QuestionDiagram} from '../../src/questionDiagrams.ts';
+import {detectAndGenerateDiagram} from '../autonomousDiagramService.ts';
+import {templateQuestion,selectBank} from '../freeQuestionBank.ts';
 
-test('1. Circle with Tangent SVG generation produces valid grayscale diagram', () => {
-  const svg = generateCircleTangentDiagram({
-    radiusLabel: '5 cm',
-    tangentLabel: '12 cm',
-    hypotenuseLabel: '13 cm',
-    center: 'O',
-    tangentPoint: 'T',
-    externalPoint: 'P'
-  });
-
-  assert.ok(svg.includes('<svg'), 'Must contain SVG opening tag');
-  assert.ok(svg.includes('</svg>'), 'Must contain SVG closing tag');
-  assert.ok(svg.includes('5 cm'), 'Must contain radius label');
-  assert.ok(svg.includes('12 cm'), 'Must contain tangent label');
-  assert.ok(svg.includes('13 cm'), 'Must contain hypotenuse label');
-  assert.ok(svg.includes('#0F172A') || svg.includes('#000000'), 'Must use monochrome/grayscale stroke');
-  assert.ok(svg.includes('#FFFFFF'), 'Must use white background');
+test('missing figures never receive guessed values or relationships from keywords',()=>{
+  for(const stem of ['Refer to the bar chart below.','In triangle ABC find its area.','Refer to the Venn diagram of students.','Choose the mirror image of AB.'])assert.equal(detectAndGenerateDiagram({question_text:stem}),undefined);
+  assert.ok(questionVisualIssues({question_text:'Refer to the bar chart below.'}).length);
+  assert.ok(questionVisualIssues({question_text:'A pure textual problem requiring a visual slot.'},true).length);
 });
-
-test('2. Right-Angled Triangle SVG generation produces valid geometry', () => {
-  const svg = generateRightTriangleDiagram({
-    A: 'A',
-    B: 'B',
-    C: 'C',
-    baseLabel: '8 cm',
-    heightLabel: '6 cm',
-    hypLabel: '10 cm',
-    showAltitude: true
-  });
-
-  assert.ok(svg.includes('<polygon'), 'Must contain polygon for triangle');
-  assert.ok(svg.includes('8 cm'), 'Must include base label');
-  assert.ok(svg.includes('6 cm'), 'Must include height label');
-  assert.ok(svg.includes('10 cm'), 'Must include hypotenuse label');
-  assert.ok(svg.includes('Altitude'), 'Must support altitude visualization');
+test('chart data requires matching labels, values, units and finite dimensions',()=>{
+  const spec:QuestionDiagram={kind:'BAR_CHART',title:'Books',categories:['A','B'],values:[40,60],unit:'books'};
+  assert.deepEqual(diagramIssues(spec,'A has 40 books and B has 60 books.'),[]);
+  assert.ok(diagramIssues({...spec,values:[40,61]},'A has 40 books and B has 60 books.').length);
+  for(const values of [[1],[1,NaN],[-1,2],[1,Infinity]])assert.ok(diagramIssues({...spec,values}).length);
+  assert.ok(diagramIssues({...spec,unit:'tonnes'},'A has 40 books and B has 60 books.').length);
+  assert.ok(diagramIssues({...spec,categories:['A','<script>']}).length);
 });
-
-test('3. Venn Diagrams produce valid 2-Set and 3-Set grayscale SVG layouts', () => {
-  const svg2 = generateVennDiagram({
-    setA: 'Cricket',
-    setB: 'Football',
-    shadingRegion: 'INTERSECTION'
-  });
-  assert.ok(svg2.includes('Cricket'), 'Must include set A label');
-  assert.ok(svg2.includes('Football'), 'Must include set B label');
-  assert.ok(svg2.includes('A ∩ B'), 'Must indicate intersection');
-
-  const svg3 = generateVennDiagram({
-    setA: 'Engineers',
-    setB: 'Doctors',
-    setC: 'Artists',
-    shadingRegion: 'ALL_THREE'
-  });
-  assert.ok(svg3.includes('Engineers'), 'Must include set A');
-  assert.ok(svg3.includes('Doctors'), 'Must include set B');
-  assert.ok(svg3.includes('Artists'), 'Must include set C');
+test('SVG labels are escaped, and all renderer colours are neutral grayscale',()=>{
+  const svg=renderQuestionDiagram({kind:'BAR_CHART',title:'A & B',categories:['A','B'],values:[2,4],unit:'books'}).svg_content!;
+  assert.ok(svg.includes('A &amp; B'));assert.ok(!svg.includes('A & B'));
+  for(const color of svg.match(/#[0-9a-f]{3,6}\b/gi)||[])assert.equal(new Set(color.slice(1).toLowerCase()).size,1);
+  assert.ok(!/script|foreignObject|onload|https:\/\//.test(svg));
 });
-
-test('4. Data Interpretation Bar Chart produces calibrated grayscale bars and axes', () => {
-  const svg = generateGrayscaleBarChart({
-    title: 'Yearly Production (in Lakhs)',
-    categories: ['2020', '2021', '2022', '2023'],
-    values: [40, 60, 85, 95]
-  });
-
-  assert.ok(svg.includes('Yearly Production (in Lakhs)'), 'Must contain chart title');
-  assert.ok(svg.includes('2020'), 'Must contain year 2020');
-  assert.ok(svg.includes('2023'), 'Must contain year 2023');
-  assert.ok(svg.includes('95'), 'Must render bar value 95');
-  assert.ok(svg.includes('<rect'), 'Must contain bar rectangles');
+test('right triangle keeps the given side ratio and does not label the calculated hypotenuse',()=>{
+  const stem='Triangle ABC is right-angled at B, AB = 6 cm and BC = 8 cm. Find AC from the figure.';
+  const visual=renderQuestionDiagram({kind:'RIGHT_TRIANGLE',vertices:['A','B','C'],base:8,height:6,unit:'cm'},stem);
+  const points=visual.svg_content!.match(/M([\d.]+) ([\d.]+)V([\d.]+)H([\d.]+)Z/)!;
+  assert.ok(Math.abs((Number(points[4])-Number(points[1]))/(Number(points[3])-Number(points[2]))-8/6)<1e-8);
+  assert.ok(!visual.svg_content!.includes('10 cm'));
+  assert.ok(diagramIssues(visual.render_spec,stem.replace('at B','at A')).length);
 });
-
-test('5. Non-Verbal Reasoning Mirror Pattern produces reflection diagram', () => {
-  const svg = generateMirrorPatternDiagram({
-    symbol: 'T E S T'
-  });
-
-  assert.ok(svg.includes('T E S T'), 'Must include test symbol');
-  assert.ok(svg.includes('Mirror Line MN') || svg.includes('M'), 'Must include mirror line');
-  assert.ok(svg.includes('Mirror Image'), 'Must include mirror image caption');
+test('circle tangent endpoint lies on the circle and is perpendicular to its radius',()=>{
+  const svg=renderQuestionDiagram({kind:'CIRCLE_TANGENT',radius:5,distance:13,unit:'cm'}).svg_content!;
+  const c=svg.match(/<circle cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)"/)!;
+  const lines=[...svg.matchAll(/<line x1="([\d.]+)" y1="([\d.]+)" x2="([\d.]+)" y2="([\d.]+)"/g)].map(x=>x.slice(1).map(Number));
+  const [radius,tangent]=lines;const [cx,cy,r]=c.slice(1).map(Number);
+  assert.ok(Math.abs(Math.hypot(radius[2]-cx,radius[3]-cy)-r)<1e-8);
+  assert.ok(Math.abs((radius[2]-cx)*(tangent[0]-tangent[2])+(radius[3]-cy)*(tangent[1]-tangent[3]))<1e-8);
+  assert.ok(!svg.includes('12 cm'));
 });
-
-test('6. Autonomous Detection: Geometry question automatically generates diagram', () => {
-  const visual = detectAndGenerateDiagram({
-    question_text: 'In the given figure, a tangent PT of 12 cm is drawn from an external point P to a circle with radius of 5 cm and center O. What is distance OP?',
-    topic: 'Geometry - Circles & Tangents',
-    question_type: 'CALCULATION'
-  });
-
-  assert.ok(visual !== undefined, 'Must detect and generate visual specification');
-  assert.strictEqual(visual?.visual_type, 'GEOMETRY');
-  assert.strictEqual(visual?.is_grayscale, true);
-  assert.ok(visual?.svg_content && visual.svg_content.includes('<svg'));
-  assert.ok(visual?.svg_content?.includes('5 cm'));
-  assert.ok(visual?.svg_content?.includes('12 cm'));
-  assert.strictEqual(visual?.answer_dependency, true);
+test('Venn intersections are actually clipped, while captions do not reveal the answer',()=>{
+  const v=renderQuestionDiagram({kind:'VENN_2',sets:['Cricket','Football'],region:'INTERSECTION'});
+  assert.ok(v.svg_content!.includes('clip-path="url(#a)"'));
+  assert.ok(!/intersection|∩/i.test(v.alt_text+' '+v.figure_caption));
+  const only=renderQuestionDiagram({kind:'VENN_2',sets:['Cricket','Football'],region:'A_ONLY'});
+  assert.ok(only.svg_content!.includes('mask="url(#not-b)"'));
 });
-
-test('7. Autonomous Detection: Venn diagram question automatically generates diagram', () => {
-  const visual = detectAndGenerateDiagram({
-    question_text: 'In a class of 80 students, refer to the Venn diagram representing students who play cricket and football.',
-    topic: 'Logical Reasoning - Venn Diagrams'
-  });
-
-  assert.ok(visual !== undefined, 'Must detect Venn diagram');
-  assert.strictEqual(visual?.visual_type, 'VENN');
-  assert.strictEqual(visual?.is_grayscale, true);
-  assert.ok(visual?.svg_content?.includes('<svg'));
+test('inclined manometer retains stated length and angle, with no computed rise in its figure',()=>{
+  const v=renderQuestionDiagram({kind:'INCLINED_MANOMETER',length:20,angle:30,unit:'cm'},'An inclined manometer has L = 20 cm at 30 degrees. Find h.');
+  assert.ok(v.svg_content!.includes('L = 20 cm'));assert.ok(v.svg_content!.includes('30°'));
+  assert.ok(!/10 cm|sin\(/.test(v.svg_content!));assert.ok(v.svg_content!.includes('hᵥ'));
 });
-
-test('8. Autonomous Detection: Non-visual question produces no diagram', () => {
-  const visual = detectAndGenerateDiagram({
-    question_text: 'Under Article 32 of the Constitution of India, which writ is issued to produce a detained person?',
-    topic: 'Indian Polity & Constitution'
-  });
-
-  assert.strictEqual(visual, undefined, 'Must not generate diagram for pure text questions');
+test('visual slot selection rejects missing or wrong figure types',()=>{
+  const template=templateQuestion('Bar chart',1)!;
+  const q:any={id:'q',status:'READY',question:template.question,topic:'Bar chart',subject:'Math',difficulty:'EASY',fact_family:'one',template_id:template.template_id};
+  const slot:any={slot_id:'1',subject:'Math',topic:'Bar chart',difficulty:'EASY',answerable_fact_family:'',visual_requirement:true,visual_type:'BAR_CHART'};
+  assert.equal(selectBank([slot],[q],new Set()).missing.length,0);
+  assert.equal(selectBank([{...slot,visual_type:'MAP'}],[q],new Set()).missing.length,1);
+  assert.equal(selectBank([slot],[{...q,question:{...q.question,visual_specification:undefined}}],new Set()).missing.length,1);
+});
+test('numerical visual templates calculate answers independently of their rendered figures',()=>{
+  for(let n=0;n<20;n++) {
+    const t=templateQuestion('Right triangle',n)!.question,ts=t.visual_specification!.render_spec as any;
+    assert.equal(Number(t.options[t.correct_option_index])**2,ts.base**2+ts.height**2);
+    const b=templateQuestion('Bar chart',n)!.question,bs=b.visual_specification!.render_spec as any;
+    assert.equal(Number(b.options[b.correct_option_index]),bs.values[1]-bs.values[0]);
+    assert.deepEqual(questionVisualIssues(t),[]);assert.deepEqual(questionVisualIssues(b),[]);
+  }
 });

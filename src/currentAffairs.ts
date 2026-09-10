@@ -54,6 +54,10 @@ export function currentAffairsTopics(exam:{syllabus_topics:string[];pattern?:{se
 // Explicit topic vocabulary helps match headlines without a model call.
 // These are relevance hints; they cannot authenticate a claim or its answer.
 const TOPIC_VOCABULARY: Array<[RegExp,RegExp]> = [
+  [/sports?/, /\b(sport|cricket|chess|olympic|medal|tournament|champion|athletics)\b/],
+  [/scheme|welfare/, /\b(scheme|yojana|beneficiaries|eligibility|welfare|subsidy)\b/],
+  [/award|appointment/, /\b(award|honour|appointed|appointment|chairperson|president)\b/],
+  [/report|indices|ranking/, /\b(report|survey|index|indices|ranking|rankings)\b/],
   [/science|technology|scientific/, /\b(isro|satellites?|space|gaganyaan|launch|biotechnology|semiconductor|artificial intelligence)\b/],
   [/econom|banking|finance/, /\b(rbi|inflation|gdp|monetary|fiscal|banking|financial|budget|employment)\b/],
   [/environment|ecolog|biodiversity/, /\b(climate|carbon|wildlife|forests?|biodiversity|conservation|pollution)\b/],
@@ -86,7 +90,7 @@ export function rankArticle(text: string, topics: string[], publicationDate: str
   if (age === null) reasons.push('Publication date is missing: review before use.');
   else if (outside) reasons.push('Publication falls outside the one-year preparation window.');
   else reasons.push(`Published ${age} days before the selected cutoff.`);
-  reasons.push('Retrieved from an allowed primary publisher. Event date and answer still require validation.');
+  reasons.push('Relevance ranking does not verify the publisher, event date or answer.');
   if(routineRelease) reasons.push('Recurring operational auction release: lower research priority than a policy or syllabus development.');
   if(broadOnly) reasons.push('Broad section match only: specific topic relevance needs review.');
   return {

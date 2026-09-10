@@ -1,12 +1,19 @@
 import { jurisdictionMatches,subjectsForExam,type SubjectId } from '../src/researchCoverage.ts';
 import type { ExamRecord } from '../src/types.ts';
 export interface SubjectPublisher {
+  tier?:'SECONDARY'|'EDUCATIONAL';
+  path_prefix?:string;
   jurisdiction?:'Andhra Pradesh'|'Telangana';
   id:string; name:string; url:string; subjects:SubjectId[];
-  mode:'FEED'|'ICC_NEWS'|'REFERENCE'|'UNAVAILABLE'; kind:'CURRENT'|'REFERENCE';
+  mode:'FEED'|'HTML_NEWS'|'ICC_NEWS'|'REFERENCE'|'UNAVAILABLE'; kind:'CURRENT'|'REFERENCE';
   refresh_hours:number; note:string; title_filter?:RegExp;
 }
 export const SUBJECT_PUBLISHERS:SubjectPublisher[]=[
+  {id:'telangana-today',name:'Telangana Today',url:'https://telanganatoday.com/feed',subjects:['state','schemes','sports','science','economy','environment','history','awards','reports'],jurisdiction:'Telangana',mode:'FEED',kind:'CURRENT',tier:'SECONDARY',refresh_hours:12,note:'Regional reporting. Each claim needs independent corroboration and date review; copied reports are one source.'},
+  {id:'tnie-telangana',name:'The New Indian Express: Telangana',url:'https://www.newindianexpress.com/states/telangana',path_prefix:'/states/telangana/',subjects:['state','schemes','economy','environment','history','awards','reports'],jurisdiction:'Telangana',mode:'HTML_NEWS',kind:'CURRENT',tier:'SECONDARY',refresh_hours:12,note:'Telangana reporting; collect readable article text and corroborate claims before use.'},
+  {id:'tnie-ap',name:'The New Indian Express: Andhra Pradesh',url:'https://www.newindianexpress.com/states/andhra-pradesh',path_prefix:'/states/andhra-pradesh/',subjects:['state','schemes','economy','environment','history','awards','reports'],jurisdiction:'Andhra Pradesh',mode:'HTML_NEWS',kind:'CURRENT',tier:'SECONDARY',refresh_hours:12,note:'Andhra Pradesh reporting; announcements must not be treated as completed implementation.'},
+  {id:'openstax-biology',name:'OpenStax: the science of biology',url:'https://openstax.org/books/biology-2e/pages/1-1-the-science-of-biology',subjects:['science'],mode:'REFERENCE',kind:'REFERENCE',tier:'EDUCATIONAL',refresh_hours:720,note:'One educational chapter, not the whole science syllabus. Retain attribution and review concept alignment.'},
+  {id:'openstax-percent',name:'OpenStax: understanding percent',url:'https://openstax.org/books/prealgebra-2e/pages/6-1-understand-percent',subjects:['math'],mode:'REFERENCE',kind:'REFERENCE',tier:'EDUCATIONAL',refresh_hours:720,note:'Percent concepts and worked examples. Generated numerical answers are calculated separately.'},
   {id:'icc',name:'ICC cricket news',url:'https://www.icc-cricket.com/news',subjects:['sports'],mode:'ICC_NEWS',kind:'CURRENT',refresh_hours:12,note:'Cricket only. Results, records and rankings need event/category checks.'},
   {id:'fide',name:'FIDE chess news',url:'https://www.fide.com/feed/',subjects:['sports'],mode:'FEED',kind:'CURRENT',refresh_hours:12,note:'Chess only. A preview is not a completed tournament result.'},
   {id:'pmindia-schemes',name:'PM India scheme announcements',url:'https://www.pmindia.gov.in/en/feed/?s=scheme&post_type=news_updates',subjects:['schemes'],mode:'FEED',kind:'CURRENT',refresh_hours:12,title_filter:/scheme|yojana|welfare|beneficiar|cabinet|programme|program|project/i,note:'Announcements need comparison with department guidelines.'},

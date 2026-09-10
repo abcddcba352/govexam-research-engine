@@ -371,6 +371,8 @@ export interface ExamRecord {
   preparation_mode?: PreparationMode;
   preparation_basis?: PreparationBasis;
   data_provenance?: DataProvenance;
+  stages?: ExamStage[];
+  structure_scheme?: ExamStructureScheme;
 }
 
 export interface ExamIntakeInput {
@@ -393,6 +395,8 @@ export interface ExamIntakeInput {
   exam_profile_status?: ExamProfileStatus;
   pattern_status?: PatternStatus;
   preparation_mode?: PreparationMode;
+  stages?: ExamStage[];
+  structure_scheme?: ExamStructureScheme;
 }
 
 // ==========================================
@@ -651,6 +655,7 @@ export interface QuestionAuditResult {
 }
 
 export interface VisualSpecification {
+  render_spec?: import('./questionDiagrams.ts').QuestionDiagram;
   visual_type: 'TABLE' | 'BAR_CHART' | 'LINE_CHART' | 'PIE_CHART' | 'MAP' | 'VENN' | 'SCIENCE_DIAGRAM' | 'GEOMETRY' | 'SEATING_DIAGRAM' | 'REASONING_FIGURE' | 'OTHER';
   visual_specification?: string;
   data_values?: Record<string, any> | Array<any>;
