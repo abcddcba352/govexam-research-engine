@@ -52,13 +52,16 @@ export const ConductingBoardExplorer: React.FC<ConductingBoardExplorerProps> = (
     if (jurisdictionTier === 'CENTRAL') {
       return getCentralBoards();
     }
+    if (!selectedState) {
+      return [];
+    }
     return getBoardsForState(selectedState);
   }, [jurisdictionTier, selectedState]);
 
-  // If no board is selected or selected board is not in active list, default to first
+  // Current selected board: ONLY if selectedBoardId is explicitly selected!
   const currentBoard = useMemo(() => {
-    const found = activeBoards.find(b => b.id === selectedBoardId);
-    return found || activeBoards[0] || null;
+    if (!selectedBoardId) return null;
+    return activeBoards.find(b => b.id === selectedBoardId) || null;
   }, [activeBoards, selectedBoardId]);
 
   // Match database exams to active board
@@ -135,19 +138,6 @@ export const ConductingBoardExplorer: React.FC<ConductingBoardExplorerProps> = (
         <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl shrink-0">
           <button
             type="button"
-            onClick={() => onJurisdictionChange('CENTRAL')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-              jurisdictionTier === 'CENTRAL'
-                ? 'bg-white text-indigo-700 shadow-xs ring-1 ring-slate-200'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <span>🏛️</span>
-            <span>Central / National ({CENTRAL_CONDUCTING_BOARDS.length} Boards)</span>
-          </button>
-
-          <button
-            type="button"
             onClick={() => onJurisdictionChange('STATE')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               jurisdictionTier === 'STATE'
@@ -157,6 +147,19 @@ export const ConductingBoardExplorer: React.FC<ConductingBoardExplorerProps> = (
           >
             <span>🗺️</span>
             <span>State-Wise Branches</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onJurisdictionChange('CENTRAL')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              jurisdictionTier === 'CENTRAL'
+                ? 'bg-white text-indigo-700 shadow-xs ring-1 ring-slate-200'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span>🏛️</span>
+            <span>Central / National ({CENTRAL_CONDUCTING_BOARDS.length} Boards)</span>
           </button>
         </div>
       </div>
@@ -177,6 +180,7 @@ export const ConductingBoardExplorer: React.FC<ConductingBoardExplorerProps> = (
               onChange={(e) => onStateChange(e.target.value)}
               className="text-xs font-bold bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer shadow-2xs"
             >
+              <option value="">-- Choose an Indian State --</option>
               {INDIAN_STATES.map(s => (
                 <option key={s.code} value={s.name}>
                   {s.name} ({s.shortCommission})
@@ -210,85 +214,119 @@ export const ConductingBoardExplorer: React.FC<ConductingBoardExplorerProps> = (
         </div>
       )}
 
-      {/* 3. Conducting Boards Shelf (Cards for each board) */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-bold text-slate-700 flex items-center gap-1.5">
-            <span>Official Examination Boards</span>
-            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono text-[10px]">
-              {activeBoards.length} {jurisdictionTier === 'STATE' ? `in ${selectedState}` : 'Central Bodies'}
-            </span>
-          </span>
-          <span className="text-[11px] text-slate-500">
-            Click any board to view its examination branch
-          </span>
+      {/* State-Wise Step 1 Guidance: shown when STATE is active and no state is selected yet */}
+      {jurisdictionTier === 'STATE' && !selectedState && (
+        <div className="bg-gradient-to-r from-slate-50 to-indigo-50/40 border border-dashed border-indigo-200 rounded-xl p-6 text-center space-y-2">
+          <div className="text-3xl">🗺️</div>
+          <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+            Step 1: Select a State
+          </h4>
+          <p className="text-xs text-slate-500 max-w-md mx-auto">
+            Click on any State chip or use the dropdown above (e.g. <strong>Telangana</strong>, <strong>Andhra Pradesh</strong>, etc.) to view its conducting recruitment boards.
+          </p>
         </div>
+      )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {activeBoards.map((board) => {
-            const isSelected = currentBoard?.id === board.id;
-            const dbExams = getBoardDbExams(board);
-            const dbCount = dbExams.length;
+      {/* 3. Conducting Boards Shelf (Cards for each board) */}
+      {(jurisdictionTier === 'CENTRAL' || selectedState) && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-bold text-slate-700 flex items-center gap-1.5">
+              <span>Official Examination Boards</span>
+              <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono text-[10px]">
+                {activeBoards.length} {jurisdictionTier === 'STATE' ? `in ${selectedState}` : 'Central Bodies'}
+              </span>
+            </span>
+            <span className="text-[11px] text-slate-500">
+              Click any board to view its examination branch
+            </span>
+          </div>
 
-            return (
-              <button
-                key={board.id}
-                type="button"
-                onClick={() => onSelectBoard(board.id)}
-                className={`text-left p-3.5 rounded-xl border transition-all cursor-pointer relative group flex flex-col justify-between ${
-                  isSelected
-                    ? 'border-indigo-600 bg-indigo-50/40 ring-2 ring-indigo-500/20 shadow-xs'
-                    : 'border-slate-200 bg-white hover:border-indigo-300 hover:bg-slate-50/60'
-                }`}
-              >
-                <div>
-                  <div className="flex items-start justify-between gap-2 mb-1.5">
-                    <span className="text-xl" role="img" aria-label={board.name}>
-                      {board.icon}
-                    </span>
-                    <div className="flex items-center gap-1 flex-wrap justify-end">
-                      {dbCount > 0 && (
-                        <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                          {dbCount} in DB
-                        </span>
-                      )}
-                      <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-medium">
-                        {board.exams.length} exams
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {activeBoards.map((board) => {
+              const isSelected = currentBoard?.id === board.id;
+              const dbExams = getBoardDbExams(board);
+              const dbCount = dbExams.length;
+
+              return (
+                <button
+                  key={board.id}
+                  type="button"
+                  onClick={() => onSelectBoard(board.id)}
+                  className={`text-left p-3.5 rounded-xl border transition-all cursor-pointer relative group flex flex-col justify-between ${
+                    isSelected
+                      ? 'border-indigo-600 bg-indigo-50/40 ring-2 ring-indigo-500/20 shadow-xs'
+                      : 'border-slate-200 bg-white hover:border-indigo-300 hover:bg-slate-50/60'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-start justify-between gap-2 mb-1.5">
+                      <span className="text-xl" role="img" aria-label={board.name}>
+                        {board.icon}
                       </span>
+                      <div className="flex items-center gap-1 flex-wrap justify-end">
+                        {dbCount > 0 && (
+                          <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                            {dbCount} in DB
+                          </span>
+                        )}
+                        <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-medium">
+                          {board.exams.length} exams
+                        </span>
+                      </div>
                     </div>
+
+                    <h4 className="text-xs font-bold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">
+                      {board.shortName}
+                    </h4>
+                    <p className="text-[11px] text-slate-500 line-clamp-2 mt-0.5 leading-snug">
+                      {board.name}
+                    </p>
                   </div>
 
-                  <h4 className="text-xs font-bold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">
-                    {board.shortName}
-                  </h4>
-                  <p className="text-[11px] text-slate-500 line-clamp-2 mt-0.5 leading-snug">
-                    {board.name}
-                  </p>
-                </div>
+                  <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                    <span className="font-semibold text-slate-600 flex items-center gap-1 text-[10px]">
+                      {board.category === 'PSC' && '🏛️ Public Service'}
+                      {board.category === 'POLICE' && '👮 Police Board'}
+                      {board.category === 'TEACHER' && '🎓 Education Board'}
+                      {board.category === 'HEALTH' && '🏥 Health Recruitment'}
+                      {board.category === 'TECHNICAL_INSTITUTE' && '🔬 Premier Institute'}
+                      {board.category === 'POWER' && '⚡ Power Utilities'}
+                      {board.category === 'RAILWAY' && '🚆 Indian Railways'}
+                      {board.category === 'CENTRAL' && '🏛️ Central Commission'}
+                      {board.category === 'BANKING' && '🏦 Banking Board'}
+                    </span>
 
-                <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                  <span className="font-semibold text-slate-600 flex items-center gap-1 text-[10px]">
-                    {board.category === 'PSC' && '🏛️ Public Service'}
-                    {board.category === 'POLICE' && '👮 Police Board'}
-                    {board.category === 'TEACHER' && '🎓 Education Board'}
-                    {board.category === 'HEALTH' && '🏥 Health Recruitment'}
-                    {board.category === 'TECHNICAL_INSTITUTE' && '🔬 Premier Institute'}
-                    {board.category === 'POWER' && '⚡ Power Utilities'}
-                    {board.category === 'RAILWAY' && '🚆 Indian Railways'}
-                    {board.category === 'CENTRAL' && '🏛️ Central Commission'}
-                    {board.category === 'BANKING' && '🏦 Banking Board'}
-                  </span>
+                    <span className="text-indigo-600 font-bold flex items-center gap-0.5 text-[11px]">
+                      <span>{isSelected ? 'Selected' : 'Explore'}</span>
+                      <ChevronRight className="w-3 h-3" />
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
 
-                  <span className="text-indigo-600 font-bold flex items-center gap-0.5 text-[11px]">
-                    <span>Explore</span>
-                    <ChevronRight className="w-3 h-3" />
-                  </span>
-                </div>
-              </button>
-            );
-          })}
+          {/* Prompt when boards are shown but none is clicked yet */}
+          {!currentBoard && (
+            <div className="bg-indigo-50/70 border border-indigo-200 rounded-xl p-4 text-center space-y-1 mt-2">
+              <p className="text-xs font-bold text-indigo-900 flex items-center justify-center gap-1.5">
+                <span>🏢</span>
+                <span>
+                  {jurisdictionTier === 'STATE'
+                    ? `Step 2: Click a Conducting Board in ${selectedState}`
+                    : 'Click a Central Recruitment Board'}
+                </span>
+              </p>
+              <p className="text-[11px] text-indigo-700">
+                {jurisdictionTier === 'STATE'
+                  ? `Select a board above (e.g. ${activeBoards.slice(0, 3).map(b => b.shortName).join(', ')}) to view its specific examinations and posts.`
+                  : 'Select an authority above (e.g. SSC, RRB, UPSC) to view its examinations.'}
+              </p>
+            </div>
+          )}
         </div>
-      </div>
+      )}
 
       {/* 4. Active Board Branch Details & Exams List */}
       {currentBoard && (

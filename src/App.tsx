@@ -73,12 +73,12 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<
     'COVERAGE' | 'CURRENT_AFFAIRS' | 'INTAKE' | 'STUDIO' | 'COMPARE' | 'PYQ' | 'BLUEPRINT' | 'MOCKS' | 'LEDGER' | 'SOURCES' | 'LOGS'
   >('INTAKE');
-  const [examQuery, setExamQuery] = useState('TGPSC Group 2 Paper 1');
+  const [examQuery, setExamQuery] = useState('');
   const [researchExamId, setResearchExamId] = useState<string | undefined>();
   const [selectedMode, setSelectedMode] = useState<ResearchMode>('HYBRID');
   const [jurisdictionTier, setJurisdictionTier] = useState<'CENTRAL' | 'STATE'>('STATE');
-  const [selectedState, setSelectedState] = useState<string>('Telangana');
-  const [selectedBoardId, setSelectedBoardId] = useState<string>('tgpsc');
+  const [selectedState, setSelectedState] = useState<string>('');
+  const [selectedBoardId, setSelectedBoardId] = useState<string>('');
   
   // Direct Web inputs
   const [userUrls, setUserUrls] = useState<string[]>([]);
@@ -176,11 +176,7 @@ export default function App() {
       if (res.ok) {
         const data = await res.json();
         setRuns(data);
-        if (data.length > 0 && !currentRunLog) {
-          setCurrentRunLog(data[0]);
-          setIdentification(data[0].identification);
-          setCurrentFacts(data[0].facts);
-        }
+
       }
     } catch (e) {
       console.error("Failed to load runs", e);
@@ -548,27 +544,30 @@ export default function App() {
               jurisdictionTier={jurisdictionTier}
               onJurisdictionChange={(tier) => {
                 setJurisdictionTier(tier);
-                if (tier === 'CENTRAL') {
-                  setSelectedBoardId('ssc');
-                  setExamQuery('SSC CGL Tier 1');
-                } else {
-                  setSelectedBoardId('tgpsc');
-                  setExamQuery('TGPSC Group 2 Paper 1');
-                }
+                setSelectedState('');
+                setSelectedBoardId('');
+                setExamQuery('');
                 setResearchExamId(undefined);
+                setStructureScheme(null);
+                setShowStructureExplorer(false);
               }}
               selectedState={selectedState}
               onStateChange={(st) => {
                 setSelectedState(st);
-                if (st === 'Telangana') setSelectedBoardId('tgpsc');
-                else if (st === 'Andhra Pradesh') setSelectedBoardId('appsc');
-                else setSelectedBoardId(`${st.toLowerCase().replace(/\s+/g, '_')}_psc`);
-                const defaultEx = INDIAN_STATES.find(s => s.name === st)?.popularExams[0] || `${st} PSC Exam`;
-                setExamQuery(defaultEx);
+                setSelectedBoardId('');
+                setExamQuery('');
                 setResearchExamId(undefined);
+                setStructureScheme(null);
+                setShowStructureExplorer(false);
               }}
               selectedBoardId={selectedBoardId}
-              onSelectBoard={(boardId) => setSelectedBoardId(boardId)}
+              onSelectBoard={(boardId) => {
+                setSelectedBoardId(boardId === selectedBoardId ? '' : boardId);
+                setExamQuery('');
+                setResearchExamId(undefined);
+                setStructureScheme(null);
+                setShowStructureExplorer(false);
+              }}
               onSelectExam={(examTitle, matchedDbExam) => {
                 setExamQuery(examTitle);
                 setResearchExamId(matchedDbExam?.exam_id);
@@ -716,7 +715,9 @@ export default function App() {
             )}
 
             {/* Source Trust Hierarchy Legend */}
-            <TrustHierarchyLegend />
+            {identification && !isResearching && (
+              <TrustHierarchyLegend />
+            )}
 
             {/* Step 2: Discovered Facts with Source Verification */}
             {(currentFacts.length > 0 || currentRunLog?.research_status === 'RESEARCH_PARTIAL_QUOTA_EXHAUSTED' || currentRunLog?.ui_message) && !isResearching && (

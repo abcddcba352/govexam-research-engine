@@ -347,9 +347,9 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Jurisdiction filters & form states
-  const [presetFilterTier, setPresetFilterTier] = useState<'ALL' | 'CENTRAL' | 'STATE'>('ALL');
-  const [registryFilterTier, setRegistryFilterTier] = useState<'ALL' | 'CENTRAL' | 'STATE'>('ALL');
-  const [registrySelectedState, setRegistrySelectedState] = useState<string>('ALL_STATES');
+  const [presetFilterTier, setPresetFilterTier] = useState<'ALL' | 'CENTRAL' | 'STATE'>('STATE');
+  const [registryFilterTier, setRegistryFilterTier] = useState<'ALL' | 'CENTRAL' | 'STATE'>('STATE');
+  const [registrySelectedState, setRegistrySelectedState] = useState<string>('Telangana');
   const [registrySelectedBoard, setRegistrySelectedBoard] = useState<string>('ALL_BOARDS');
   const [formJurisdictionType, setFormJurisdictionType] = useState<'CENTRAL' | 'STATE'>('STATE');
   const [formSelectedState, setFormSelectedState] = useState<string>('Telangana');
