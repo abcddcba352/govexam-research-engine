@@ -610,13 +610,18 @@ export interface QuestionAuditResult {
 }
 
 export interface VisualSpecification {
-  visual_type: 'TABLE' | 'BAR_CHART' | 'LINE_CHART' | 'PIE_CHART' | 'MAP' | 'VENN' | 'SCIENCE_DIAGRAM' | 'GEOMETRY' | 'SEATING_DIAGRAM' | 'OTHER';
+  visual_type: 'TABLE' | 'BAR_CHART' | 'LINE_CHART' | 'PIE_CHART' | 'MAP' | 'VENN' | 'SCIENCE_DIAGRAM' | 'GEOMETRY' | 'SEATING_DIAGRAM' | 'REASONING_FIGURE' | 'OTHER';
   visual_specification?: string;
   data_values?: Record<string, any> | Array<any>;
   labels?: string[];
   alt_text: string;
   answer_dependency: boolean;
   ascii_art?: string;
+  svg_content?: string;
+  image_url?: string;
+  is_grayscale?: boolean;
+  figure_caption?: string;
+  dimensions?: { width: number; height: number };
 }
 
 export interface BilingualQuestion {

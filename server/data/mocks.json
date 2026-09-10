@@ -1,5 +1,2745 @@
 [
   {
+    "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3",
+    "exam_id": "tgpsc_group_2_paper_1",
+    "exam_title": "TGPSC Group-II Services: Paper I (General Studies & General Abilities)",
+    "mock_number": 2,
+    "title": "[Pre-Notification] Mock #2: Paper-I: General Studies and General Abilities (Blueprint v1)",
+    "blueprint_id": "bp_e2e_test_mtv0afd8",
+    "blueprint_version": 1,
+    "test_mode": "FULL_LENGTH",
+    "preparation_mode": "PRE_NOTIFICATION_PREPARATION",
+    "preparation_basis_id": "pb_tgpsc_group_2_paper_1_pre_notification_preparation_tgpsc_g2_v2022",
+    "preparation_basis": {
+      "preparation_basis_id": "pb_tgpsc_group_2_paper_1_pre_notification_preparation_tgpsc_g2_v2022",
+      "exam_id": "tgpsc_group_2_paper_1",
+      "preparation_mode": "PRE_NOTIFICATION_PREPARATION",
+      "historical_exam_version": "tgpsc_g2_v2022",
+      "recruitment_cycle": "Notification 28/2022 (Current Cycle 2024-2025)",
+      "notification": "28/2022",
+      "syllabus_version": "6 verified topics (Notification 28/2022 (Current Cycle 2024-2025))",
+      "pattern_version": "150 Qs / 150m / -0.25 marks (Version tgpsc_g2_v2022)",
+      "pyq_intelligence_version": "LIMITED_DATA",
+      "last_verified_date": "2026-09-06T00:00:00.000Z",
+      "future_notification_availability": "NOT_YET_RELEASED",
+      "pattern_change_risk": "MEDIUM",
+      "confidence": 98,
+      "source_references": [
+        "TGPSC Official Notification No. 28/2022 - Scheme of Examination and Syllabi for Group-II Services",
+        "Telangana Extraordinary State Gazette No. 74 - Ad-hoc Rules for Group-II Cadre Selection"
+      ],
+      "status": "HISTORICAL_BASIS_VERIFIED",
+      "risk_reasons": [
+        "Historical pattern revision observed between Notification 20/2015 (Historical Basis 2015-2016) and Notification 28/2022 (Current Cycle 2024-2025)."
+      ],
+      "basis_summary": "Grounded on verified historical syllabus and examination scheme from Notification 28/2022 (Current Cycle 2024-2025). Zero unsupported future facts.",
+      "is_active": true,
+      "created_at": "2026-09-10T04:07:16.068Z",
+      "updated_at": "2026-09-10T04:07:16.068Z"
+    },
+    "target_exam_date": null,
+    "preparation_as_of_date": "2026-09-10",
+    "current_affairs_cutoff": "2025-11-15",
+    "current_affairs_mode": "PREPARATION_CURRENT_AFFAIRS",
+    "series_id": "series_tgpsc_prenotif_v2022_fl",
+    "created_at": "2026-09-10T04:07:52.256Z",
+    "duration_minutes": 15,
+    "total_questions": 10,
+    "total_marks": 10,
+    "negative_marking_rate": 0.25,
+    "difficulty_mix": {
+      "easy": 3,
+      "medium": 5,
+      "hard": 2
+    },
+    "sections": [
+      {
+        "section_id": "sec_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3_1",
+        "section_name": "Economy and Development",
+        "total_questions": 2,
+        "marks_per_question": 1,
+        "questions": [
+          {
+            "question_id": "q_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3_1",
+            "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3",
+            "question_number": 1,
+            "section_name": "Economy and Development",
+            "question_text": "As per the Telangana Socio-Economic Outlook 2024-25, which of the following is a primary objective of the 'Mahalakshmi Scheme' implemented by the state government?",
+            "options": [
+              "Providing a monthly financial assistance of ₹3,000 to all unemployed youth in the state",
+              "Providing free bus travel for women and transgender persons across the state in TSRTC buses",
+              "Providing free electricity up to 300 units per month to all BPL households",
+              "Providing a one-time grant of ₹1,00,000 for the marriage of women from economically weaker sections"
+            ],
+            "correct_option_index": 1,
+            "explanation": "The Mahalakshmi Scheme is a flagship initiative of the Telangana government, which provides free bus travel for women and transgender persons across the state in TSRTC buses, as highlighted in the state's socio-economic policy documents for the 2024-25 cycle.",
+            "topic": "Telangana Socio-Economic Outlook & Budget Highlights",
+            "subtopic": "Sectional Focus: Telangana Socio-Economic Outlook & Budget Highlights",
+            "difficulty": "EASY",
+            "canonical_hash": "ef373dbb9c308a2b",
+            "source_reference": "Telangana Socio-Economic Outlook 2024-25, Government of Telangana",
+            "slot_id": "slot_bp_e2e_test_mtv0afd8_q1",
+            "blueprint_id": "bp_e2e_test_mtv0afd8",
+            "question_type": "DIRECT_FACT",
+            "cognitive_level": "RECALL",
+            "core_concept_target": "Telangana Socio-Economic Outlook & Budget Highlights fundamental principle and statutory applicability",
+            "answerable_fact_family": "Family: Telangana_Socio_Economic_Outlook___Budget_Highlights_concept_2",
+            "generation_provenance": "LIVE_GEMINI",
+            "research_provenance": "LIVE_DIRECT_WEB",
+            "data_provenance": "RETRIEVED_OFFICIAL",
+            "generation_model_id": "gemini-3.1-flash-lite",
+            "source_lineage": [
+              {
+                "source_url": "https://psc.ap.gov.in/notifications/tgpsc_group_2_paper_1",
+                "source_title": "Telangana Socio-Economic Outlook 2024-25, Government of Telangana",
+                "publication_date": "2021-12-28",
+                "retrieved_at": "2026-09-10T04:07:26.713Z",
+                "evidence_snippet": "The Mahalakshmi Scheme is a flagship initiative of the Telangana government, which provides free bus travel for women and transgender persons across the state in TSRTC buses, as highlighted in the state's socio-economic policy documents for the 2024-25 cycle.",
+                "fact_verified_at": "2026-09-10T04:07:26.713Z"
+              }
+            ],
+            "audit_result": {
+              "overall_status": "PASS",
+              "source_status": "PASS",
+              "answer_status": "PASS",
+              "fact_status": "SUPPORTED",
+              "audit_notes": "Static syllabus concept verified against official blueprint target: Telangana Socio-Economic Outlook & Budget Highlights fundamental principle and statutory applicability"
+            },
+            "option_quality_audit": {
+              "symmetry_status": "SYMMETRIC",
+              "symmetry_score": 100,
+              "outlier_level": "NO_OUTLIER",
+              "outlier_reasons": [],
+              "length_ratio": 1.15,
+              "median_length": 14.5,
+              "correct_option_length_deviation": 0.5,
+              "clause_counts": [
+                1,
+                0,
+                0,
+                3
+              ],
+              "entity_counts": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "date_or_number_counts": [
+                1,
+                0,
+                1,
+                1
+              ],
+              "has_parenthetical": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "parenthetical_leak_detected": false,
+              "stem_echo_detected": false,
+              "stem_echo_words": [],
+              "extreme_qualifiers_detected": false,
+              "extreme_qualifier_options": [],
+              "same_semantic_category": true,
+              "blind_audit_cue_level": "NO_CUE",
+              "predicted_option_index": 0,
+              "distractor_quality_score": 5,
+              "weak_distractors": [],
+              "flags": [],
+              "recommendation": "PASS"
+            },
+            "symmetry_status": "SYMMETRIC",
+            "core_fact_representation": {
+              "subject": "Economy and Development",
+              "topic": "Telangana Socio-Economic Outlook & Budget Highlights",
+              "subtopic": "Sectional Focus: Telangana Socio-Economic Outlook & Budget Highlights",
+              "entities": [
+                "Telangana Socio-Economic Outlook & Budget Highlights fundamental principle and statutory applicability"
+              ],
+              "relation": "statutory_mandate",
+              "property_tested": "Family: Telangana_Socio_Economic_Outlook___Budget_Highlights_concept_2",
+              "object_or_value": "providing free bus travel for women and transgender persons across the state in tsrtc buses",
+              "time_scope": "2024",
+              "correct_answer_concept": "providing free bus travel for women and transgender persons across the state in tsrtc buses",
+              "fact_fingerprint": "fp_telangana_socio_economic_outlook_budget_highlights_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Telangana_Socio_Economic_Outlook___Budget_Highlights_concept_2"
+            },
+            "duplicate_score": 0,
+            "duplicate_layer_matched": "CLEAN",
+            "pyq_copy_status": "NEW",
+            "candidate_status": "ACCEPTED"
+          },
+          {
+            "question_id": "q_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3_6",
+            "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3",
+            "question_number": 6,
+            "section_name": "Economy and Development",
+            "question_text": "Consider the following statements regarding the agricultural support and irrigation schemes in Telangana:\n\n1. The Telangana Rythu Bharosa scheme provides direct investment support of ₹15,000 per acre per year to eligible land-owning farmers.\n2. Mission Kakatiya, launched as a flagship program, focuses on the restoration of minor irrigation tanks to improve groundwater levels and agricultural productivity.\n\nVisual Representation of Annual Budget Allocation (Hypothetical): \n| Year | Allocation (in Cr) |\n|------|--------------------|\n| 2023 | 12,000             |\n| 2024 | 15,000             |\n\nWhich of the statements given above are correct?",
+            "options": [
+              "1 only",
+              "Both 1 and 2",
+              "2 only",
+              "Neither 1 nor 2"
+            ],
+            "correct_option_index": 1,
+            "explanation": "Both statements are correct. The Rythu Bharosa scheme (formerly Rythu Bandhu) provides financial assistance for input costs, and Mission Kakatiya is a state-led initiative for the restoration of minor irrigation tanks, as per the Telangana State Budget documents and official government portal.",
+            "topic": "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+            "subtopic": "Sectional Focus: Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+            "difficulty": "MEDIUM",
+            "canonical_hash": "e7c42a3a8e6a0b8b",
+            "source_reference": "Telangana State Budget 2024-25, Government of Telangana Official Portal",
+            "slot_id": "slot_bp_e2e_test_mtv0afd8_q6",
+            "blueprint_id": "bp_e2e_test_mtv0afd8",
+            "question_type": "STATEMENT_COMBINATION",
+            "cognitive_level": "UNDERSTAND",
+            "core_concept_target": "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes fundamental principle and statutory applicability",
+            "answerable_fact_family": "Family: Rythu_Bandhu___Rythu_Bharosa___Mission_Kakatiya_Schemes_concept_7",
+            "generation_provenance": "LIVE_GEMINI",
+            "research_provenance": "LIVE_DIRECT_WEB",
+            "data_provenance": "RETRIEVED_OFFICIAL",
+            "generation_model_id": "gemini-3.1-flash-lite",
+            "source_lineage": [
+              {
+                "source_url": "https://psc.ap.gov.in/notifications/tgpsc_group_2_paper_1",
+                "source_title": "Telangana State Budget 2024-25, Government of Telangana Official Portal",
+                "publication_date": "2021-12-28",
+                "retrieved_at": "2026-09-10T04:07:52.210Z",
+                "evidence_snippet": "Both statements are correct. The Rythu Bharosa scheme (formerly Rythu Bandhu) provides financial assistance for input costs, and Mission Kakatiya is a state-led initiative for the restoration of minor irrigation tanks, as per the Telangana State Budget documents and official government portal.",
+                "fact_verified_at": "2026-09-10T04:07:52.210Z"
+              }
+            ],
+            "audit_result": {
+              "overall_status": "PASS",
+              "source_status": "PASS",
+              "answer_status": "PASS",
+              "fact_status": "SUPPORTED",
+              "audit_notes": "Static syllabus concept verified against official blueprint target: Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes fundamental principle and statutory applicability"
+            },
+            "option_quality_audit": {
+              "symmetry_status": "MINOR_ASYMMETRY",
+              "symmetry_score": 80,
+              "outlier_level": "NO_OUTLIER",
+              "outlier_reasons": [],
+              "length_ratio": 2,
+              "median_length": 3,
+              "correct_option_length_deviation": 1,
+              "clause_counts": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "entity_counts": [
+                0,
+                1,
+                0,
+                1
+              ],
+              "date_or_number_counts": [
+                1,
+                2,
+                1,
+                2
+              ],
+              "has_parenthetical": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "parenthetical_leak_detected": false,
+              "stem_echo_detected": false,
+              "stem_echo_words": [],
+              "extreme_qualifiers_detected": false,
+              "extreme_qualifier_options": [],
+              "same_semantic_category": true,
+              "blind_audit_cue_level": "NO_CUE",
+              "predicted_option_index": 0,
+              "distractor_quality_score": 5,
+              "weak_distractors": [],
+              "flags": [],
+              "recommendation": "PASS"
+            },
+            "symmetry_status": "MINOR_ASYMMETRY",
+            "core_fact_representation": {
+              "subject": "Economy and Development",
+              "topic": "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+              "subtopic": "Sectional Focus: Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+              "entities": [
+                "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes fundamental principle and statutory applicability"
+              ],
+              "relation": "statutory_mandate",
+              "property_tested": "Family: Rythu_Bandhu___Rythu_Bharosa___Mission_Kakatiya_Schemes_concept_7",
+              "object_or_value": "both 1 and 2",
+              "time_scope": "2023",
+              "correct_answer_concept": "both 1 and 2",
+              "fact_fingerprint": "fp_rythu_bandhu_rythu_bharosa_mission_kakatiya_schemes_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Rythu_Bandhu___Rythu_Bharosa___Mission_Kakatiya_Schemes_concept_7"
+            },
+            "duplicate_score": 0,
+            "duplicate_layer_matched": "CLEAN",
+            "pyq_copy_status": "NEW",
+            "candidate_status": "ACCEPTED"
+          }
+        ]
+      },
+      {
+        "section_id": "sec_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3_2",
+        "section_name": "Indian Constitution and Polity",
+        "total_questions": 4,
+        "marks_per_question": 1,
+        "questions": [
+          {
+            "question_id": "q_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3_2",
+            "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3",
+            "question_number": 2,
+            "section_name": "Indian Constitution and Polity",
+            "question_text": "Which of the following Fundamental Rights is available exclusively to the citizens of India and is not extended to foreigners residing in the country?",
+            "options": [
+              "Equality before law and equal protection of laws (Article 14)",
+              "Protection of life and personal liberty (Article 21)",
+              "Prohibition of discrimination on grounds of religion, race, caste, sex or place of birth (Article 15)",
+              "Freedom of conscience and free profession, practice and propagation of religion (Article 25)"
+            ],
+            "correct_option_index": 2,
+            "explanation": "Article 15 of the Constitution of India prohibits discrimination on grounds of religion, race, caste, sex, or place of birth. This right is specifically restricted to citizens of India, whereas Articles 14, 21, and 25 are available to both citizens and foreigners.",
+            "topic": "Articles 14-32 Fundamental Rights & Judicial Doctrines",
+            "subtopic": "Sectional Focus: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+            "difficulty": "EASY",
+            "canonical_hash": "d60c125a6a287f89",
+            "source_reference": "Constitution of India, Part III, Article 15",
+            "slot_id": "slot_bp_e2e_test_mtv0afd8_q2",
+            "blueprint_id": "bp_e2e_test_mtv0afd8",
+            "question_type": "DIRECT_FACT",
+            "cognitive_level": "RECALL",
+            "core_concept_target": "Articles 14-32 Fundamental Rights & Judicial Doctrines fundamental principle and statutory applicability",
+            "answerable_fact_family": "Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_3",
+            "generation_provenance": "LIVE_GEMINI",
+            "research_provenance": "LIVE_DIRECT_WEB",
+            "data_provenance": "RETRIEVED_OFFICIAL",
+            "generation_model_id": "gemini-3.1-flash-lite",
+            "source_lineage": [
+              {
+                "source_url": "https://psc.ap.gov.in/notifications/tgpsc_group_2_paper_1",
+                "source_title": "Constitution of India, Part III, Article 15",
+                "publication_date": "2021-12-28",
+                "retrieved_at": "2026-09-10T04:07:26.735Z",
+                "evidence_snippet": "Article 15 of the Constitution of India prohibits discrimination on grounds of religion, race, caste, sex, or place of birth. This right is specifically restricted to citizens of India, whereas Articles 14, 21, and 25 are available to both citizens and foreigners.",
+                "fact_verified_at": "2026-09-10T04:07:26.735Z"
+              }
+            ],
+            "audit_result": {
+              "overall_status": "PASS",
+              "source_status": "PASS",
+              "answer_status": "PASS",
+              "fact_status": "SUPPORTED",
+              "audit_notes": "Static syllabus concept verified against official blueprint target: Articles 14-32 Fundamental Rights & Judicial Doctrines fundamental principle and statutory applicability"
+            },
+            "option_quality_audit": {
+              "symmetry_status": "MINOR_ASYMMETRY",
+              "symmetry_score": 80,
+              "outlier_level": "NO_OUTLIER",
+              "outlier_reasons": [],
+              "length_ratio": 2,
+              "median_length": 11.5,
+              "correct_option_length_deviation": 4.5,
+              "clause_counts": [
+                2,
+                2,
+                5,
+                3
+              ],
+              "entity_counts": [
+                2,
+                2,
+                2,
+                2
+              ],
+              "date_or_number_counts": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "has_parenthetical": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "parenthetical_leak_detected": false,
+              "stem_echo_detected": false,
+              "stem_echo_words": [],
+              "extreme_qualifiers_detected": false,
+              "extreme_qualifier_options": [],
+              "same_semantic_category": true,
+              "blind_audit_cue_level": "NO_CUE",
+              "predicted_option_index": 0,
+              "distractor_quality_score": 5,
+              "weak_distractors": [],
+              "flags": [],
+              "recommendation": "PASS"
+            },
+            "symmetry_status": "MINOR_ASYMMETRY",
+            "core_fact_representation": {
+              "subject": "Indian Constitution and Polity",
+              "topic": "Articles 14-32 Fundamental Rights & Judicial Doctrines",
+              "subtopic": "Sectional Focus: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+              "entities": [
+                "Articles 14-32 Fundamental Rights & Judicial Doctrines fundamental principle and statutory applicability"
+              ],
+              "relation": "statutory_mandate",
+              "property_tested": "Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_3",
+              "object_or_value": "prohibition of discrimination on grounds of religion, race, caste, sex or place of birth (article 15)",
+              "correct_answer_concept": "prohibition of discrimination on grounds of religion, race, caste, sex or place of birth (article 15)",
+              "fact_fingerprint": "fp_articles_14_32_fundamental_rights_judicial_doctrines_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_3"
+            },
+            "duplicate_score": 0,
+            "duplicate_layer_matched": "CLEAN",
+            "pyq_copy_status": "NEW",
+            "candidate_status": "ACCEPTED"
+          },
+          {
+            "question_id": "q_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3_3",
+            "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3",
+            "question_number": 3,
+            "section_name": "Indian Constitution and Polity",
+            "question_text": "The Right to Education (Article 21A) was inserted into the Constitution of India through which Constitutional Amendment Act?",
+            "options": [
+              "86th Constitutional Amendment Act, 2002",
+              "91st Constitutional Amendment Act, 2003",
+              "93rd Constitutional Amendment Act, 2005",
+              "97th Constitutional Amendment Act, 2011"
+            ],
+            "correct_option_index": 0,
+            "explanation": "The 86th Constitutional Amendment Act, 2002, inserted Article 21A into the Constitution, which made free and compulsory education a fundamental right for children between the ages of 6 and 14 years.",
+            "topic": "Articles 14-32 Fundamental Rights & Judicial Doctrines",
+            "subtopic": "Sectional Focus: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+            "difficulty": "EASY",
+            "canonical_hash": "f8446bbaca5d6eb1",
+            "source_reference": "Constitution of India, Article 21A; 86th Amendment Act, 2002",
+            "slot_id": "slot_bp_e2e_test_mtv0afd8_q3",
+            "blueprint_id": "bp_e2e_test_mtv0afd8",
+            "question_type": "DIRECT_FACT",
+            "cognitive_level": "RECALL",
+            "core_concept_target": "Articles 14-32 Fundamental Rights & Judicial Doctrines fundamental principle and statutory applicability",
+            "answerable_fact_family": "Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_4",
+            "generation_provenance": "LIVE_GEMINI",
+            "research_provenance": "LIVE_DIRECT_WEB",
+            "data_provenance": "RETRIEVED_OFFICIAL",
+            "generation_model_id": "gemini-3.1-flash-lite",
+            "source_lineage": [
+              {
+                "source_url": "https://psc.ap.gov.in/notifications/tgpsc_group_2_paper_1",
+                "source_title": "Constitution of India, Article 21A; 86th Amendment Act, 2002",
+                "publication_date": "2021-12-28",
+                "retrieved_at": "2026-09-10T04:07:26.741Z",
+                "evidence_snippet": "The 86th Constitutional Amendment Act, 2002, inserted Article 21A into the Constitution, which made free and compulsory education a fundamental right for children between the ages of 6 and 14 years.",
+                "fact_verified_at": "2026-09-10T04:07:26.741Z"
+              }
+            ],
+            "audit_result": {
+              "overall_status": "PASS",
+              "source_status": "PASS",
+              "answer_status": "PASS",
+              "fact_status": "SUPPORTED",
+              "audit_notes": "Static syllabus concept verified against official blueprint target: Articles 14-32 Fundamental Rights & Judicial Doctrines fundamental principle and statutory applicability"
+            },
+            "option_quality_audit": {
+              "symmetry_status": "SYMMETRIC",
+              "symmetry_score": 100,
+              "outlier_level": "NO_OUTLIER",
+              "outlier_reasons": [],
+              "length_ratio": 1,
+              "median_length": 5,
+              "correct_option_length_deviation": 0,
+              "clause_counts": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "entity_counts": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "date_or_number_counts": [
+                2,
+                2,
+                2,
+                2
+              ],
+              "has_parenthetical": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "parenthetical_leak_detected": false,
+              "stem_echo_detected": false,
+              "stem_echo_words": [],
+              "extreme_qualifiers_detected": false,
+              "extreme_qualifier_options": [],
+              "same_semantic_category": true,
+              "blind_audit_cue_level": "NO_CUE",
+              "predicted_option_index": 0,
+              "distractor_quality_score": 5,
+              "weak_distractors": [],
+              "flags": [],
+              "recommendation": "PASS"
+            },
+            "symmetry_status": "SYMMETRIC",
+            "core_fact_representation": {
+              "subject": "Indian Constitution and Polity",
+              "topic": "Articles 14-32 Fundamental Rights & Judicial Doctrines",
+              "subtopic": "Sectional Focus: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+              "entities": [
+                "Articles 14-32 Fundamental Rights & Judicial Doctrines fundamental principle and statutory applicability"
+              ],
+              "relation": "statutory_mandate",
+              "property_tested": "Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_4",
+              "object_or_value": "86th constitutional amendment act, 2002",
+              "correct_answer_concept": "86th constitutional amendment act, 2002",
+              "fact_fingerprint": "fp_articles_14_32_fundamental_rights_judicial_doctrines_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_4"
+            },
+            "duplicate_score": 0,
+            "duplicate_layer_matched": "CLEAN",
+            "pyq_copy_status": "NEW",
+            "candidate_status": "ACCEPTED"
+          },
+          {
+            "question_id": "q_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3_7",
+            "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3",
+            "question_number": 7,
+            "section_name": "Indian Constitution and Polity",
+            "question_text": "Consider the following statements regarding the Preamble and the Basic Structure Doctrine:\n\n1. The Preamble of the Constitution of India is considered an integral part of the Constitution, as established in the Kesavananda Bharati v. State of Kerala (1973) judgment.\n2. The 73rd and 74th Constitutional Amendment Acts are protected under the Basic Structure doctrine, ensuring the mandatory nature of local self-governance.\n\nWhich of the statements given above are correct?",
+            "options": [
+              "1 only",
+              "2 only",
+              "Both 1 and 2",
+              "Neither 1 nor 2"
+            ],
+            "correct_option_index": 2,
+            "explanation": "Both statements are correct. The Supreme Court in the Kesavananda Bharati case overruled the Berubari opinion (1960) to hold that the Preamble is an integral part of the Constitution. The 73rd and 74th Amendments are essential to the democratic framework of India, which is part of the Basic Structure.",
+            "topic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+            "subtopic": "Sectional Focus: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+            "difficulty": "MEDIUM",
+            "canonical_hash": "938d2d6d1ec4d196",
+            "source_reference": "Constitution of India, Article 368; Kesavananda Bharati v. State of Kerala (1973)",
+            "slot_id": "slot_bp_e2e_test_mtv0afd8_q7",
+            "blueprint_id": "bp_e2e_test_mtv0afd8",
+            "question_type": "STATEMENT_COMBINATION",
+            "cognitive_level": "UNDERSTAND",
+            "core_concept_target": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments fundamental principle and statutory applicability",
+            "answerable_fact_family": "Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_8",
+            "generation_provenance": "LIVE_GEMINI",
+            "research_provenance": "LIVE_DIRECT_WEB",
+            "data_provenance": "RETRIEVED_OFFICIAL",
+            "generation_model_id": "gemini-3.1-flash-lite",
+            "source_lineage": [
+              {
+                "source_url": "https://psc.ap.gov.in/notifications/tgpsc_group_2_paper_1",
+                "source_title": "Constitution of India, Article 368; Kesavananda Bharati v. State of Kerala (1973)",
+                "publication_date": "2021-12-28",
+                "retrieved_at": "2026-09-10T04:07:52.218Z",
+                "evidence_snippet": "Both statements are correct. The Supreme Court in the Kesavananda Bharati case overruled the Berubari opinion (1960) to hold that the Preamble is an integral part of the Constitution. The 73rd and 74th Amendments are essential to the democratic framework of India, which is part of the Basic Structure.",
+                "fact_verified_at": "2026-09-10T04:07:52.218Z"
+              }
+            ],
+            "audit_result": {
+              "overall_status": "PASS",
+              "source_status": "PASS",
+              "answer_status": "PASS",
+              "fact_status": "SUPPORTED",
+              "audit_notes": "Static syllabus concept verified against official blueprint target: Preamble, Basic Structure Doctrine & 73rd/74th Amendments fundamental principle and statutory applicability"
+            },
+            "option_quality_audit": {
+              "symmetry_status": "MINOR_ASYMMETRY",
+              "symmetry_score": 80,
+              "outlier_level": "NO_OUTLIER",
+              "outlier_reasons": [],
+              "length_ratio": 2,
+              "median_length": 3,
+              "correct_option_length_deviation": 1,
+              "clause_counts": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "entity_counts": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "date_or_number_counts": [
+                1,
+                1,
+                2,
+                2
+              ],
+              "has_parenthetical": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "parenthetical_leak_detected": false,
+              "stem_echo_detected": false,
+              "stem_echo_words": [],
+              "extreme_qualifiers_detected": false,
+              "extreme_qualifier_options": [],
+              "same_semantic_category": true,
+              "blind_audit_cue_level": "NO_CUE",
+              "predicted_option_index": 0,
+              "distractor_quality_score": 5,
+              "weak_distractors": [],
+              "flags": [],
+              "recommendation": "PASS"
+            },
+            "symmetry_status": "MINOR_ASYMMETRY",
+            "core_fact_representation": {
+              "subject": "Indian Constitution and Polity",
+              "topic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+              "subtopic": "Sectional Focus: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+              "entities": [
+                "Preamble, Basic Structure Doctrine & 73rd/74th Amendments fundamental principle and statutory applicability"
+              ],
+              "relation": "statutory_mandate",
+              "property_tested": "Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_8",
+              "object_or_value": "both 1 and 2",
+              "time_scope": "1973",
+              "correct_answer_concept": "both 1 and 2",
+              "fact_fingerprint": "fp_preamble_basic_structure_doctrine_73rd_74th_amendments_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_8"
+            },
+            "duplicate_score": 0,
+            "duplicate_layer_matched": "CLEAN",
+            "pyq_copy_status": "NEW",
+            "candidate_status": "ACCEPTED"
+          },
+          {
+            "question_id": "q_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3_8",
+            "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3",
+            "question_number": 8,
+            "section_name": "Indian Constitution and Polity",
+            "question_text": "Which landmark judicial pronouncement explicitly declared that the Preamble is an integral part of the Constitution of India, thereby allowing it to be amended under Article 368, provided the basic structure is not altered?",
+            "options": [
+              "Kesavananda Bharati v. State of Kerala (1973)",
+              "Berubari Union Case (1960)",
+              "A.K. Gopalan v. State of Madras (1950)",
+              "Minerva Mills v. Union of India (1980)"
+            ],
+            "correct_option_index": 0,
+            "explanation": "In the Kesavananda Bharati case (1973), the Supreme Court rejected the earlier opinion in the Berubari case and held that the Preamble is an integral part of the Constitution and can be amended under Article 368, subject to the Basic Structure doctrine.",
+            "topic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+            "subtopic": "Sectional Focus: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+            "difficulty": "MEDIUM",
+            "canonical_hash": "88cbc8f28ea78c3b",
+            "source_reference": "M. Laxmikanth, Indian Polity, 7th Edition; Kesavananda Bharati v. State of Kerala (1973)",
+            "slot_id": "slot_bp_e2e_test_mtv0afd8_q8",
+            "blueprint_id": "bp_e2e_test_mtv0afd8",
+            "question_type": "CONCEPTUAL",
+            "cognitive_level": "APPLY",
+            "core_concept_target": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments fundamental principle and statutory applicability",
+            "answerable_fact_family": "Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_9",
+            "generation_provenance": "LIVE_GEMINI",
+            "research_provenance": "LIVE_DIRECT_WEB",
+            "data_provenance": "RETRIEVED_OFFICIAL",
+            "generation_model_id": "gemini-3.1-flash-lite",
+            "source_lineage": [
+              {
+                "source_url": "https://psc.ap.gov.in/notifications/tgpsc_group_2_paper_1",
+                "source_title": "M. Laxmikanth, Indian Polity, 7th Edition; Kesavananda Bharati v. State of Kerala (1973)",
+                "publication_date": "2021-12-28",
+                "retrieved_at": "2026-09-10T04:07:52.229Z",
+                "evidence_snippet": "In the Kesavananda Bharati case (1973), the Supreme Court rejected the earlier opinion in the Berubari case and held that the Preamble is an integral part of the Constitution and can be amended under Article 368, subject to the Basic Structure doctrine.",
+                "fact_verified_at": "2026-09-10T04:07:52.229Z"
+              }
+            ],
+            "audit_result": {
+              "overall_status": "PASS",
+              "source_status": "PASS",
+              "answer_status": "PASS",
+              "fact_status": "SUPPORTED",
+              "audit_notes": "Static syllabus concept verified against official blueprint target: Preamble, Basic Structure Doctrine & 73rd/74th Amendments fundamental principle and statutory applicability"
+            },
+            "option_quality_audit": {
+              "symmetry_status": "SYMMETRIC",
+              "symmetry_score": 100,
+              "outlier_level": "NO_OUTLIER",
+              "outlier_reasons": [],
+              "length_ratio": 1.75,
+              "median_length": 7,
+              "correct_option_length_deviation": 0,
+              "clause_counts": [
+                2,
+                2,
+                2,
+                2
+              ],
+              "entity_counts": [
+                3,
+                1,
+                3,
+                3
+              ],
+              "date_or_number_counts": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "has_parenthetical": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "parenthetical_leak_detected": false,
+              "stem_echo_detected": false,
+              "stem_echo_words": [],
+              "extreme_qualifiers_detected": false,
+              "extreme_qualifier_options": [],
+              "same_semantic_category": true,
+              "blind_audit_cue_level": "NO_CUE",
+              "predicted_option_index": 0,
+              "distractor_quality_score": 5,
+              "weak_distractors": [],
+              "flags": [],
+              "recommendation": "PASS"
+            },
+            "symmetry_status": "SYMMETRIC",
+            "core_fact_representation": {
+              "subject": "Indian Constitution and Polity",
+              "topic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+              "subtopic": "Sectional Focus: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+              "entities": [
+                "Preamble, Basic Structure Doctrine & 73rd/74th Amendments fundamental principle and statutory applicability"
+              ],
+              "relation": "statutory_mandate",
+              "property_tested": "Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_9",
+              "object_or_value": "kesavananda bharati v. state of kerala (1973)",
+              "correct_answer_concept": "kesavananda bharati v. state of kerala (1973)",
+              "fact_fingerprint": "fp_preamble_basic_structure_doctrine_73rd_74th_amendments_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_9"
+            },
+            "duplicate_score": 0,
+            "duplicate_layer_matched": "CLEAN",
+            "pyq_copy_status": "NEW",
+            "candidate_status": "ACCEPTED"
+          }
+        ]
+      },
+      {
+        "section_id": "sec_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3_3",
+        "section_name": "History and Cultural Heritage",
+        "total_questions": 2,
+        "marks_per_question": 1,
+        "questions": [
+          {
+            "question_id": "q_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3_4",
+            "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3",
+            "question_number": 4,
+            "section_name": "History and Cultural Heritage",
+            "question_text": "Which of the following architectural styles is characteristic of the Asaf Jahi period in Hyderabad, distinguishing it from the earlier Kakatiya temple architecture?",
+            "options": [
+              "Indo-Saracenic style featuring large domes, high arches, and minarets",
+              "Star-shaped (Trikuta) temple plan layouts with intricate stone carvings",
+              "Sandbox foundation technique used for building heavy stone structures",
+              "Use of lightweight porous 'floating bricks' for temple gopurams"
+            ],
+            "correct_option_index": 0,
+            "explanation": "The Asaf Jahi (Nizam) period is characterized by the Indo-Saracenic architectural style, which blends Islamic, Mughal, and European elements, featuring domes and arches. Options B, C, and D are specific to the Kakatiya architectural tradition.",
+            "topic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+            "subtopic": "Sectional Focus: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+            "difficulty": "MEDIUM",
+            "canonical_hash": "e756ea5e927a5040",
+            "source_reference": "History of Hyderabad, Department of Heritage Telangana",
+            "slot_id": "slot_bp_e2e_test_mtv0afd8_q4",
+            "blueprint_id": "bp_e2e_test_mtv0afd8",
+            "question_type": "DIRECT_FACT",
+            "cognitive_level": "UNDERSTAND",
+            "core_concept_target": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions fundamental principle and statutory applicability",
+            "answerable_fact_family": "Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_5",
+            "generation_provenance": "LIVE_GEMINI",
+            "research_provenance": "LIVE_DIRECT_WEB",
+            "data_provenance": "RETRIEVED_OFFICIAL",
+            "generation_model_id": "gemini-3.1-flash-lite",
+            "source_lineage": [
+              {
+                "source_url": "https://psc.ap.gov.in/notifications/tgpsc_group_2_paper_1",
+                "source_title": "History of Hyderabad, Department of Heritage Telangana",
+                "publication_date": "2021-12-28",
+                "retrieved_at": "2026-09-10T04:07:26.746Z",
+                "evidence_snippet": "The Asaf Jahi (Nizam) period is characterized by the Indo-Saracenic architectural style, which blends Islamic, Mughal, and European elements, featuring domes and arches. Options B, C, and D are specific to the Kakatiya architectural tradition.",
+                "fact_verified_at": "2026-09-10T04:07:26.746Z"
+              }
+            ],
+            "audit_result": {
+              "overall_status": "PASS",
+              "source_status": "PASS",
+              "answer_status": "PASS",
+              "fact_status": "SUPPORTED",
+              "audit_notes": "Static syllabus concept verified against official blueprint target: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions fundamental principle and statutory applicability"
+            },
+            "option_quality_audit": {
+              "symmetry_status": "SYMMETRIC",
+              "symmetry_score": 100,
+              "outlier_level": "NO_OUTLIER",
+              "outlier_reasons": [],
+              "length_ratio": 1,
+              "median_length": 9,
+              "correct_option_length_deviation": 0,
+              "clause_counts": [
+                3,
+                3,
+                0,
+                0
+              ],
+              "entity_counts": [
+                2,
+                2,
+                1,
+                1
+              ],
+              "date_or_number_counts": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "has_parenthetical": [
+                false,
+                true,
+                false,
+                false
+              ],
+              "parenthetical_leak_detected": false,
+              "stem_echo_detected": false,
+              "stem_echo_words": [],
+              "extreme_qualifiers_detected": false,
+              "extreme_qualifier_options": [],
+              "same_semantic_category": true,
+              "blind_audit_cue_level": "STRONG_CUE",
+              "predicted_option_index": 1,
+              "distractor_quality_score": 5,
+              "weak_distractors": [],
+              "flags": [],
+              "recommendation": "PASS"
+            },
+            "symmetry_status": "SYMMETRIC",
+            "core_fact_representation": {
+              "subject": "History and Cultural Heritage",
+              "topic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+              "subtopic": "Sectional Focus: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+              "entities": [
+                "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions fundamental principle and statutory applicability"
+              ],
+              "relation": "statutory_mandate",
+              "property_tested": "Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_5",
+              "object_or_value": "indo-saracenic style featuring large domes, high arches, and minarets",
+              "correct_answer_concept": "indo-saracenic style featuring large domes, high arches, and minarets",
+              "fact_fingerprint": "fp_kakatiya_asaf_jahi_dynasty_architecture_inscriptions_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_5"
+            },
+            "duplicate_score": 0,
+            "duplicate_layer_matched": "CLEAN",
+            "pyq_copy_status": "NEW",
+            "candidate_status": "ACCEPTED"
+          },
+          {
+            "question_id": "q_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3_5",
+            "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3",
+            "question_number": 5,
+            "section_name": "History and Cultural Heritage",
+            "question_text": "Consider the following statements regarding the Thousand Pillar Temple (Rudreshwara Swamy Temple) in Hanamkonda: \n1. It was built by the Kakatiya King Rudra Deva in 1163 CE. \n2. The temple is a Trikutalayam, dedicated to Shiva, Vishnu, and Surya. \n3. The temple is renowned for its sandbox foundation technique. \nWhich of the statements given above are correct?",
+            "options": [
+              "1 and 2 only",
+              "2 and 3 only",
+              "1 and 3 only",
+              "1, 2 and 3"
+            ],
+            "correct_option_index": 3,
+            "explanation": "The Thousand Pillar Temple was commissioned by Rudra Deva in 1163 CE. It is a classic example of a Trikutalayam (three-shrine temple) dedicated to Shiva, Vishnu, and Surya, and utilizes the advanced sandbox foundation technique typical of Kakatiya engineering.",
+            "topic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+            "subtopic": "Sectional Focus: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+            "difficulty": "MEDIUM",
+            "canonical_hash": "b7d61d83375d4d67",
+            "source_reference": "Archaeological Survey of India (ASI) Records on Kakatiya Monuments",
+            "slot_id": "slot_bp_e2e_test_mtv0afd8_q5",
+            "blueprint_id": "bp_e2e_test_mtv0afd8",
+            "question_type": "STATEMENT_COMBINATION",
+            "cognitive_level": "UNDERSTAND",
+            "core_concept_target": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions fundamental principle and statutory applicability",
+            "answerable_fact_family": "Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_6",
+            "generation_provenance": "LIVE_GEMINI",
+            "research_provenance": "LIVE_DIRECT_WEB",
+            "data_provenance": "RETRIEVED_OFFICIAL",
+            "generation_model_id": "gemini-3.1-flash-lite",
+            "source_lineage": [
+              {
+                "source_url": "https://psc.ap.gov.in/notifications/tgpsc_group_2_paper_1",
+                "source_title": "Archaeological Survey of India (ASI) Records on Kakatiya Monuments",
+                "publication_date": "2021-12-28",
+                "retrieved_at": "2026-09-10T04:07:26.752Z",
+                "evidence_snippet": "The Thousand Pillar Temple was commissioned by Rudra Deva in 1163 CE. It is a classic example of a Trikutalayam (three-shrine temple) dedicated to Shiva, Vishnu, and Surya, and utilizes the advanced sandbox foundation technique typical of Kakatiya engineering.",
+                "fact_verified_at": "2026-09-10T04:07:26.752Z"
+              }
+            ],
+            "audit_result": {
+              "overall_status": "PASS",
+              "source_status": "PASS",
+              "answer_status": "PASS",
+              "fact_status": "SUPPORTED",
+              "audit_notes": "Static syllabus concept verified against official blueprint target: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions fundamental principle and statutory applicability"
+            },
+            "option_quality_audit": {
+              "symmetry_status": "SYMMETRIC",
+              "symmetry_score": 100,
+              "outlier_level": "NO_OUTLIER",
+              "outlier_reasons": [],
+              "length_ratio": 1,
+              "median_length": 4,
+              "correct_option_length_deviation": 0,
+              "clause_counts": [
+                0,
+                0,
+                0,
+                1
+              ],
+              "entity_counts": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "date_or_number_counts": [
+                2,
+                2,
+                2,
+                3
+              ],
+              "has_parenthetical": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "parenthetical_leak_detected": false,
+              "stem_echo_detected": false,
+              "stem_echo_words": [],
+              "extreme_qualifiers_detected": false,
+              "extreme_qualifier_options": [],
+              "same_semantic_category": true,
+              "blind_audit_cue_level": "NO_CUE",
+              "predicted_option_index": 0,
+              "distractor_quality_score": 5,
+              "weak_distractors": [],
+              "flags": [],
+              "recommendation": "PASS"
+            },
+            "symmetry_status": "SYMMETRIC",
+            "core_fact_representation": {
+              "subject": "History and Cultural Heritage",
+              "topic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+              "subtopic": "Sectional Focus: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+              "entities": [
+                "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions fundamental principle and statutory applicability"
+              ],
+              "relation": "statutory_mandate",
+              "property_tested": "Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_6",
+              "object_or_value": "1, 2 and 3",
+              "correct_answer_concept": "1, 2 and 3",
+              "fact_fingerprint": "fp_kakatiya_asaf_jahi_dynasty_architecture_inscriptions_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_6"
+            },
+            "duplicate_score": 0,
+            "duplicate_layer_matched": "CLEAN",
+            "pyq_copy_status": "NEW",
+            "candidate_status": "ACCEPTED"
+          }
+        ]
+      },
+      {
+        "section_id": "sec_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3_4",
+        "section_name": "General Studies",
+        "total_questions": 2,
+        "marks_per_question": 1,
+        "questions": [
+          {
+            "question_id": "q_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3_9",
+            "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3",
+            "question_number": 9,
+            "section_name": "General Studies",
+            "question_text": "Regarding the agro-climatic systems of the Western Ghats and Eastern Ghats, which of the following statements is correct?",
+            "options": [
+              "The Eastern Ghats are a continuous mountain range, whereas the Western Ghats are highly eroded and discontinuous.",
+              "The Western Ghats receive significantly less rainfall than the Eastern Ghats due to the rain-shadow effect.",
+              "The Western Ghats act as a major orographic barrier for the Southwest Monsoon, while the Eastern Ghats are parallel to the coast and receive less orographic rainfall.",
+              "Both A and B are correct."
+            ],
+            "correct_option_index": 3,
+            "explanation": "Statement C is the correct description of the orographic influence. The Western Ghats are a continuous escarpment that forces moisture-laden winds to rise, causing heavy rainfall on the windward side, whereas the Eastern Ghats are discontinuous and parallel to the coast, resulting in significantly less orographic precipitation.",
+            "topic": "Western Ghats vs Eastern Ghats Agro-climatic systems",
+            "subtopic": "Sectional Focus: Western Ghats vs Eastern Ghats Agro-climatic systems",
+            "difficulty": "HARD",
+            "canonical_hash": "61dcd36f2b1de18d",
+            "source_reference": "NCERT Geography, India: Physical Environment",
+            "slot_id": "slot_bp_e2e_test_mtv0afd8_q9",
+            "blueprint_id": "bp_e2e_test_mtv0afd8",
+            "question_type": "CONCEPTUAL",
+            "cognitive_level": "APPLY",
+            "core_concept_target": "Western Ghats vs Eastern Ghats Agro-climatic systems fundamental principle and statutory applicability",
+            "answerable_fact_family": "Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_10",
+            "generation_provenance": "LIVE_GEMINI",
+            "research_provenance": "LIVE_DIRECT_WEB",
+            "data_provenance": "RETRIEVED_OFFICIAL",
+            "generation_model_id": "gemini-3.1-flash-lite",
+            "source_lineage": [
+              {
+                "source_url": "https://psc.ap.gov.in/notifications/tgpsc_group_2_paper_1",
+                "source_title": "NCERT Geography, India: Physical Environment",
+                "publication_date": "2021-12-28",
+                "retrieved_at": "2026-09-10T04:07:52.240Z",
+                "evidence_snippet": "Statement C is the correct description of the orographic influence. The Western Ghats are a continuous escarpment that forces moisture-laden winds to rise, causing heavy rainfall on the windward side, whereas the Eastern Ghats are discontinuous and parallel to the coast, resulting in significantly less orographic precipitation.",
+                "fact_verified_at": "2026-09-10T04:07:52.240Z"
+              }
+            ],
+            "audit_result": {
+              "overall_status": "PASS",
+              "source_status": "PASS",
+              "answer_status": "PASS",
+              "fact_status": "SUPPORTED",
+              "audit_notes": "Static syllabus concept verified against official blueprint target: Western Ghats vs Eastern Ghats Agro-climatic systems fundamental principle and statutory applicability"
+            },
+            "option_quality_audit": {
+              "symmetry_status": "MINOR_ASYMMETRY",
+              "symmetry_score": 80,
+              "outlier_level": "NO_OUTLIER",
+              "outlier_reasons": [],
+              "length_ratio": 4.5,
+              "median_length": 16.5,
+              "correct_option_length_deviation": -10.5,
+              "clause_counts": [
+                1,
+                1,
+                1,
+                0
+              ],
+              "entity_counts": [
+                2,
+                2,
+                3,
+                1
+              ],
+              "date_or_number_counts": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "has_parenthetical": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "parenthetical_leak_detected": false,
+              "stem_echo_detected": false,
+              "stem_echo_words": [],
+              "extreme_qualifiers_detected": false,
+              "extreme_qualifier_options": [],
+              "same_semantic_category": true,
+              "blind_audit_cue_level": "NO_CUE",
+              "predicted_option_index": 0,
+              "distractor_quality_score": 5,
+              "weak_distractors": [],
+              "flags": [],
+              "recommendation": "PASS"
+            },
+            "symmetry_status": "MINOR_ASYMMETRY",
+            "core_fact_representation": {
+              "subject": "General Studies",
+              "topic": "Western Ghats vs Eastern Ghats Agro-climatic systems",
+              "subtopic": "Sectional Focus: Western Ghats vs Eastern Ghats Agro-climatic systems",
+              "entities": [
+                "Western Ghats vs Eastern Ghats Agro-climatic systems fundamental principle and statutory applicability"
+              ],
+              "relation": "statutory_mandate",
+              "property_tested": "Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_10",
+              "object_or_value": "both a and b are correct.",
+              "correct_answer_concept": "both a and b are correct.",
+              "fact_fingerprint": "fp_western_ghats_vs_eastern_ghats_agro_climatic_systems_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_10"
+            },
+            "duplicate_score": 0,
+            "duplicate_layer_matched": "CLEAN",
+            "pyq_copy_status": "NEW",
+            "candidate_status": "ACCEPTED"
+          },
+          {
+            "question_id": "q_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3_10",
+            "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3",
+            "question_number": 10,
+            "section_name": "General Studies",
+            "question_text": "Match List-I (Peaks) with List-II (Mountain Range) and choose the correct code:\n\nList-I:\nA. Anaimudi\nB. Mahendragiri\nC. Doddabetta\nD. Jindhagada\n\nList-II:\n1. Western Ghats\n2. Eastern Ghats\n\nChoose the correct code:",
+            "options": [
+              "A-1, B-2, C-1, D-2",
+              "A-1, B-2, C-1, D-2",
+              "A-2, B-1, C-2, D-1",
+              "A-1, B-1, C-2, D-2"
+            ],
+            "correct_option_index": 1,
+            "explanation": "Anaimudi (Western Ghats), Mahendragiri (Eastern Ghats), Doddabetta (Western Ghats), and Jindhagada (Eastern Ghats). The correct mapping is A-1, B-2, C-1, D-2.",
+            "topic": "Western Ghats vs Eastern Ghats Agro-climatic systems",
+            "subtopic": "Sectional Focus: Western Ghats vs Eastern Ghats Agro-climatic systems",
+            "difficulty": "HARD",
+            "canonical_hash": "fa43c8433aa56536",
+            "source_reference": "Physical Geography of India, Survey of India Data",
+            "slot_id": "slot_bp_e2e_test_mtv0afd8_q10",
+            "blueprint_id": "bp_e2e_test_mtv0afd8",
+            "question_type": "MATCHING",
+            "cognitive_level": "ANALYSE",
+            "core_concept_target": "Western Ghats vs Eastern Ghats Agro-climatic systems fundamental principle and statutory applicability",
+            "answerable_fact_family": "Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_11",
+            "generation_provenance": "LIVE_GEMINI",
+            "research_provenance": "LIVE_DIRECT_WEB",
+            "data_provenance": "RETRIEVED_OFFICIAL",
+            "generation_model_id": "gemini-3.1-flash-lite",
+            "source_lineage": [
+              {
+                "source_url": "https://psc.ap.gov.in/notifications/tgpsc_group_2_paper_1",
+                "source_title": "Physical Geography of India, Survey of India Data",
+                "publication_date": "2021-12-28",
+                "retrieved_at": "2026-09-10T04:07:52.247Z",
+                "evidence_snippet": "Anaimudi (Western Ghats), Mahendragiri (Eastern Ghats), Doddabetta (Western Ghats), and Jindhagada (Eastern Ghats). The correct mapping is A-1, B-2, C-1, D-2.",
+                "fact_verified_at": "2026-09-10T04:07:52.247Z"
+              }
+            ],
+            "audit_result": {
+              "overall_status": "PASS",
+              "source_status": "PASS",
+              "answer_status": "PASS",
+              "fact_status": "SUPPORTED",
+              "audit_notes": "Static syllabus concept verified against official blueprint target: Western Ghats vs Eastern Ghats Agro-climatic systems fundamental principle and statutory applicability"
+            },
+            "option_quality_audit": {
+              "symmetry_status": "SYMMETRIC",
+              "symmetry_score": 100,
+              "outlier_level": "NO_OUTLIER",
+              "outlier_reasons": [],
+              "length_ratio": 1,
+              "median_length": 4,
+              "correct_option_length_deviation": 0,
+              "clause_counts": [
+                7,
+                7,
+                7,
+                7
+              ],
+              "entity_counts": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "date_or_number_counts": [
+                4,
+                4,
+                4,
+                4
+              ],
+              "has_parenthetical": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "parenthetical_leak_detected": false,
+              "stem_echo_detected": false,
+              "stem_echo_words": [],
+              "extreme_qualifiers_detected": false,
+              "extreme_qualifier_options": [],
+              "same_semantic_category": true,
+              "blind_audit_cue_level": "NO_CUE",
+              "predicted_option_index": 0,
+              "distractor_quality_score": 5,
+              "weak_distractors": [],
+              "flags": [],
+              "recommendation": "PASS"
+            },
+            "symmetry_status": "SYMMETRIC",
+            "core_fact_representation": {
+              "subject": "General Studies",
+              "topic": "Western Ghats vs Eastern Ghats Agro-climatic systems",
+              "subtopic": "Sectional Focus: Western Ghats vs Eastern Ghats Agro-climatic systems",
+              "entities": [
+                "Western Ghats vs Eastern Ghats Agro-climatic systems fundamental principle and statutory applicability"
+              ],
+              "relation": "statutory_mandate",
+              "property_tested": "Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_11",
+              "object_or_value": "a-1, b-2, c-1, d-2",
+              "correct_answer_concept": "a-1, b-2, c-1, d-2",
+              "fact_fingerprint": "fp_western_ghats_vs_eastern_ghats_agro_climatic_systems_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_11"
+            },
+            "duplicate_score": 0,
+            "duplicate_layer_matched": "CLEAN",
+            "pyq_copy_status": "NEW",
+            "candidate_status": "ACCEPTED"
+          }
+        ]
+      }
+    ],
+    "duplicates_prevented_count": 0,
+    "status": "FINAL",
+    "generation_status": "GENERATION_SUCCESS",
+    "audit_notes": "Approved for candidate practice",
+    "data_provenance": "RETRIEVED_OFFICIAL",
+    "generation_provenance": "LIVE_GEMINI",
+    "research_provenance": "LIVE_DIRECT_WEB",
+    "duplicate_layers_status": "ALL_APPLICABLE_DUPLICATE_LAYERS_EXECUTED_AND_PASSED",
+    "quality_audit": {
+      "audit_id": "audit_mock_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3_mtv0b9lm",
+      "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv0afl3",
+      "exam_id": "tgpsc_group_2_paper_1",
+      "blueprint_id": "bp_e2e_test_mtv0afd8",
+      "status": "PASSED",
+      "overall_score": 90,
+      "total_questions_audited": 10,
+      "accepted_questions_count": 10,
+      "repair_required_count": 1,
+      "replacement_required_count": 0,
+      "critical_blockers_count": 0,
+      "checks": [
+        {
+          "id": "CHECK_01_COUNT",
+          "title": "Total Question Count Verification",
+          "category": "STRUCTURE",
+          "passed": true,
+          "details": "Paper contains exactly 10 questions as specified."
+        },
+        {
+          "id": "CHECK_02_SEQUENCE",
+          "title": "Question Number Sequence Continuity",
+          "category": "STRUCTURE",
+          "passed": false,
+          "details": "Question numbers have gaps or duplicate index assignments."
+        },
+        {
+          "id": "CHECK_03_PATTERN",
+          "title": "Official Exam Pattern & Marking Scheme",
+          "category": "SYLLABUS",
+          "passed": true,
+          "details": "Marking scheme matches exam specification: negative marking rate is 0.25."
+        },
+        {
+          "id": "CHECK_04_SUBJECT_DIST",
+          "title": "Subject Weight Distribution",
+          "category": "SYLLABUS",
+          "passed": true,
+          "details": "Subject allocations reflect blueprint weights."
+        },
+        {
+          "id": "CHECK_05_TOPIC_DIST",
+          "title": "Topic Diversity & Granularity",
+          "category": "SYLLABUS",
+          "passed": true,
+          "details": "Covered 6 distinct topics across 10 questions."
+        },
+        {
+          "id": "CHECK_06_DIFFICULTY",
+          "title": "Difficulty Spectrum Balance",
+          "category": "COGNITIVE",
+          "passed": true,
+          "details": "Easy: 3, Medium: 5, Hard: 2."
+        },
+        {
+          "id": "CHECK_07_COGNITIVE",
+          "title": "Bloom Cognitive Taxonomy Coverage",
+          "category": "COGNITIVE",
+          "passed": true,
+          "details": "Levels observed: RECALL, UNDERSTAND, APPLY, ANALYSE"
+        },
+        {
+          "id": "CHECK_08_TYPES",
+          "title": "Question Archetype & Format Variety",
+          "category": "COGNITIVE",
+          "passed": true,
+          "details": "Archetypes verified: DIRECT_FACT, STATEMENT_COMBINATION, CONCEPTUAL, MATCHING"
+        },
+        {
+          "id": "CHECK_09_STATIC_CURRENT",
+          "title": "Static vs Current Affairs Balance",
+          "category": "SYLLABUS",
+          "passed": true,
+          "details": "Current Affairs: 0 questions; Static Core: 10 questions."
+        },
+        {
+          "id": "CHECK_10_GEO_SCOPE",
+          "title": "State vs National Jurisdiction Scope",
+          "category": "SYLLABUS",
+          "passed": true,
+          "details": "State-specific questions: 2, National/Universal: 8."
+        },
+        {
+          "id": "CHECK_11_VISUALS",
+          "title": "Visual / Data Representation Verification",
+          "category": "STRUCTURE",
+          "passed": true,
+          "details": "Visual / Tabular elements rendered: 0 items."
+        },
+        {
+          "id": "CHECK_12_LANGUAGE",
+          "title": "Language Protocol & Parity Check",
+          "category": "STRUCTURE",
+          "passed": true,
+          "details": "Language protocol verified; English terminology consistency maintained."
+        },
+        {
+          "id": "CHECK_13_ANSWER_KEYS",
+          "title": "Answer Position Distribution (A/B/C/D)",
+          "category": "STRUCTURE",
+          "passed": true,
+          "details": "Distribution: A: 3, B: 3, C: 2, D: 2."
+        },
+        {
+          "id": "CHECK_14_INT_DUPLICATES",
+          "title": "Internal Paper Duplicate Check",
+          "category": "AUTHENTICITY",
+          "passed": true,
+          "affected_question_numbers": [],
+          "details": "Zero duplicate questions detected within this paper."
+        },
+        {
+          "id": "CHECK_15_FACT_DUPLICATES",
+          "title": "Core Answerable Fact Repetition",
+          "category": "AUTHENTICITY",
+          "passed": false,
+          "affected_question_numbers": [
+            3,
+            8,
+            5,
+            10
+          ],
+          "details": "Same-fact repetition observed at question numbers: 3, 8, 5, 10."
+        },
+        {
+          "id": "CHECK_16_PYQ_RISK",
+          "title": "Previous-Year Paper Direct Copy Risk",
+          "category": "AUTHENTICITY",
+          "passed": true,
+          "affected_question_numbers": [],
+          "details": "Zero questions copy previous-year exam items verbatim."
+        },
+        {
+          "id": "CHECK_17_SOURCES",
+          "title": "Authoritative Source Coverage",
+          "category": "EVIDENCE",
+          "passed": true,
+          "details": "100% of questions carry validated source citations & evidence lineage."
+        },
+        {
+          "id": "CHECK_18_CUTOFF",
+          "title": "Current-Affairs Dates & Evidence",
+          "category": "LEGAL_TEMPORAL",
+          "passed": true,
+          "affected_question_numbers": [],
+          "details": "Pre-notification preparation mode: grounded on verified syllabus & statutory gazette provisions."
+        },
+        {
+          "id": "CHECK_19_LEGAL_VALIDITY",
+          "title": "Statutory & Constitutional Legal Validity",
+          "category": "LEGAL_TEMPORAL",
+          "passed": true,
+          "details": "Legal currency requires source-backed question verification; unsupported claims remain unresolved."
+        },
+        {
+          "id": "CHECK_20_EXPLANATION",
+          "title": "Detailed Rationale & Pedagogical Explanation",
+          "category": "EVIDENCE",
+          "passed": true,
+          "affected_question_numbers": [],
+          "details": "Every question contains an unambiguous pedagogical explanation."
+        },
+        {
+          "id": "CHECK_21_SLOT_COVERAGE",
+          "title": "Locked Blueprint Slot Complete Coverage",
+          "category": "STRUCTURE",
+          "passed": true,
+          "details": "All questions correspond to defined blueprint slots."
+        }
+      ],
+      "summary": "Paper Quality Audit completed: 19/21 checks passed (90% compliance score). Audit Status: REPAIR_REQUIRED.",
+      "audited_at": "2026-09-10T04:07:54.970Z",
+      "auditor_signoff": {
+        "auditor_name": "Lead Quality Auditor",
+        "signed_at": "2026-09-10T04:07:55.042Z",
+        "notes": "Approved for candidate practice"
+      }
+    },
+    "finalized_at": "2026-09-10T04:07:55.042Z"
+  },
+  {
+    "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5",
+    "exam_id": "tgpsc_group_2_paper_1",
+    "exam_title": "TGPSC Group-II Services: Paper I (General Studies & General Abilities)",
+    "mock_number": 2,
+    "title": "[Pre-Notification] Mock #2: Paper-I: General Studies and General Abilities (Blueprint v1)",
+    "blueprint_id": "bp_e2e_test_mtv08bg9",
+    "blueprint_version": 1,
+    "test_mode": "FULL_LENGTH",
+    "preparation_mode": "PRE_NOTIFICATION_PREPARATION",
+    "preparation_basis_id": "pb_tgpsc_group_2_paper_1_pre_notification_preparation_tgpsc_g2_v2022",
+    "preparation_basis": {
+      "preparation_basis_id": "pb_tgpsc_group_2_paper_1_pre_notification_preparation_tgpsc_g2_v2022",
+      "exam_id": "tgpsc_group_2_paper_1",
+      "preparation_mode": "PRE_NOTIFICATION_PREPARATION",
+      "historical_exam_version": "tgpsc_g2_v2022",
+      "recruitment_cycle": "Notification 28/2022 (Current Cycle 2024-2025)",
+      "notification": "28/2022",
+      "syllabus_version": "6 verified topics (Notification 28/2022 (Current Cycle 2024-2025))",
+      "pattern_version": "150 Qs / 150m / -0.25 marks (Version tgpsc_g2_v2022)",
+      "pyq_intelligence_version": "LIMITED_DATA",
+      "last_verified_date": "2026-09-06T00:00:00.000Z",
+      "future_notification_availability": "NOT_YET_RELEASED",
+      "pattern_change_risk": "MEDIUM",
+      "confidence": 98,
+      "source_references": [
+        "TGPSC Official Notification No. 28/2022 - Scheme of Examination and Syllabi for Group-II Services",
+        "Telangana Extraordinary State Gazette No. 74 - Ad-hoc Rules for Group-II Cadre Selection"
+      ],
+      "status": "HISTORICAL_BASIS_VERIFIED",
+      "risk_reasons": [
+        "Historical pattern revision observed between Notification 20/2015 (Historical Basis 2015-2016) and Notification 28/2022 (Current Cycle 2024-2025)."
+      ],
+      "basis_summary": "Grounded on verified historical syllabus and examination scheme from Notification 28/2022 (Current Cycle 2024-2025). Zero unsupported future facts.",
+      "is_active": true,
+      "created_at": "2026-09-10T04:05:37.899Z",
+      "updated_at": "2026-09-10T04:05:37.899Z"
+    },
+    "target_exam_date": null,
+    "preparation_as_of_date": "2026-09-10",
+    "current_affairs_cutoff": "2025-11-15",
+    "current_affairs_mode": "PREPARATION_CURRENT_AFFAIRS",
+    "series_id": "series_tgpsc_prenotif_v2022_fl",
+    "created_at": "2026-09-10T04:06:03.999Z",
+    "duration_minutes": 15,
+    "total_questions": 10,
+    "total_marks": 10,
+    "negative_marking_rate": 0.25,
+    "difficulty_mix": {
+      "easy": 3,
+      "medium": 5,
+      "hard": 2
+    },
+    "sections": [
+      {
+        "section_id": "sec_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5_1",
+        "section_name": "Economy and Development",
+        "total_questions": 2,
+        "marks_per_question": 1,
+        "questions": [
+          {
+            "question_id": "q_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5_1",
+            "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5",
+            "question_number": 1,
+            "section_name": "Economy and Development",
+            "question_text": "According to the Telangana Socio-Economic Outlook 2024-25, what is the primary objective of the 'Indira Mahila Shakti' initiative launched by the state government for women's self-help groups (SHGs)?",
+            "options": [
+              "Providing direct monthly cash transfers to all unemployed women in the state",
+              "Establishing digital literacy centers exclusively for women in rural districts",
+              "Transforming women's SHGs into entrepreneurs by providing interest-free loans and market linkages",
+              "Distributing free agricultural machinery to women farmers in the state"
+            ],
+            "correct_option_index": 2,
+            "explanation": "The 'Indira Mahila Shakti' initiative is a flagship program highlighted in the 2024-25 Outlook, aimed at empowering women's SHGs by facilitating access to credit and creating sustainable entrepreneurial opportunities through market linkages, moving beyond mere micro-finance.",
+            "topic": "Telangana Socio-Economic Outlook & Budget Highlights",
+            "subtopic": "Sectional Focus: Telangana Socio-Economic Outlook & Budget Highlights",
+            "difficulty": "EASY",
+            "canonical_hash": "76bdd7db25ba33cd",
+            "source_reference": "Telangana Socio-Economic Outlook 2024-25, Planning Department, Government of Telangana",
+            "slot_id": "slot_bp_e2e_test_mtv08bg9_q1",
+            "blueprint_id": "bp_e2e_test_mtv08bg9",
+            "question_type": "DIRECT_FACT",
+            "cognitive_level": "RECALL",
+            "core_concept_target": "Telangana Socio-Economic Outlook & Budget Highlights fundamental principle and statutory applicability",
+            "answerable_fact_family": "Family: Telangana_Socio_Economic_Outlook___Budget_Highlights_concept_2",
+            "generation_provenance": "LIVE_GEMINI",
+            "research_provenance": "LIVE_DIRECT_WEB",
+            "data_provenance": "RETRIEVED_OFFICIAL",
+            "generation_model_id": "gemini-3.1-flash-lite",
+            "source_lineage": [
+              {
+                "source_url": "https://psc.ap.gov.in/notifications/tgpsc_group_2_paper_1",
+                "source_title": "Telangana Socio-Economic Outlook 2024-25, Planning Department, Government of Telangana",
+                "publication_date": "2021-12-28",
+                "retrieved_at": "2026-09-10T04:05:51.955Z",
+                "evidence_snippet": "The 'Indira Mahila Shakti' initiative is a flagship program highlighted in the 2024-25 Outlook, aimed at empowering women's SHGs by facilitating access to credit and creating sustainable entrepreneurial opportunities through market linkages, moving beyond mere micro-finance.",
+                "fact_verified_at": "2026-09-10T04:05:51.955Z"
+              }
+            ],
+            "audit_result": {
+              "overall_status": "PASS",
+              "fact_status": "SUPPORTED",
+              "audit_notes": "Static syllabus concept verified against official blueprint target: Telangana Socio-Economic Outlook & Budget Highlights fundamental principle and statutory applicability"
+            },
+            "option_quality_audit": {
+              "symmetry_status": "SYMMETRIC",
+              "symmetry_score": 100,
+              "outlier_level": "NO_OUTLIER",
+              "outlier_reasons": [],
+              "length_ratio": 1.2,
+              "median_length": 11,
+              "correct_option_length_deviation": 1,
+              "clause_counts": [
+                0,
+                0,
+                1,
+                0
+              ],
+              "entity_counts": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "date_or_number_counts": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "has_parenthetical": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "parenthetical_leak_detected": false,
+              "stem_echo_detected": false,
+              "stem_echo_words": [],
+              "extreme_qualifiers_detected": false,
+              "extreme_qualifier_options": [
+                1
+              ],
+              "same_semantic_category": true,
+              "blind_audit_cue_level": "NO_CUE",
+              "predicted_option_index": 0,
+              "distractor_quality_score": 5,
+              "weak_distractors": [],
+              "flags": [],
+              "recommendation": "PASS"
+            },
+            "symmetry_status": "SYMMETRIC",
+            "core_fact_representation": {
+              "subject": "Economy and Development",
+              "topic": "Telangana Socio-Economic Outlook & Budget Highlights",
+              "subtopic": "Sectional Focus: Telangana Socio-Economic Outlook & Budget Highlights",
+              "entities": [
+                "Telangana Socio-Economic Outlook & Budget Highlights fundamental principle and statutory applicability"
+              ],
+              "relation": "statutory_mandate",
+              "property_tested": "Family: Telangana_Socio_Economic_Outlook___Budget_Highlights_concept_2",
+              "object_or_value": "transforming women's shgs into entrepreneurs by providing interest-free loans and market linkages",
+              "time_scope": "2024",
+              "correct_answer_concept": "transforming women's shgs into entrepreneurs by providing interest-free loans and market linkages",
+              "fact_fingerprint": "fp_telangana_socio_economic_outlook_budget_highlights_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Telangana_Socio_Economic_Outlook___Budget_Highlights_concept_2"
+            },
+            "duplicate_score": 0,
+            "duplicate_layer_matched": "CLEAN",
+            "pyq_copy_status": "NEW",
+            "candidate_status": "ACCEPTED"
+          },
+          {
+            "question_id": "q_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5_6",
+            "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5",
+            "question_number": 6,
+            "section_name": "Economy and Development",
+            "question_text": "Consider the following statements regarding the agricultural welfare schemes in Telangana:\n\n1. The Rythu Bandhu scheme provides an annual investment support of ₹20,000 per acre to all land-owning farmers in the state.\n2. Mission Kakatiya, launched in 2015, focuses on the restoration of minor irrigation tanks to improve agricultural productivity and groundwater levels.\n\nVisual representation of annual fund disbursement (in ₹ Crores) for minor irrigation projects:\n| Year | Disbursement |\n|---|---|\n| 2022 | 1200 |\n| 2023 | 1500 |\n| 2024 | 1800 |\n\nWhich of the statements given above is/are correct?",
+            "options": [
+              "1 only",
+              "2 only",
+              "Both 1 and 2",
+              "Neither 1 nor 2"
+            ],
+            "correct_option_index": 1,
+            "explanation": "Statement 1 is incorrect because the Rythu Bandhu scheme provides ₹10,000 per acre per year (₹5,000 per season), not ₹20,000. Statement 2 is correct as Mission Kakatiya is a flagship program of the Telangana government aimed at the restoration of minor irrigation tanks to enhance agricultural productivity.",
+            "topic": "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+            "subtopic": "Sectional Focus: Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+            "difficulty": "MEDIUM",
+            "canonical_hash": "f3dbe39642b16e98",
+            "source_reference": "Telangana State Budget 2024-25 and Department of Agriculture, Government of Telangana",
+            "slot_id": "slot_bp_e2e_test_mtv08bg9_q6",
+            "blueprint_id": "bp_e2e_test_mtv08bg9",
+            "question_type": "STATEMENT_COMBINATION",
+            "cognitive_level": "UNDERSTAND",
+            "core_concept_target": "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes fundamental principle and statutory applicability",
+            "answerable_fact_family": "Family: Rythu_Bandhu___Rythu_Bharosa___Mission_Kakatiya_Schemes_concept_7",
+            "generation_provenance": "LIVE_GEMINI",
+            "research_provenance": "LIVE_DIRECT_WEB",
+            "data_provenance": "RETRIEVED_OFFICIAL",
+            "generation_model_id": "gemini-3.1-flash-lite",
+            "source_lineage": [
+              {
+                "source_url": "https://psc.ap.gov.in/notifications/tgpsc_group_2_paper_1",
+                "source_title": "Telangana State Budget 2024-25 and Department of Agriculture, Government of Telangana",
+                "publication_date": "2021-12-28",
+                "retrieved_at": "2026-09-10T04:06:03.967Z",
+                "evidence_snippet": "Statement 1 is incorrect because the Rythu Bandhu scheme provides ₹10,000 per acre per year (₹5,000 per season), not ₹20,000. Statement 2 is correct as Mission Kakatiya is a flagship program of the Telangana government aimed at the restoration of minor irrigation tanks to enhance agricultural productivity.",
+                "fact_verified_at": "2026-09-10T04:06:03.967Z"
+              }
+            ],
+            "audit_result": {
+              "overall_status": "PASS",
+              "fact_status": "SUPPORTED",
+              "audit_notes": "Static syllabus concept verified against official blueprint target: Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes fundamental principle and statutory applicability"
+            },
+            "option_quality_audit": {
+              "symmetry_status": "MINOR_ASYMMETRY",
+              "symmetry_score": 80,
+              "outlier_level": "NO_OUTLIER",
+              "outlier_reasons": [],
+              "length_ratio": 2,
+              "median_length": 3,
+              "correct_option_length_deviation": -1,
+              "clause_counts": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "entity_counts": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "date_or_number_counts": [
+                1,
+                1,
+                2,
+                2
+              ],
+              "has_parenthetical": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "parenthetical_leak_detected": false,
+              "stem_echo_detected": false,
+              "stem_echo_words": [],
+              "extreme_qualifiers_detected": false,
+              "extreme_qualifier_options": [],
+              "same_semantic_category": true,
+              "blind_audit_cue_level": "NO_CUE",
+              "predicted_option_index": 0,
+              "distractor_quality_score": 5,
+              "weak_distractors": [],
+              "flags": [],
+              "recommendation": "PASS"
+            },
+            "symmetry_status": "MINOR_ASYMMETRY",
+            "core_fact_representation": {
+              "subject": "Economy and Development",
+              "topic": "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+              "subtopic": "Sectional Focus: Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+              "entities": [
+                "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes fundamental principle and statutory applicability"
+              ],
+              "relation": "statutory_mandate",
+              "property_tested": "Family: Rythu_Bandhu___Rythu_Bharosa___Mission_Kakatiya_Schemes_concept_7",
+              "object_or_value": "2 only",
+              "time_scope": "2015",
+              "correct_answer_concept": "2 only",
+              "fact_fingerprint": "fp_rythu_bandhu_rythu_bharosa_mission_kakatiya_schemes_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Rythu_Bandhu___Rythu_Bharosa___Mission_Kakatiya_Schemes_concept_7"
+            },
+            "duplicate_score": 0,
+            "duplicate_layer_matched": "CLEAN",
+            "pyq_copy_status": "NEW",
+            "candidate_status": "ACCEPTED"
+          }
+        ]
+      },
+      {
+        "section_id": "sec_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5_2",
+        "section_name": "Indian Constitution and Polity",
+        "total_questions": 4,
+        "marks_per_question": 1,
+        "questions": [
+          {
+            "question_id": "q_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5_2",
+            "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5",
+            "question_number": 2,
+            "section_name": "Indian Constitution and Polity",
+            "question_text": "Which of the following statements correctly describes the scope of Article 25 of the Indian Constitution?",
+            "options": [
+              "It guarantees the right to establish and maintain institutions for religious and charitable purposes.",
+              "It guarantees to every person the freedom of conscience and the right to freely profess, practice, and propagate religion, subject to public order, morality, and health.",
+              "It provides for the absolute right of religious denominations to manage their own affairs in matters of religion without any state interference.",
+              "It prohibits the state from imposing any tax for the promotion of any particular religion or religious denomination."
+            ],
+            "correct_option_index": 1,
+            "explanation": "Article 25(1) of the Constitution of India guarantees the freedom of conscience and the right to freely profess, practice, and propagate religion, subject to public order, morality, and health. Option A refers to Article 26, and Option D refers to Article 27.",
+            "topic": "Articles 14-32 Fundamental Rights & Judicial Doctrines",
+            "subtopic": "Sectional Focus: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+            "difficulty": "EASY",
+            "canonical_hash": "0eadb45071104052",
+            "source_reference": "Constitution of India, Part III, Article 25",
+            "slot_id": "slot_bp_e2e_test_mtv08bg9_q2",
+            "blueprint_id": "bp_e2e_test_mtv08bg9",
+            "question_type": "DIRECT_FACT",
+            "cognitive_level": "RECALL",
+            "core_concept_target": "Articles 14-32 Fundamental Rights & Judicial Doctrines fundamental principle and statutory applicability",
+            "answerable_fact_family": "Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_3",
+            "generation_provenance": "LIVE_GEMINI",
+            "research_provenance": "LIVE_DIRECT_WEB",
+            "data_provenance": "RETRIEVED_OFFICIAL",
+            "generation_model_id": "gemini-3.1-flash-lite",
+            "source_lineage": [
+              {
+                "source_url": "https://psc.ap.gov.in/notifications/tgpsc_group_2_paper_1",
+                "source_title": "Constitution of India, Part III, Article 25",
+                "publication_date": "2021-12-28",
+                "retrieved_at": "2026-09-10T04:05:51.970Z",
+                "evidence_snippet": "Article 25(1) of the Constitution of India guarantees the freedom of conscience and the right to freely profess, practice, and propagate religion, subject to public order, morality, and health. Option A refers to Article 26, and Option D refers to Article 27.",
+                "fact_verified_at": "2026-09-10T04:05:51.970Z"
+              }
+            ],
+            "audit_result": {
+              "overall_status": "PASS",
+              "fact_status": "SUPPORTED",
+              "audit_notes": "Static syllabus concept verified against official blueprint target: Articles 14-32 Fundamental Rights & Judicial Doctrines fundamental principle and statutory applicability"
+            },
+            "option_quality_audit": {
+              "symmetry_status": "MINOR_ASYMMETRY",
+              "symmetry_score": 80,
+              "outlier_level": "NO_OUTLIER",
+              "outlier_reasons": [],
+              "length_ratio": 1.86,
+              "median_length": 20,
+              "correct_option_length_deviation": 6,
+              "clause_counts": [
+                0,
+                5,
+                0,
+                0
+              ],
+              "entity_counts": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "date_or_number_counts": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "has_parenthetical": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "parenthetical_leak_detected": false,
+              "stem_echo_detected": false,
+              "stem_echo_words": [],
+              "extreme_qualifiers_detected": false,
+              "extreme_qualifier_options": [],
+              "same_semantic_category": true,
+              "blind_audit_cue_level": "NO_CUE",
+              "predicted_option_index": 0,
+              "distractor_quality_score": 5,
+              "weak_distractors": [],
+              "flags": [],
+              "recommendation": "PASS"
+            },
+            "symmetry_status": "MINOR_ASYMMETRY",
+            "core_fact_representation": {
+              "subject": "Indian Constitution and Polity",
+              "topic": "Articles 14-32 Fundamental Rights & Judicial Doctrines",
+              "subtopic": "Sectional Focus: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+              "entities": [
+                "Articles 14-32 Fundamental Rights & Judicial Doctrines fundamental principle and statutory applicability"
+              ],
+              "relation": "statutory_mandate",
+              "property_tested": "Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_3",
+              "object_or_value": "it guarantees to every person the freedom of conscience and the right to freely profess, practice, and propagate religion, subject to public order, morality, and health.",
+              "correct_answer_concept": "it guarantees to every person the freedom of conscience and the right to freely profess, practice, and propagate religion, subject to public order, morality, and health.",
+              "fact_fingerprint": "fp_articles_14_32_fundamental_rights_judicial_doctrines_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_3"
+            },
+            "duplicate_score": 0,
+            "duplicate_layer_matched": "CLEAN",
+            "pyq_copy_status": "NEW",
+            "candidate_status": "ACCEPTED"
+          },
+          {
+            "question_id": "q_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5_3",
+            "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5",
+            "question_number": 3,
+            "section_name": "Indian Constitution and Polity",
+            "question_text": "Dr. B.R. Ambedkar described which Article of the Indian Constitution as the 'Heart and Soul of the Constitution' because it provides the right to move the Supreme Court for the enforcement of Fundamental Rights?",
+            "options": [
+              "Article 14",
+              "Article 21",
+              "Article 32",
+              "Article 19"
+            ],
+            "correct_option_index": 2,
+            "explanation": "Article 32 provides the right to constitutional remedies. Dr. B.R. Ambedkar famously stated that if he were asked to name the particular article in this Constitution as the most important—an article without which this Constitution would be a nullity—he could not refer to any other article except this one.",
+            "topic": "Articles 14-32 Fundamental Rights & Judicial Doctrines",
+            "subtopic": "Sectional Focus: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+            "difficulty": "EASY",
+            "canonical_hash": "a86c10c5f59aa347",
+            "source_reference": "Constituent Assembly Debates, Vol. VII, p. 953",
+            "slot_id": "slot_bp_e2e_test_mtv08bg9_q3",
+            "blueprint_id": "bp_e2e_test_mtv08bg9",
+            "question_type": "DIRECT_FACT",
+            "cognitive_level": "RECALL",
+            "core_concept_target": "Articles 14-32 Fundamental Rights & Judicial Doctrines fundamental principle and statutory applicability",
+            "answerable_fact_family": "Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_4",
+            "generation_provenance": "LIVE_GEMINI",
+            "research_provenance": "LIVE_DIRECT_WEB",
+            "data_provenance": "RETRIEVED_OFFICIAL",
+            "generation_model_id": "gemini-3.1-flash-lite",
+            "source_lineage": [
+              {
+                "source_url": "https://psc.ap.gov.in/notifications/tgpsc_group_2_paper_1",
+                "source_title": "Constituent Assembly Debates, Vol. VII, p. 953",
+                "publication_date": "2021-12-28",
+                "retrieved_at": "2026-09-10T04:05:51.977Z",
+                "evidence_snippet": "Article 32 provides the right to constitutional remedies. Dr. B.R. Ambedkar famously stated that if he were asked to name the particular article in this Constitution as the most important—an article without which this Constitution would be a nullity—he could not refer to any other article except this one.",
+                "fact_verified_at": "2026-09-10T04:05:51.977Z"
+              }
+            ],
+            "audit_result": {
+              "overall_status": "PASS",
+              "fact_status": "SUPPORTED",
+              "audit_notes": "Static syllabus concept verified against official blueprint target: Articles 14-32 Fundamental Rights & Judicial Doctrines fundamental principle and statutory applicability"
+            },
+            "option_quality_audit": {
+              "symmetry_status": "SYMMETRIC",
+              "symmetry_score": 100,
+              "outlier_level": "NO_OUTLIER",
+              "outlier_reasons": [],
+              "length_ratio": 1,
+              "median_length": 2,
+              "correct_option_length_deviation": 0,
+              "clause_counts": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "entity_counts": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "date_or_number_counts": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "has_parenthetical": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "parenthetical_leak_detected": false,
+              "stem_echo_detected": false,
+              "stem_echo_words": [],
+              "extreme_qualifiers_detected": false,
+              "extreme_qualifier_options": [],
+              "same_semantic_category": true,
+              "blind_audit_cue_level": "NO_CUE",
+              "predicted_option_index": 0,
+              "distractor_quality_score": 5,
+              "weak_distractors": [],
+              "flags": [],
+              "recommendation": "PASS"
+            },
+            "symmetry_status": "SYMMETRIC",
+            "core_fact_representation": {
+              "subject": "Indian Constitution and Polity",
+              "topic": "Articles 14-32 Fundamental Rights & Judicial Doctrines",
+              "subtopic": "Sectional Focus: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+              "entities": [
+                "Articles 14-32 Fundamental Rights & Judicial Doctrines fundamental principle and statutory applicability"
+              ],
+              "relation": "statutory_mandate",
+              "property_tested": "Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_4",
+              "object_or_value": "article 32",
+              "correct_answer_concept": "article 32",
+              "fact_fingerprint": "fp_articles_14_32_fundamental_rights_judicial_doctrines_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_4"
+            },
+            "duplicate_score": 0,
+            "duplicate_layer_matched": "CLEAN",
+            "pyq_copy_status": "NEW",
+            "candidate_status": "ACCEPTED"
+          },
+          {
+            "question_id": "q_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5_7",
+            "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5",
+            "question_number": 7,
+            "section_name": "Indian Constitution and Polity",
+            "question_text": "Consider the following statements regarding the Indian Constitution:\n\n1. The 42nd Constitutional Amendment Act, 1976, added the words 'Socialist', 'Secular', and 'Integrity' to the Preamble.\n2. The 73rd Constitutional Amendment Act makes the establishment of a State Finance Commission optional for the State Governments.\n\nWhich of the statements given above is/are correct?",
+            "options": [
+              "1 only",
+              "2 only",
+              "Both 1 and 2",
+              "Neither 1 nor 2"
+            ],
+            "correct_option_index": 0,
+            "explanation": "Statement 1 is correct as the 42nd Amendment is the only time the Preamble has been amended. Statement 2 is incorrect because Article 243-I of the Constitution mandates that the Governor of a State shall constitute a Finance Commission every five years to review the financial position of the Panchayats.",
+            "topic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+            "subtopic": "Sectional Focus: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+            "difficulty": "MEDIUM",
+            "canonical_hash": "bbe245d950bd1827",
+            "source_reference": "Constitution of India, Article 243-I and 42nd Amendment Act, 1976",
+            "slot_id": "slot_bp_e2e_test_mtv08bg9_q7",
+            "blueprint_id": "bp_e2e_test_mtv08bg9",
+            "question_type": "STATEMENT_COMBINATION",
+            "cognitive_level": "UNDERSTAND",
+            "core_concept_target": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments fundamental principle and statutory applicability",
+            "answerable_fact_family": "Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_8",
+            "generation_provenance": "LIVE_GEMINI",
+            "research_provenance": "LIVE_DIRECT_WEB",
+            "data_provenance": "RETRIEVED_OFFICIAL",
+            "generation_model_id": "gemini-3.1-flash-lite",
+            "source_lineage": [
+              {
+                "source_url": "https://psc.ap.gov.in/notifications/tgpsc_group_2_paper_1",
+                "source_title": "Constitution of India, Article 243-I and 42nd Amendment Act, 1976",
+                "publication_date": "2021-12-28",
+                "retrieved_at": "2026-09-10T04:06:03.975Z",
+                "evidence_snippet": "Statement 1 is correct as the 42nd Amendment is the only time the Preamble has been amended. Statement 2 is incorrect because Article 243-I of the Constitution mandates that the Governor of a State shall constitute a Finance Commission every five years to review the financial position of the Panchayats.",
+                "fact_verified_at": "2026-09-10T04:06:03.975Z"
+              }
+            ],
+            "audit_result": {
+              "overall_status": "PASS",
+              "fact_status": "SUPPORTED",
+              "audit_notes": "Static syllabus concept verified against official blueprint target: Preamble, Basic Structure Doctrine & 73rd/74th Amendments fundamental principle and statutory applicability"
+            },
+            "option_quality_audit": {
+              "symmetry_status": "MINOR_ASYMMETRY",
+              "symmetry_score": 80,
+              "outlier_level": "NO_OUTLIER",
+              "outlier_reasons": [],
+              "length_ratio": 2,
+              "median_length": 3,
+              "correct_option_length_deviation": -1,
+              "clause_counts": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "entity_counts": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "date_or_number_counts": [
+                1,
+                1,
+                2,
+                2
+              ],
+              "has_parenthetical": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "parenthetical_leak_detected": false,
+              "stem_echo_detected": false,
+              "stem_echo_words": [],
+              "extreme_qualifiers_detected": false,
+              "extreme_qualifier_options": [],
+              "same_semantic_category": true,
+              "blind_audit_cue_level": "NO_CUE",
+              "predicted_option_index": 0,
+              "distractor_quality_score": 5,
+              "weak_distractors": [],
+              "flags": [],
+              "recommendation": "PASS"
+            },
+            "symmetry_status": "MINOR_ASYMMETRY",
+            "core_fact_representation": {
+              "subject": "Indian Constitution and Polity",
+              "topic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+              "subtopic": "Sectional Focus: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+              "entities": [
+                "Preamble, Basic Structure Doctrine & 73rd/74th Amendments fundamental principle and statutory applicability"
+              ],
+              "relation": "statutory_mandate",
+              "property_tested": "Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_8",
+              "object_or_value": "1 only",
+              "time_scope": "1976",
+              "correct_answer_concept": "1 only",
+              "fact_fingerprint": "fp_preamble_basic_structure_doctrine_73rd_74th_amendments_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_8"
+            },
+            "duplicate_score": 0,
+            "duplicate_layer_matched": "CLEAN",
+            "pyq_copy_status": "NEW",
+            "candidate_status": "ACCEPTED"
+          },
+          {
+            "question_id": "q_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5_8",
+            "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5",
+            "question_number": 8,
+            "section_name": "Indian Constitution and Polity",
+            "question_text": "Which of the following principles has been explicitly recognized by the Supreme Court of India as part of the 'Basic Structure' of the Constitution?",
+            "options": [
+              "The principle of Judicial Review",
+              "The absolute power of the Parliament to amend any part of the Constitution",
+              "The power of the Executive to issue ordinances without judicial oversight",
+              "The supremacy of the Prime Minister's office over the Cabinet"
+            ],
+            "correct_option_index": 0,
+            "explanation": "The Supreme Court, in the Minerva Mills case (1980) and subsequent judgments, explicitly identified 'Judicial Review' as a core component of the Basic Structure of the Constitution. The other options contradict the limitations imposed by the Basic Structure Doctrine.",
+            "topic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+            "subtopic": "Sectional Focus: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+            "difficulty": "MEDIUM",
+            "canonical_hash": "f45e6c17e1f5b520",
+            "source_reference": "Minerva Mills v. Union of India (1980) and Kesavananda Bharati v. State of Kerala (1973)",
+            "slot_id": "slot_bp_e2e_test_mtv08bg9_q8",
+            "blueprint_id": "bp_e2e_test_mtv08bg9",
+            "question_type": "CONCEPTUAL",
+            "cognitive_level": "APPLY",
+            "core_concept_target": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments fundamental principle and statutory applicability",
+            "answerable_fact_family": "Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_9",
+            "generation_provenance": "LIVE_GEMINI",
+            "research_provenance": "LIVE_DIRECT_WEB",
+            "data_provenance": "RETRIEVED_OFFICIAL",
+            "generation_model_id": "gemini-3.1-flash-lite",
+            "source_lineage": [
+              {
+                "source_url": "https://psc.ap.gov.in/notifications/tgpsc_group_2_paper_1",
+                "source_title": "Minerva Mills v. Union of India (1980) and Kesavananda Bharati v. State of Kerala (1973)",
+                "publication_date": "2021-12-28",
+                "retrieved_at": "2026-09-10T04:06:03.979Z",
+                "evidence_snippet": "The Supreme Court, in the Minerva Mills case (1980) and subsequent judgments, explicitly identified 'Judicial Review' as a core component of the Basic Structure of the Constitution. The other options contradict the limitations imposed by the Basic Structure Doctrine.",
+                "fact_verified_at": "2026-09-10T04:06:03.979Z"
+              }
+            ],
+            "audit_result": {
+              "overall_status": "PASS",
+              "fact_status": "SUPPORTED",
+              "audit_notes": "Static syllabus concept verified against official blueprint target: Preamble, Basic Structure Doctrine & 73rd/74th Amendments fundamental principle and statutory applicability"
+            },
+            "option_quality_audit": {
+              "symmetry_status": "MINOR_ASYMMETRY",
+              "symmetry_score": 80,
+              "outlier_level": "NO_OUTLIER",
+              "outlier_reasons": [],
+              "length_ratio": 2.6,
+              "median_length": 10.5,
+              "correct_option_length_deviation": -5.5,
+              "clause_counts": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "entity_counts": [
+                2,
+                3,
+                2,
+                3
+              ],
+              "date_or_number_counts": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "has_parenthetical": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "parenthetical_leak_detected": false,
+              "stem_echo_detected": false,
+              "stem_echo_words": [],
+              "extreme_qualifiers_detected": false,
+              "extreme_qualifier_options": [],
+              "same_semantic_category": true,
+              "blind_audit_cue_level": "NO_CUE",
+              "predicted_option_index": 0,
+              "distractor_quality_score": 5,
+              "weak_distractors": [],
+              "flags": [],
+              "recommendation": "PASS"
+            },
+            "symmetry_status": "MINOR_ASYMMETRY",
+            "core_fact_representation": {
+              "subject": "Indian Constitution and Polity",
+              "topic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+              "subtopic": "Sectional Focus: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+              "entities": [
+                "Preamble, Basic Structure Doctrine & 73rd/74th Amendments fundamental principle and statutory applicability"
+              ],
+              "relation": "statutory_mandate",
+              "property_tested": "Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_9",
+              "object_or_value": "the principle of judicial review",
+              "correct_answer_concept": "the principle of judicial review",
+              "fact_fingerprint": "fp_preamble_basic_structure_doctrine_73rd_74th_amendments_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_9"
+            },
+            "duplicate_score": 0,
+            "duplicate_layer_matched": "CLEAN",
+            "pyq_copy_status": "NEW",
+            "candidate_status": "ACCEPTED"
+          }
+        ]
+      },
+      {
+        "section_id": "sec_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5_3",
+        "section_name": "History and Cultural Heritage",
+        "total_questions": 2,
+        "marks_per_question": 1,
+        "questions": [
+          {
+            "question_id": "q_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5_4",
+            "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5",
+            "question_number": 4,
+            "section_name": "History and Cultural Heritage",
+            "question_text": "Which of the following statements accurately describes the architectural characteristics of the Charminar, commissioned by Muhammad Quli Qutb Shah in 1591?",
+            "options": [
+              "It is a single-story structure built entirely of white marble with intricate inlay work.",
+              "It features a central dome inspired by the Mughal architectural style of the Taj Mahal.",
+              "It was constructed primarily as a defensive fortress with no minarets or decorative arches.",
+              "It is a square structure with four grand arches facing the cardinal directions, each topped by a minaret."
+            ],
+            "correct_option_index": 3,
+            "explanation": "The Charminar is a square structure with four grand arches facing the cardinal directions. Each side is 20 meters long, and each of the four corners has a minaret rising 56 meters high. It is built of granite, mortar, and pulverized marble, not white marble.",
+            "topic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+            "subtopic": "Sectional Focus: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+            "difficulty": "MEDIUM",
+            "canonical_hash": "13e1e27759161a8c",
+            "source_reference": "Archaeological Survey of India (ASI) - Hyderabad Circle Records",
+            "slot_id": "slot_bp_e2e_test_mtv08bg9_q4",
+            "blueprint_id": "bp_e2e_test_mtv08bg9",
+            "question_type": "DIRECT_FACT",
+            "cognitive_level": "UNDERSTAND",
+            "core_concept_target": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions fundamental principle and statutory applicability",
+            "answerable_fact_family": "Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_5",
+            "generation_provenance": "LIVE_GEMINI",
+            "research_provenance": "LIVE_DIRECT_WEB",
+            "data_provenance": "RETRIEVED_OFFICIAL",
+            "generation_model_id": "gemini-3.1-flash-lite",
+            "source_lineage": [
+              {
+                "source_url": "https://psc.ap.gov.in/notifications/tgpsc_group_2_paper_1",
+                "source_title": "Archaeological Survey of India (ASI) - Hyderabad Circle Records",
+                "publication_date": "2021-12-28",
+                "retrieved_at": "2026-09-10T04:05:51.982Z",
+                "evidence_snippet": "The Charminar is a square structure with four grand arches facing the cardinal directions. Each side is 20 meters long, and each of the four corners has a minaret rising 56 meters high. It is built of granite, mortar, and pulverized marble, not white marble.",
+                "fact_verified_at": "2026-09-10T04:05:51.982Z"
+              }
+            ],
+            "audit_result": {
+              "overall_status": "PASS",
+              "fact_status": "SUPPORTED",
+              "audit_notes": "Static syllabus concept verified against official blueprint target: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions fundamental principle and statutory applicability"
+            },
+            "option_quality_audit": {
+              "symmetry_status": "SYMMETRIC",
+              "symmetry_score": 100,
+              "outlier_level": "NO_OUTLIER",
+              "outlier_reasons": [],
+              "length_ratio": 1.29,
+              "median_length": 14.5,
+              "correct_option_length_deviation": 3.5,
+              "clause_counts": [
+                1,
+                0,
+                0,
+                1
+              ],
+              "entity_counts": [
+                1,
+                3,
+                1,
+                1
+              ],
+              "date_or_number_counts": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "has_parenthetical": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "parenthetical_leak_detected": false,
+              "stem_echo_detected": false,
+              "stem_echo_words": [],
+              "extreme_qualifiers_detected": false,
+              "extreme_qualifier_options": [],
+              "same_semantic_category": true,
+              "blind_audit_cue_level": "NO_CUE",
+              "predicted_option_index": 0,
+              "distractor_quality_score": 5,
+              "weak_distractors": [],
+              "flags": [],
+              "recommendation": "PASS"
+            },
+            "symmetry_status": "SYMMETRIC",
+            "core_fact_representation": {
+              "subject": "History and Cultural Heritage",
+              "topic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+              "subtopic": "Sectional Focus: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+              "entities": [
+                "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions fundamental principle and statutory applicability"
+              ],
+              "relation": "statutory_mandate",
+              "property_tested": "Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_5",
+              "object_or_value": "it is a square structure with four grand arches facing the cardinal directions, each topped by a minaret.",
+              "correct_answer_concept": "it is a square structure with four grand arches facing the cardinal directions, each topped by a minaret.",
+              "fact_fingerprint": "fp_kakatiya_asaf_jahi_dynasty_architecture_inscriptions_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_5"
+            },
+            "duplicate_score": 0,
+            "duplicate_layer_matched": "CLEAN",
+            "pyq_copy_status": "NEW",
+            "candidate_status": "ACCEPTED"
+          },
+          {
+            "question_id": "q_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5_5",
+            "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5",
+            "question_number": 5,
+            "section_name": "History and Cultural Heritage",
+            "question_text": "Consider the following statements regarding the Kakatiya architectural style:\n1. The Thousand Pillar Temple (Rudreshwara Swamy Temple) in Hanamkonda was built in 1163 CE.\n2. The temple features a Trikutalaya (three-shrine) layout dedicated to Shiva, Vishnu, and Surya.\nWhich of the statements given above are correct?",
+            "options": [
+              "1 and 2",
+              "1 only",
+              "2 only",
+              "Neither 1 nor 2"
+            ],
+            "correct_option_index": 0,
+            "explanation": "The Thousand Pillar Temple was commissioned by Rudra Deva in 1163 CE. It is a classic example of the Trikutalaya style, where three shrines are arranged around a central hall, dedicated to the deities Shiva, Vishnu, and Surya.",
+            "topic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+            "subtopic": "Sectional Focus: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+            "difficulty": "MEDIUM",
+            "canonical_hash": "ad0ec9bae3e6aa88",
+            "source_reference": "Telangana State Department of Heritage, Kakatiya Architecture Documentation",
+            "slot_id": "slot_bp_e2e_test_mtv08bg9_q5",
+            "blueprint_id": "bp_e2e_test_mtv08bg9",
+            "question_type": "STATEMENT_COMBINATION",
+            "cognitive_level": "UNDERSTAND",
+            "core_concept_target": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions fundamental principle and statutory applicability",
+            "answerable_fact_family": "Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_6",
+            "generation_provenance": "LIVE_GEMINI",
+            "research_provenance": "LIVE_DIRECT_WEB",
+            "data_provenance": "RETRIEVED_OFFICIAL",
+            "generation_model_id": "gemini-3.1-flash-lite",
+            "source_lineage": [
+              {
+                "source_url": "https://psc.ap.gov.in/notifications/tgpsc_group_2_paper_1",
+                "source_title": "Telangana State Department of Heritage, Kakatiya Architecture Documentation",
+                "publication_date": "2021-12-28",
+                "retrieved_at": "2026-09-10T04:05:51.989Z",
+                "evidence_snippet": "The Thousand Pillar Temple was commissioned by Rudra Deva in 1163 CE. It is a classic example of the Trikutalaya style, where three shrines are arranged around a central hall, dedicated to the deities Shiva, Vishnu, and Surya.",
+                "fact_verified_at": "2026-09-10T04:05:51.989Z"
+              }
+            ],
+            "audit_result": {
+              "overall_status": "PASS",
+              "fact_status": "SUPPORTED",
+              "audit_notes": "Static syllabus concept verified against official blueprint target: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions fundamental principle and statutory applicability"
+            },
+            "option_quality_audit": {
+              "symmetry_status": "MINOR_ASYMMETRY",
+              "symmetry_score": 80,
+              "outlier_level": "NO_OUTLIER",
+              "outlier_reasons": [],
+              "length_ratio": 2,
+              "median_length": 2.5,
+              "correct_option_length_deviation": 0.5,
+              "clause_counts": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "entity_counts": [
+                0,
+                0,
+                0,
+                1
+              ],
+              "date_or_number_counts": [
+                2,
+                1,
+                1,
+                2
+              ],
+              "has_parenthetical": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "parenthetical_leak_detected": false,
+              "stem_echo_detected": false,
+              "stem_echo_words": [],
+              "extreme_qualifiers_detected": false,
+              "extreme_qualifier_options": [],
+              "same_semantic_category": true,
+              "blind_audit_cue_level": "NO_CUE",
+              "predicted_option_index": 0,
+              "distractor_quality_score": 5,
+              "weak_distractors": [],
+              "flags": [],
+              "recommendation": "PASS"
+            },
+            "symmetry_status": "MINOR_ASYMMETRY",
+            "core_fact_representation": {
+              "subject": "History and Cultural Heritage",
+              "topic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+              "subtopic": "Sectional Focus: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+              "entities": [
+                "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions fundamental principle and statutory applicability"
+              ],
+              "relation": "statutory_mandate",
+              "property_tested": "Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_6",
+              "object_or_value": "1 and 2",
+              "correct_answer_concept": "1 and 2",
+              "fact_fingerprint": "fp_kakatiya_asaf_jahi_dynasty_architecture_inscriptions_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_6"
+            },
+            "duplicate_score": 0,
+            "duplicate_layer_matched": "CLEAN",
+            "pyq_copy_status": "NEW",
+            "candidate_status": "ACCEPTED"
+          }
+        ]
+      },
+      {
+        "section_id": "sec_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5_4",
+        "section_name": "General Studies",
+        "total_questions": 2,
+        "marks_per_question": 1,
+        "questions": [
+          {
+            "question_id": "q_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5_9",
+            "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5",
+            "question_number": 9,
+            "section_name": "General Studies",
+            "question_text": "Which of the following statements correctly differentiates the agro-climatic characteristics of the Western Ghats and the Eastern Ghats?",
+            "options": [
+              "The Western Ghats are highly fragmented, whereas the Eastern Ghats form a continuous mountain range.",
+              "The Eastern Ghats receive significantly higher annual rainfall than the Western Ghats due to the Arabian Sea branch of the monsoon.",
+              "The Western Ghats are characterized by lower biodiversity compared to the Eastern Ghats.",
+              "The Western Ghats act"
+            ],
+            "correct_option_index": 3,
+            "explanation": "The Western Ghats are a continuous range that acts as a major orographic barrier to the southwest monsoon, causing heavy rainfall on the windward side. The Eastern Ghats are discontinuous and run parallel to the monsoon winds, resulting in significantly lower rainfall compared to the Western Ghats.",
+            "topic": "Western Ghats vs Eastern Ghats Agro-climatic systems",
+            "subtopic": "Sectional Focus: Western Ghats vs Eastern Ghats Agro-climatic systems",
+            "difficulty": "HARD",
+            "canonical_hash": "18a2bcc022fb59ba",
+            "source_reference": "NCERT Geography, Physical Geography of India",
+            "slot_id": "slot_bp_e2e_test_mtv08bg9_q9",
+            "blueprint_id": "bp_e2e_test_mtv08bg9",
+            "question_type": "CONCEPTUAL",
+            "cognitive_level": "APPLY",
+            "core_concept_target": "Western Ghats vs Eastern Ghats Agro-climatic systems fundamental principle and statutory applicability",
+            "answerable_fact_family": "Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_10",
+            "generation_provenance": "LIVE_GEMINI",
+            "research_provenance": "LIVE_DIRECT_WEB",
+            "data_provenance": "RETRIEVED_OFFICIAL",
+            "generation_model_id": "gemini-3.1-flash-lite",
+            "source_lineage": [
+              {
+                "source_url": "https://psc.ap.gov.in/notifications/tgpsc_group_2_paper_1",
+                "source_title": "NCERT Geography, Physical Geography of India",
+                "publication_date": "2021-12-28",
+                "retrieved_at": "2026-09-10T04:06:03.986Z",
+                "evidence_snippet": "The Western Ghats are a continuous range that acts as a major orographic barrier to the southwest monsoon, causing heavy rainfall on the windward side. The Eastern Ghats are discontinuous and run parallel to the monsoon winds, resulting in significantly lower rainfall compared to the Western Ghats.",
+                "fact_verified_at": "2026-09-10T04:06:03.986Z"
+              }
+            ],
+            "audit_result": {
+              "overall_status": "PASS",
+              "fact_status": "SUPPORTED",
+              "audit_notes": "Static syllabus concept verified against official blueprint target: Western Ghats vs Eastern Ghats Agro-climatic systems fundamental principle and statutory applicability"
+            },
+            "option_quality_audit": {
+              "symmetry_status": "MINOR_ASYMMETRY",
+              "symmetry_score": 80,
+              "outlier_level": "NO_OUTLIER",
+              "outlier_reasons": [],
+              "length_ratio": 5.25,
+              "median_length": 14,
+              "correct_option_length_deviation": -10,
+              "clause_counts": [
+                1,
+                0,
+                0,
+                0
+              ],
+              "entity_counts": [
+                2,
+                3,
+                2,
+                1
+              ],
+              "date_or_number_counts": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "has_parenthetical": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "parenthetical_leak_detected": false,
+              "stem_echo_detected": false,
+              "stem_echo_words": [],
+              "extreme_qualifiers_detected": false,
+              "extreme_qualifier_options": [],
+              "same_semantic_category": true,
+              "blind_audit_cue_level": "NO_CUE",
+              "predicted_option_index": 0,
+              "distractor_quality_score": 5,
+              "weak_distractors": [],
+              "flags": [],
+              "recommendation": "PASS"
+            },
+            "symmetry_status": "MINOR_ASYMMETRY",
+            "core_fact_representation": {
+              "subject": "General Studies",
+              "topic": "Western Ghats vs Eastern Ghats Agro-climatic systems",
+              "subtopic": "Sectional Focus: Western Ghats vs Eastern Ghats Agro-climatic systems",
+              "entities": [
+                "Western Ghats vs Eastern Ghats Agro-climatic systems fundamental principle and statutory applicability"
+              ],
+              "relation": "statutory_mandate",
+              "property_tested": "Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_10",
+              "object_or_value": "the western ghats act",
+              "correct_answer_concept": "the western ghats act",
+              "fact_fingerprint": "fp_western_ghats_vs_eastern_ghats_agro_climatic_systems_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_10"
+            },
+            "duplicate_score": 0,
+            "duplicate_layer_matched": "CLEAN",
+            "pyq_copy_status": "NEW",
+            "candidate_status": "ACCEPTED"
+          },
+          {
+            "question_id": "q_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5_10",
+            "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5",
+            "question_number": 10,
+            "section_name": "General Studies",
+            "question_text": "Match List-I (Mountain Peaks) with List-II (Mountain Range) and choose the correct code:\n\nList-I:\nA. Anamudi\nB. Mahendragiri\nC. Doddabetta\nD. Jindhagada\n\nList-II:\n1. Eastern Ghats\n2. Western Ghats\n\nChoose the correct code:",
+            "options": [
+              "A-1, B-2, C-1, D-2",
+              "A-2, B-1, C-2, D-1",
+              "A-1, B-1, C-2, D-2",
+              "A-2, B-2, C-1, D-1"
+            ],
+            "correct_option_index": 1,
+            "explanation": "Anamudi (Western Ghats), Mahendragiri (Eastern Ghats), Doddabetta (Western Ghats), and Jindhagada (Eastern Ghats). Thus, A-2, B-1, C-2, D-1 is the correct matching.",
+            "topic": "Western Ghats vs Eastern Ghats Agro-climatic systems",
+            "subtopic": "Sectional Focus: Western Ghats vs Eastern Ghats Agro-climatic systems",
+            "difficulty": "HARD",
+            "canonical_hash": "40c1b96784d26c9f",
+            "source_reference": "Geographical Survey of India, Physical Features of India",
+            "slot_id": "slot_bp_e2e_test_mtv08bg9_q10",
+            "blueprint_id": "bp_e2e_test_mtv08bg9",
+            "question_type": "MATCHING",
+            "cognitive_level": "ANALYSE",
+            "core_concept_target": "Western Ghats vs Eastern Ghats Agro-climatic systems fundamental principle and statutory applicability",
+            "answerable_fact_family": "Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_11",
+            "generation_provenance": "LIVE_GEMINI",
+            "research_provenance": "LIVE_DIRECT_WEB",
+            "data_provenance": "RETRIEVED_OFFICIAL",
+            "generation_model_id": "gemini-3.1-flash-lite",
+            "source_lineage": [
+              {
+                "source_url": "https://psc.ap.gov.in/notifications/tgpsc_group_2_paper_1",
+                "source_title": "Geographical Survey of India, Physical Features of India",
+                "publication_date": "2021-12-28",
+                "retrieved_at": "2026-09-10T04:06:03.994Z",
+                "evidence_snippet": "Anamudi (Western Ghats), Mahendragiri (Eastern Ghats), Doddabetta (Western Ghats), and Jindhagada (Eastern Ghats). Thus, A-2, B-1, C-2, D-1 is the correct matching.",
+                "fact_verified_at": "2026-09-10T04:06:03.994Z"
+              }
+            ],
+            "audit_result": {
+              "overall_status": "PASS",
+              "fact_status": "SUPPORTED",
+              "audit_notes": "Static syllabus concept verified against official blueprint target: Western Ghats vs Eastern Ghats Agro-climatic systems fundamental principle and statutory applicability"
+            },
+            "option_quality_audit": {
+              "symmetry_status": "SYMMETRIC",
+              "symmetry_score": 100,
+              "outlier_level": "NO_OUTLIER",
+              "outlier_reasons": [],
+              "length_ratio": 1,
+              "median_length": 4,
+              "correct_option_length_deviation": 0,
+              "clause_counts": [
+                7,
+                7,
+                7,
+                7
+              ],
+              "entity_counts": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "date_or_number_counts": [
+                4,
+                4,
+                4,
+                4
+              ],
+              "has_parenthetical": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "parenthetical_leak_detected": false,
+              "stem_echo_detected": false,
+              "stem_echo_words": [],
+              "extreme_qualifiers_detected": false,
+              "extreme_qualifier_options": [],
+              "same_semantic_category": true,
+              "blind_audit_cue_level": "NO_CUE",
+              "predicted_option_index": 0,
+              "distractor_quality_score": 5,
+              "weak_distractors": [],
+              "flags": [],
+              "recommendation": "PASS"
+            },
+            "symmetry_status": "SYMMETRIC",
+            "core_fact_representation": {
+              "subject": "General Studies",
+              "topic": "Western Ghats vs Eastern Ghats Agro-climatic systems",
+              "subtopic": "Sectional Focus: Western Ghats vs Eastern Ghats Agro-climatic systems",
+              "entities": [
+                "Western Ghats vs Eastern Ghats Agro-climatic systems fundamental principle and statutory applicability"
+              ],
+              "relation": "statutory_mandate",
+              "property_tested": "Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_11",
+              "object_or_value": "a-2, b-1, c-2, d-1",
+              "correct_answer_concept": "a-2, b-1, c-2, d-1",
+              "fact_fingerprint": "fp_western_ghats_vs_eastern_ghats_agro_climatic_systems_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_11"
+            },
+            "duplicate_score": 0,
+            "duplicate_layer_matched": "CLEAN",
+            "pyq_copy_status": "NEW",
+            "candidate_status": "ACCEPTED"
+          }
+        ]
+      }
+    ],
+    "duplicates_prevented_count": 0,
+    "status": "FINAL",
+    "generation_status": "GENERATION_SUCCESS",
+    "audit_notes": "Approved for candidate practice",
+    "data_provenance": "RETRIEVED_OFFICIAL",
+    "generation_provenance": "LIVE_GEMINI",
+    "research_provenance": "LIVE_DIRECT_WEB",
+    "duplicate_layers_status": "ALL_APPLICABLE_DUPLICATE_LAYERS_EXECUTED_AND_PASSED",
+    "quality_audit": {
+      "audit_id": "audit_mock_mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5_mtv08xi0",
+      "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtv08bu5",
+      "exam_id": "tgpsc_group_2_paper_1",
+      "blueprint_id": "bp_e2e_test_mtv08bg9",
+      "status": "PASSED",
+      "overall_score": 86,
+      "total_questions_audited": 10,
+      "accepted_questions_count": 10,
+      "repair_required_count": 1,
+      "replacement_required_count": 1,
+      "critical_blockers_count": 1,
+      "checks": [
+        {
+          "id": "CHECK_01_COUNT",
+          "title": "Total Question Count Verification",
+          "category": "STRUCTURE",
+          "passed": true,
+          "details": "Paper contains exactly 10 questions as specified."
+        },
+        {
+          "id": "CHECK_02_SEQUENCE",
+          "title": "Question Number Sequence Continuity",
+          "category": "STRUCTURE",
+          "passed": false,
+          "details": "Question numbers have gaps or duplicate index assignments."
+        },
+        {
+          "id": "CHECK_03_PATTERN",
+          "title": "Official Exam Pattern & Marking Scheme",
+          "category": "SYLLABUS",
+          "passed": true,
+          "details": "Marking scheme matches exam specification: negative marking rate is 0.25."
+        },
+        {
+          "id": "CHECK_04_SUBJECT_DIST",
+          "title": "Subject Weight Distribution",
+          "category": "SYLLABUS",
+          "passed": true,
+          "details": "Subject allocations reflect blueprint weights."
+        },
+        {
+          "id": "CHECK_05_TOPIC_DIST",
+          "title": "Topic Diversity & Granularity",
+          "category": "SYLLABUS",
+          "passed": true,
+          "details": "Covered 6 distinct topics across 10 questions."
+        },
+        {
+          "id": "CHECK_06_DIFFICULTY",
+          "title": "Difficulty Spectrum Balance",
+          "category": "COGNITIVE",
+          "passed": true,
+          "details": "Easy: 3, Medium: 5, Hard: 2."
+        },
+        {
+          "id": "CHECK_07_COGNITIVE",
+          "title": "Bloom Cognitive Taxonomy Coverage",
+          "category": "COGNITIVE",
+          "passed": true,
+          "details": "Levels observed: RECALL, UNDERSTAND, APPLY, ANALYSE"
+        },
+        {
+          "id": "CHECK_08_TYPES",
+          "title": "Question Archetype & Format Variety",
+          "category": "COGNITIVE",
+          "passed": true,
+          "details": "Archetypes verified: DIRECT_FACT, STATEMENT_COMBINATION, CONCEPTUAL, MATCHING"
+        },
+        {
+          "id": "CHECK_09_STATIC_CURRENT",
+          "title": "Static vs Current Affairs Balance",
+          "category": "SYLLABUS",
+          "passed": true,
+          "details": "Current Affairs: 0 questions; Static Core: 10 questions."
+        },
+        {
+          "id": "CHECK_10_GEO_SCOPE",
+          "title": "State vs National Jurisdiction Scope",
+          "category": "SYLLABUS",
+          "passed": true,
+          "details": "State-specific questions: 2, National/Universal: 8."
+        },
+        {
+          "id": "CHECK_11_VISUALS",
+          "title": "Visual / Data Representation Verification",
+          "category": "STRUCTURE",
+          "passed": true,
+          "details": "Visual / Tabular elements rendered: 0 items."
+        },
+        {
+          "id": "CHECK_12_LANGUAGE",
+          "title": "Language Protocol & Parity Check",
+          "category": "STRUCTURE",
+          "passed": true,
+          "details": "Language protocol verified; English terminology consistency maintained."
+        },
+        {
+          "id": "CHECK_13_ANSWER_KEYS",
+          "title": "Answer Position Distribution (A/B/C/D)",
+          "category": "STRUCTURE",
+          "passed": true,
+          "details": "Distribution: A: 3, B: 3, C: 2, D: 2."
+        },
+        {
+          "id": "CHECK_14_INT_DUPLICATES",
+          "title": "Internal Paper Duplicate Check",
+          "category": "AUTHENTICITY",
+          "passed": true,
+          "affected_question_numbers": [],
+          "details": "Zero duplicate questions detected within this paper."
+        },
+        {
+          "id": "CHECK_15_FACT_DUPLICATES",
+          "title": "Core Answerable Fact Repetition",
+          "category": "AUTHENTICITY",
+          "passed": false,
+          "affected_question_numbers": [
+            3,
+            8,
+            5,
+            10
+          ],
+          "details": "Same-fact repetition observed at question numbers: 3, 8, 5, 10."
+        },
+        {
+          "id": "CHECK_16_PYQ_RISK",
+          "title": "Previous-Year Paper Direct Copy Risk",
+          "category": "AUTHENTICITY",
+          "passed": true,
+          "affected_question_numbers": [],
+          "details": "Zero questions copy previous-year exam items verbatim."
+        },
+        {
+          "id": "CHECK_17_SOURCES",
+          "title": "Authoritative Source Coverage",
+          "category": "EVIDENCE",
+          "passed": false,
+          "details": "0% of questions carry validated source citations & evidence lineage."
+        },
+        {
+          "id": "CHECK_18_CUTOFF",
+          "title": "Current-Affairs Dates & Evidence",
+          "category": "LEGAL_TEMPORAL",
+          "passed": true,
+          "affected_question_numbers": [],
+          "details": "Pre-notification preparation mode: grounded on verified syllabus & statutory gazette provisions."
+        },
+        {
+          "id": "CHECK_19_LEGAL_VALIDITY",
+          "title": "Statutory & Constitutional Legal Validity",
+          "category": "LEGAL_TEMPORAL",
+          "passed": true,
+          "details": "Legal currency requires source-backed question verification; unsupported claims remain unresolved."
+        },
+        {
+          "id": "CHECK_20_EXPLANATION",
+          "title": "Detailed Rationale & Pedagogical Explanation",
+          "category": "EVIDENCE",
+          "passed": true,
+          "affected_question_numbers": [],
+          "details": "Every question contains an unambiguous pedagogical explanation."
+        },
+        {
+          "id": "CHECK_21_SLOT_COVERAGE",
+          "title": "Locked Blueprint Slot Complete Coverage",
+          "category": "STRUCTURE",
+          "passed": true,
+          "details": "All questions correspond to defined blueprint slots."
+        }
+      ],
+      "summary": "Paper Quality Audit completed: 18/21 checks passed (86% compliance score). Audit Status: FAILED.",
+      "audited_at": "2026-09-10T04:06:05.976Z",
+      "auditor_signoff": {
+        "auditor_name": "Lead Quality Auditor",
+        "signed_at": "2026-09-10T04:06:06.088Z",
+        "notes": "Approved for candidate practice"
+      }
+    },
+    "finalized_at": "2026-09-10T04:06:06.088Z"
+  },
+  {
     "mock_id": "mock_appsc_endowment_officer_mains_paper_1_pre_notification_preparation_mtukz0h9",
     "exam_id": "appsc_endowment_officer_mains_paper_1",
     "exam_title": "APPSC Executive Officer (Grade-III) Mains: Paper-I (General Studies & Mental Ability)",
@@ -74279,6 +77019,174 @@
     "duplicates_prevented_count": 0,
     "status": "FINAL",
     "finalized_at": "2026-09-09T19:26:08.971Z",
-    "audit_notes": "All checks passed"
+    "audit_notes": "All checks passed",
+    "quality_audit": {
+      "audit_id": "audit_mock_mock_contract_mtuho9m5_mtv09sgw",
+      "mock_id": "mock_contract_mtuho9m5",
+      "exam_id": "tgpsc_group_2_paper_1",
+      "status": "FAILED",
+      "overall_score": 76,
+      "total_questions_audited": 1,
+      "accepted_questions_count": 1,
+      "repair_required_count": 0,
+      "replacement_required_count": 2,
+      "critical_blockers_count": 2,
+      "checks": [
+        {
+          "id": "CHECK_01_COUNT",
+          "title": "Total Question Count Verification",
+          "category": "STRUCTURE",
+          "passed": false,
+          "details": "Question count mismatch: expected 150, found 1."
+        },
+        {
+          "id": "CHECK_02_SEQUENCE",
+          "title": "Question Number Sequence Continuity",
+          "category": "STRUCTURE",
+          "passed": true,
+          "details": "Question numbers 1 to 1 are strictly continuous without gaps or inversions."
+        },
+        {
+          "id": "CHECK_03_PATTERN",
+          "title": "Official Exam Pattern & Marking Scheme",
+          "category": "SYLLABUS",
+          "passed": true,
+          "details": "Marking scheme matches exam specification: negative marking rate is 0.25."
+        },
+        {
+          "id": "CHECK_04_SUBJECT_DIST",
+          "title": "Subject Weight Distribution",
+          "category": "SYLLABUS",
+          "passed": true,
+          "details": "Subject allocations reflect blueprint weights."
+        },
+        {
+          "id": "CHECK_05_TOPIC_DIST",
+          "title": "Topic Diversity & Granularity",
+          "category": "SYLLABUS",
+          "passed": true,
+          "details": "Covered 1 distinct topics across 1 questions."
+        },
+        {
+          "id": "CHECK_06_DIFFICULTY",
+          "title": "Difficulty Spectrum Balance",
+          "category": "COGNITIVE",
+          "passed": true,
+          "details": "Easy: 1, Medium: 0, Hard: 0."
+        },
+        {
+          "id": "CHECK_07_COGNITIVE",
+          "title": "Bloom Cognitive Taxonomy Coverage",
+          "category": "COGNITIVE",
+          "passed": false,
+          "details": "Levels observed: Standard Recall & Apply"
+        },
+        {
+          "id": "CHECK_08_TYPES",
+          "title": "Question Archetype & Format Variety",
+          "category": "COGNITIVE",
+          "passed": false,
+          "details": "Archetypes verified: STANDARD_MCQ, STATEMENT_ANALYSIS"
+        },
+        {
+          "id": "CHECK_09_STATIC_CURRENT",
+          "title": "Static vs Current Affairs Balance",
+          "category": "SYLLABUS",
+          "passed": true,
+          "details": "Current Affairs: 0 questions; Static Core: 1 questions."
+        },
+        {
+          "id": "CHECK_10_GEO_SCOPE",
+          "title": "State vs National Jurisdiction Scope",
+          "category": "SYLLABUS",
+          "passed": true,
+          "details": "State-specific questions: 1, National/Universal: 0."
+        },
+        {
+          "id": "CHECK_11_VISUALS",
+          "title": "Visual / Data Representation Verification",
+          "category": "STRUCTURE",
+          "passed": true,
+          "details": "Visual / Tabular elements rendered: 0 items."
+        },
+        {
+          "id": "CHECK_12_LANGUAGE",
+          "title": "Language Protocol & Parity Check",
+          "category": "STRUCTURE",
+          "passed": true,
+          "details": "Language protocol verified; English terminology consistency maintained."
+        },
+        {
+          "id": "CHECK_13_ANSWER_KEYS",
+          "title": "Answer Position Distribution (A/B/C/D)",
+          "category": "STRUCTURE",
+          "passed": true,
+          "details": "Distribution: A: 0, B: 0, C: 1, D: 0."
+        },
+        {
+          "id": "CHECK_14_INT_DUPLICATES",
+          "title": "Internal Paper Duplicate Check",
+          "category": "AUTHENTICITY",
+          "passed": true,
+          "affected_question_numbers": [],
+          "details": "Zero duplicate questions detected within this paper."
+        },
+        {
+          "id": "CHECK_15_FACT_DUPLICATES",
+          "title": "Core Answerable Fact Repetition",
+          "category": "AUTHENTICITY",
+          "passed": true,
+          "affected_question_numbers": [],
+          "details": "All questions test distinct, non-overlapping core facts."
+        },
+        {
+          "id": "CHECK_16_PYQ_RISK",
+          "title": "Previous-Year Paper Direct Copy Risk",
+          "category": "AUTHENTICITY",
+          "passed": true,
+          "affected_question_numbers": [],
+          "details": "Zero questions copy previous-year exam items verbatim."
+        },
+        {
+          "id": "CHECK_17_SOURCES",
+          "title": "Authoritative Source Coverage",
+          "category": "EVIDENCE",
+          "passed": false,
+          "details": "0% of questions carry validated source citations & evidence lineage."
+        },
+        {
+          "id": "CHECK_18_CUTOFF",
+          "title": "Current-Affairs Dates & Evidence",
+          "category": "LEGAL_TEMPORAL",
+          "passed": true,
+          "affected_question_numbers": [],
+          "details": "No current-affairs questions in this paper."
+        },
+        {
+          "id": "CHECK_19_LEGAL_VALIDITY",
+          "title": "Statutory & Constitutional Legal Validity",
+          "category": "LEGAL_TEMPORAL",
+          "passed": false,
+          "details": "Legal currency requires source-backed question verification; unsupported claims remain unresolved."
+        },
+        {
+          "id": "CHECK_20_EXPLANATION",
+          "title": "Detailed Rationale & Pedagogical Explanation",
+          "category": "EVIDENCE",
+          "passed": true,
+          "affected_question_numbers": [],
+          "details": "Every question contains an unambiguous pedagogical explanation."
+        },
+        {
+          "id": "CHECK_21_SLOT_COVERAGE",
+          "title": "Locked Blueprint Slot Complete Coverage",
+          "category": "STRUCTURE",
+          "passed": true,
+          "details": "All questions correspond to defined blueprint slots."
+        }
+      ],
+      "summary": "Paper Quality Audit completed: 16/21 checks passed (76% compliance score). Audit Status: FAILED.",
+      "audited_at": "2026-09-10T04:06:46.112Z"
+    }
   }
 ]

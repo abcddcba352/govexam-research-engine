@@ -669,11 +669,11 @@
     "readiness_status": "LIMITED_DATA"
   },
   {
-    "profile_id": "intel_tgpsc_group_2_paper_1_mtujok9u",
+    "profile_id": "intel_tgpsc_group_2_paper_1_mtv0afc1",
     "exam_id": "tgpsc_group_2_paper_1",
     "exam_version_id": "tgpsc_g2_v2022",
     "recruitment_cycle": "Notification 28/2022 (Current Cycle 2024-2025)",
-    "analysis_date": "2026-09-09T20:22:21.858Z",
+    "analysis_date": "2026-09-10T04:07:15.745Z",
     "papers_analysed_count": 2,
     "questions_analysed_count": 5,
     "answers_verified_count": 5,

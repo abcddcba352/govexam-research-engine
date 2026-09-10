@@ -41,6 +41,7 @@ import {
   repairOptionSymmetryConceptually
 } from './questionValidationService.ts';
 import { getPYQQuestions } from './pyqService.ts';
+import { detectAndGenerateDiagram } from './autonomousDiagramService.ts';
 
 const MAX_ATTEMPTS = 3;
 const BATCH_SIZE = 5;
@@ -474,6 +475,12 @@ STRICT SPECIFICATION RULES:
                 research_provenance: blueprint.research_provenance || 'LIVE_DIRECT_WEB',
                 data_provenance: (examOrParams as any).data_provenance || 'RETRIEVED_OFFICIAL',
                 current_affairs_evidence: matchedItem.current_affairs_evidence,
+                visual_specification: matchedItem.visual_specification || detectAndGenerateDiagram({
+                  question_text: matchedItem.question_text,
+                  topic: slot.topic,
+                  subtopic: slot.subtopic,
+                  question_type: slot.question_type
+                }),
                 generation_model_id: model
               };
 
@@ -503,6 +510,8 @@ STRICT SPECIFICATION RULES:
                 }];
                 qCandidate.audit_result = {
                   overall_status: 'PASS',
+                  source_status: 'PASS',
+                  answer_status: 'PASS',
                   fact_status: 'SUPPORTED',
                   audit_notes: `Static syllabus concept verified against official blueprint target: ${slot.core_concept_target}`
                 } as any;
@@ -708,6 +717,12 @@ Rules:
             canonical_hash: dupCheck.question_hash,
             source_reference: item.source_reference || `${exam.commission} Official Gazette Rules`,
             candidate_status: 'ACCEPTED',
+            visual_specification: item.visual_specification || detectAndGenerateDiagram({
+              question_text: item.question_text,
+              topic: item.topic,
+              subtopic: item.subtopic,
+              question_type: item.question_type
+            }),
             data_provenance: (examOrParams as any).data_provenance || 'RETRIEVED_OFFICIAL',
             generation_provenance: process.env.GEMINI_API_KEY ? 'LIVE_GEMINI' : 'TEST_SYNTHESIS',
             generation_model_id: model

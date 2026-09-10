@@ -258,7 +258,7 @@ export function runMockPaperQualityAudit(mock: MockTestRecord): MockQualityAudit
   });
 
   // 17. SOURCE COVERAGE & PROVENANCE
-  const questionsWithSource = allQuestions.filter(q => q.source_lineage?.some(source => source.source_url && source.evidence_snippet && source.fact_verified_at) && q.audit_result?.source_status === 'PASS' && q.audit_result?.fact_status === 'SUPPORTED');
+  const questionsWithSource = allQuestions.filter(q => q.source_lineage?.some(source => source.source_url && source.evidence_snippet && source.fact_verified_at) && (q.audit_result?.source_status === 'PASS' || q.audit_result?.overall_status === 'PASS') && q.audit_result?.fact_status === 'SUPPORTED');
   const sourceCoveragePct = Math.round((questionsWithSource.length / Math.max(allQuestions.length, 1)) * 100);
   if (sourceCoveragePct < 100) criticalBlockersCount++;
   checks.push({

@@ -1,5 +1,1713 @@
 [
   {
+    "blueprint_id": "bp_e2e_test_mtv0afd8",
+    "exam_id": "tgpsc_group_2_paper_1",
+    "exam_version_id": "tgpsc_g2_v2022",
+    "recruitment_cycle": "Notification 28/2022 (Current Cycle 2024-2025)",
+    "series_id": "series_tgpsc_prenotif_v2022_fl",
+    "preparation_mode": "PRE_NOTIFICATION_PREPARATION",
+    "preparation_basis_id": "pb_tgpsc_group_2_paper_1_pre_notification_preparation_tgpsc_g2_v2022",
+    "mock_number": 2,
+    "test_mode": "FULL_LENGTH",
+    "language": "English",
+    "question_count": 10,
+    "total_marks": 10,
+    "negative_marking": 0.25,
+    "duration_minutes": 15,
+    "current_affairs_cutoff": "2025-11-15",
+    "status": "BLUEPRINT_LOCKED",
+    "blueprint_version": 1,
+    "created_at": "2026-09-10T04:07:15.790Z",
+    "updated_at": "2026-09-10T04:07:15.995Z",
+    "allow_cross_mode_reuse": false,
+    "slots": [
+      {
+        "slot_id": "slot_bp_e2e_test_mtv0afd8_q1",
+        "blueprint_id": "bp_e2e_test_mtv0afd8",
+        "question_number": 1,
+        "subject": "Economy and Development",
+        "topic": "Telangana Socio-Economic Outlook & Budget Highlights",
+        "subtopic": "Sectional Focus: Telangana Socio-Economic Outlook & Budget Highlights",
+        "microtopic": "Telangana Socio-Economic Outlook & Budget Highlights - Key Provisions & Core Analytical Facts",
+        "question_type": "DIRECT_FACT",
+        "question_archetype": "FACTUAL_APPLICATION",
+        "difficulty": "EASY",
+        "cognitive_level": "RECALL",
+        "static_current": "CURRENT",
+        "state_scope": "STATE_SPECIFIC",
+        "core_concept_target": "Telangana Socio-Economic Outlook & Budget Highlights fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Telangana_Socio_Economic_Outlook___Budget_Highlights_concept_2",
+        "source_requirement": "Official Government PIB Release / Gazette / State Portal (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "current_affairs_window": {
+          "window_start": "2024-11-20",
+          "window_end": "2025-11-15",
+          "cutoff_date": "2025-11-15",
+          "category": "ECONOMY"
+        },
+        "pyq_relationship": "CURRENT_EXTENSION",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the indira mahila shakti initiative is a flagship program highlighted in the 2",
+          "statement 1 is incorrect because the rythu bandhu scheme provides 10000 per ac",
+          "article 251 of the constitution of india guarantees the freedom of conscience",
+          "article 32 provides the right to constitutional remedies dr br ambedkar famo",
+          "statement 1 is correct as the 42nd amendment is the only time the preamble has b"
+        ],
+        "avoid_question_fingerprints": [
+          "76bdd7db25ba33cd",
+          "f3dbe39642b16e98",
+          "0eadb45071104052",
+          "a86c10c5f59aa347",
+          "bbe245d950bd1827"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "B",
+        "distractor_strategy": "NEAR_FACT",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Contemporary policy/scheme within the 2025-11-15 current-affairs window.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Telangana Socio-Economic Outlook & Budget Highlights",
+        "status": "LOCKED"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtv0afd8_q2",
+        "blueprint_id": "bp_e2e_test_mtv0afd8",
+        "question_number": 2,
+        "subject": "Indian Constitution and Polity",
+        "topic": "Articles 14-32 Fundamental Rights & Judicial Doctrines",
+        "subtopic": "Sectional Focus: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+        "microtopic": "Articles 14-32 Fundamental Rights & Judicial Doctrines - Key Provisions & Core Analytical Facts",
+        "question_type": "DIRECT_FACT",
+        "question_archetype": "FACTUAL_APPLICATION",
+        "difficulty": "EASY",
+        "cognitive_level": "RECALL",
+        "static_current": "STATIC",
+        "state_scope": "STATE_SPECIFIC",
+        "core_concept_target": "Articles 14-32 Fundamental Rights & Judicial Doctrines fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_3",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "UNDERTESTED_SYLLABUS",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the indira mahila shakti initiative is a flagship program highlighted in the 2",
+          "statement 1 is incorrect because the rythu bandhu scheme provides 10000 per ac",
+          "article 251 of the constitution of india guarantees the freedom of conscience",
+          "article 32 provides the right to constitutional remedies dr br ambedkar famo",
+          "statement 1 is correct as the 42nd amendment is the only time the preamble has b"
+        ],
+        "avoid_question_fingerprints": [
+          "76bdd7db25ba33cd",
+          "f3dbe39642b16e98",
+          "0eadb45071104052",
+          "a86c10c5f59aa347",
+          "bbe245d950bd1827"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "C",
+        "distractor_strategy": "COMMON_MISCONCEPTION",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Valid gazetted syllabus area under-tested in previous papers; included to prevent candidate memorization.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+        "status": "LOCKED"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtv0afd8_q3",
+        "blueprint_id": "bp_e2e_test_mtv0afd8",
+        "question_number": 3,
+        "subject": "Indian Constitution and Polity",
+        "topic": "Articles 14-32 Fundamental Rights & Judicial Doctrines",
+        "subtopic": "Sectional Focus: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+        "microtopic": "Articles 14-32 Fundamental Rights & Judicial Doctrines - Key Provisions & Core Analytical Facts",
+        "question_type": "DIRECT_FACT",
+        "question_archetype": "FACTUAL_APPLICATION",
+        "difficulty": "EASY",
+        "cognitive_level": "RECALL",
+        "static_current": "STATIC",
+        "state_scope": "STATE_SPECIFIC",
+        "core_concept_target": "Articles 14-32 Fundamental Rights & Judicial Doctrines fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_4",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "UNDERTESTED_SYLLABUS",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the indira mahila shakti initiative is a flagship program highlighted in the 2",
+          "statement 1 is incorrect because the rythu bandhu scheme provides 10000 per ac",
+          "article 251 of the constitution of india guarantees the freedom of conscience",
+          "article 32 provides the right to constitutional remedies dr br ambedkar famo",
+          "statement 1 is correct as the 42nd amendment is the only time the preamble has b"
+        ],
+        "avoid_question_fingerprints": [
+          "76bdd7db25ba33cd",
+          "f3dbe39642b16e98",
+          "0eadb45071104052",
+          "a86c10c5f59aa347",
+          "bbe245d950bd1827"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "A",
+        "distractor_strategy": "DATE_CONFUSION",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Valid gazetted syllabus area under-tested in previous papers; included to prevent candidate memorization.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+        "status": "LOCKED"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtv0afd8_q4",
+        "blueprint_id": "bp_e2e_test_mtv0afd8",
+        "question_number": 4,
+        "subject": "History and Cultural Heritage",
+        "topic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+        "subtopic": "Sectional Focus: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+        "microtopic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions - Key Provisions & Core Analytical Facts",
+        "question_type": "DIRECT_FACT",
+        "question_archetype": "FACTUAL_APPLICATION",
+        "difficulty": "MODERATE",
+        "cognitive_level": "UNDERSTAND",
+        "static_current": "STATIC",
+        "state_scope": "STATE_SPECIFIC",
+        "core_concept_target": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_5",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "ROTATIONAL_TOPIC",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the indira mahila shakti initiative is a flagship program highlighted in the 2",
+          "statement 1 is incorrect because the rythu bandhu scheme provides 10000 per ac",
+          "article 251 of the constitution of india guarantees the freedom of conscience",
+          "article 32 provides the right to constitutional remedies dr br ambedkar famo",
+          "statement 1 is correct as the 42nd amendment is the only time the preamble has b"
+        ],
+        "avoid_question_fingerprints": [
+          "76bdd7db25ba33cd",
+          "f3dbe39642b16e98",
+          "0eadb45071104052",
+          "a86c10c5f59aa347",
+          "bbe245d950bd1827"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "A",
+        "distractor_strategy": "CONCEPT_REVERSAL",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Official syllabus topic with moderate recent coverage; included for rotational syllabus coverage.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+        "status": "LOCKED"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtv0afd8_q5",
+        "blueprint_id": "bp_e2e_test_mtv0afd8",
+        "question_number": 5,
+        "subject": "History and Cultural Heritage",
+        "topic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+        "subtopic": "Sectional Focus: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+        "microtopic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions - Key Provisions & Core Analytical Facts",
+        "question_type": "STATEMENT_COMBINATION",
+        "question_archetype": "MULTI_STATEMENT_PAIRWISE_EVALUATION",
+        "difficulty": "MODERATE",
+        "cognitive_level": "UNDERSTAND",
+        "static_current": "STATIC",
+        "state_scope": "INDIA_GENERAL",
+        "core_concept_target": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_6",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "ROTATIONAL_TOPIC",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the indira mahila shakti initiative is a flagship program highlighted in the 2",
+          "statement 1 is incorrect because the rythu bandhu scheme provides 10000 per ac",
+          "article 251 of the constitution of india guarantees the freedom of conscience",
+          "article 32 provides the right to constitutional remedies dr br ambedkar famo",
+          "statement 1 is correct as the 42nd amendment is the only time the preamble has b"
+        ],
+        "avoid_question_fingerprints": [
+          "76bdd7db25ba33cd",
+          "f3dbe39642b16e98",
+          "0eadb45071104052",
+          "a86c10c5f59aa347",
+          "bbe245d950bd1827"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "D",
+        "distractor_strategy": "NUMERICAL_NEAR_MISS",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Official syllabus topic with moderate recent coverage; included for rotational syllabus coverage.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+        "status": "LOCKED"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtv0afd8_q6",
+        "blueprint_id": "bp_e2e_test_mtv0afd8",
+        "question_number": 6,
+        "subject": "Economy and Development",
+        "topic": "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+        "subtopic": "Sectional Focus: Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+        "microtopic": "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes - Key Provisions & Core Analytical Facts",
+        "question_type": "STATEMENT_COMBINATION",
+        "question_archetype": "MULTI_STATEMENT_PAIRWISE_EVALUATION",
+        "difficulty": "MODERATE",
+        "cognitive_level": "UNDERSTAND",
+        "static_current": "CURRENT",
+        "state_scope": "INDIA_GENERAL",
+        "core_concept_target": "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Rythu_Bandhu___Rythu_Bharosa___Mission_Kakatiya_Schemes_concept_7",
+        "source_requirement": "Official Government PIB Release / Gazette / State Portal (Level 5 Official)",
+        "visual_requirement": true,
+        "visual_type": "BAR_CHART",
+        "current_affairs_window": {
+          "window_start": "2024-11-20",
+          "window_end": "2025-11-15",
+          "cutoff_date": "2025-11-15",
+          "category": "NATIONAL"
+        },
+        "pyq_relationship": "CURRENT_EXTENSION",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the indira mahila shakti initiative is a flagship program highlighted in the 2",
+          "statement 1 is incorrect because the rythu bandhu scheme provides 10000 per ac",
+          "article 251 of the constitution of india guarantees the freedom of conscience",
+          "article 32 provides the right to constitutional remedies dr br ambedkar famo",
+          "statement 1 is correct as the 42nd amendment is the only time the preamble has b"
+        ],
+        "avoid_question_fingerprints": [
+          "76bdd7db25ba33cd",
+          "f3dbe39642b16e98",
+          "0eadb45071104052",
+          "a86c10c5f59aa347",
+          "bbe245d950bd1827"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "B",
+        "distractor_strategy": "LEGAL_SECTION_CONFUSION",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Contemporary policy/scheme within the 2025-11-15 current-affairs window.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+        "status": "LOCKED"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtv0afd8_q7",
+        "blueprint_id": "bp_e2e_test_mtv0afd8",
+        "question_number": 7,
+        "subject": "Indian Constitution and Polity",
+        "topic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+        "subtopic": "Sectional Focus: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+        "microtopic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments - Key Provisions & Core Analytical Facts",
+        "question_type": "STATEMENT_COMBINATION",
+        "question_archetype": "MULTI_STATEMENT_PAIRWISE_EVALUATION",
+        "difficulty": "MODERATE",
+        "cognitive_level": "UNDERSTAND",
+        "static_current": "STATIC",
+        "state_scope": "INDIA_GENERAL",
+        "core_concept_target": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_8",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "ROTATIONAL_TOPIC",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the indira mahila shakti initiative is a flagship program highlighted in the 2",
+          "statement 1 is incorrect because the rythu bandhu scheme provides 10000 per ac",
+          "article 251 of the constitution of india guarantees the freedom of conscience",
+          "article 32 provides the right to constitutional remedies dr br ambedkar famo",
+          "statement 1 is correct as the 42nd amendment is the only time the preamble has b"
+        ],
+        "avoid_question_fingerprints": [
+          "76bdd7db25ba33cd",
+          "f3dbe39642b16e98",
+          "0eadb45071104052",
+          "a86c10c5f59aa347",
+          "bbe245d950bd1827"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "C",
+        "distractor_strategy": "SAME_CATEGORY",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Official syllabus topic with moderate recent coverage; included for rotational syllabus coverage.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+        "status": "LOCKED"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtv0afd8_q8",
+        "blueprint_id": "bp_e2e_test_mtv0afd8",
+        "question_number": 8,
+        "subject": "Indian Constitution and Polity",
+        "topic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+        "subtopic": "Sectional Focus: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+        "microtopic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments - Key Provisions & Core Analytical Facts",
+        "question_type": "CONCEPTUAL",
+        "question_archetype": "FACTUAL_APPLICATION",
+        "difficulty": "MODERATE",
+        "cognitive_level": "APPLY",
+        "static_current": "STATIC",
+        "state_scope": "INDIA_GENERAL",
+        "core_concept_target": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_9",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "ROTATIONAL_TOPIC",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the indira mahila shakti initiative is a flagship program highlighted in the 2",
+          "statement 1 is incorrect because the rythu bandhu scheme provides 10000 per ac",
+          "article 251 of the constitution of india guarantees the freedom of conscience",
+          "article 32 provides the right to constitutional remedies dr br ambedkar famo",
+          "statement 1 is correct as the 42nd amendment is the only time the preamble has b"
+        ],
+        "avoid_question_fingerprints": [
+          "76bdd7db25ba33cd",
+          "f3dbe39642b16e98",
+          "0eadb45071104052",
+          "a86c10c5f59aa347",
+          "bbe245d950bd1827"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "A",
+        "distractor_strategy": "NEAR_FACT",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Official syllabus topic with moderate recent coverage; included for rotational syllabus coverage.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+        "status": "LOCKED"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtv0afd8_q9",
+        "blueprint_id": "bp_e2e_test_mtv0afd8",
+        "question_number": 9,
+        "subject": "General Studies",
+        "topic": "Western Ghats vs Eastern Ghats Agro-climatic systems",
+        "subtopic": "Sectional Focus: Western Ghats vs Eastern Ghats Agro-climatic systems",
+        "microtopic": "Western Ghats vs Eastern Ghats Agro-climatic systems - Key Provisions & Core Analytical Facts",
+        "question_type": "CONCEPTUAL",
+        "question_archetype": "FACTUAL_APPLICATION",
+        "difficulty": "DIFFICULT",
+        "cognitive_level": "APPLY",
+        "static_current": "STATIC",
+        "state_scope": "INDIA_GENERAL",
+        "core_concept_target": "Western Ghats vs Eastern Ghats Agro-climatic systems fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_10",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "UNDERTESTED_SYLLABUS",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the indira mahila shakti initiative is a flagship program highlighted in the 2",
+          "statement 1 is incorrect because the rythu bandhu scheme provides 10000 per ac",
+          "article 251 of the constitution of india guarantees the freedom of conscience",
+          "article 32 provides the right to constitutional remedies dr br ambedkar famo",
+          "statement 1 is correct as the 42nd amendment is the only time the preamble has b"
+        ],
+        "avoid_question_fingerprints": [
+          "76bdd7db25ba33cd",
+          "f3dbe39642b16e98",
+          "0eadb45071104052",
+          "a86c10c5f59aa347",
+          "bbe245d950bd1827"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "D",
+        "distractor_strategy": "COMMON_MISCONCEPTION",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Valid gazetted syllabus area under-tested in previous papers; included to prevent candidate memorization.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Western Ghats vs Eastern Ghats Agro-climatic systems",
+        "status": "LOCKED"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtv0afd8_q10",
+        "blueprint_id": "bp_e2e_test_mtv0afd8",
+        "question_number": 10,
+        "subject": "General Studies",
+        "topic": "Western Ghats vs Eastern Ghats Agro-climatic systems",
+        "subtopic": "Sectional Focus: Western Ghats vs Eastern Ghats Agro-climatic systems",
+        "microtopic": "Western Ghats vs Eastern Ghats Agro-climatic systems - Key Provisions & Core Analytical Facts",
+        "question_type": "MATCHING",
+        "question_archetype": "DUAL_COLUMN_RELATIONAL_MATCH",
+        "difficulty": "DIFFICULT",
+        "cognitive_level": "ANALYSE",
+        "static_current": "STATIC",
+        "state_scope": "INTERNATIONAL",
+        "core_concept_target": "Western Ghats vs Eastern Ghats Agro-climatic systems fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_11",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "UNDERTESTED_SYLLABUS",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the indira mahila shakti initiative is a flagship program highlighted in the 2",
+          "statement 1 is incorrect because the rythu bandhu scheme provides 10000 per ac",
+          "article 251 of the constitution of india guarantees the freedom of conscience",
+          "article 32 provides the right to constitutional remedies dr br ambedkar famo",
+          "statement 1 is correct as the 42nd amendment is the only time the preamble has b"
+        ],
+        "avoid_question_fingerprints": [
+          "76bdd7db25ba33cd",
+          "f3dbe39642b16e98",
+          "0eadb45071104052",
+          "a86c10c5f59aa347",
+          "bbe245d950bd1827"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "B",
+        "distractor_strategy": "DATE_CONFUSION",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Valid gazetted syllabus area under-tested in previous papers; included to prevent candidate memorization.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Western Ghats vs Eastern Ghats Agro-climatic systems",
+        "status": "LOCKED"
+      }
+    ],
+    "allocation_summary": {
+      "totalQuestions": 10,
+      "sections": [
+        {
+          "section_name": "Current Affairs (Regional, National & International)",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "International Relations and Events",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "General Science in everyday life",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "Environmental Issues and Disaster Management",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "Economy of India and Telangana",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "Geography of India and Telangana",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "History and Cultural Heritage of India & Telangana",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "Indian Constitution and Polity",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "Society, Culture, Heritage, Arts and Literature of Telangana",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "Policies of Telangana State",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "Logical Reasoning, Analytical Ability and Data Interpretation",
+          "count": 0,
+          "official_count": 12
+        },
+        {
+          "section_name": "Basic English (10th Standard)",
+          "count": 0,
+          "official_count": 12
+        }
+      ],
+      "subjects": [
+        {
+          "subject": "Current Affairs (Regional, National & International)",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "International Relations and Events",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "General Science in everyday life",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Environmental Issues and Disaster Management",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Economy of India and Telangana",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Geography of India and Telangana",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "History and Cultural Heritage of India & Telangana",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Indian Constitution and Polity",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Society, Culture, Heritage, Arts and Literature of Telangana",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Policies of Telangana State",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Logical Reasoning, Analytical Ability and Data Interpretation",
+          "count": 0,
+          "target_weight_pct": 0,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Basic English (10th Standard)",
+          "count": 0,
+          "target_weight_pct": 0,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        }
+      ],
+      "topics": [
+        {
+          "topic": "Telangana Socio-Economic Outlook & Budget Highlights",
+          "subject": "Economy and Development",
+          "count": 1,
+          "tag": "CURRENT_EXTENSION",
+          "relevance_score": 40
+        },
+        {
+          "topic": "Articles 14-32 Fundamental Rights & Judicial Doctrines",
+          "subject": "Indian Constitution and Polity",
+          "count": 2,
+          "tag": "UNDERTESTED_SYLLABUS",
+          "relevance_score": 50
+        },
+        {
+          "topic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+          "subject": "History and Cultural Heritage",
+          "count": 2,
+          "tag": "ROTATIONAL_COVERAGE",
+          "relevance_score": 60
+        },
+        {
+          "topic": "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+          "subject": "Economy and Development",
+          "count": 1,
+          "tag": "CURRENT_EXTENSION",
+          "relevance_score": 40
+        },
+        {
+          "topic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+          "subject": "Indian Constitution and Polity",
+          "count": 2,
+          "tag": "ROTATIONAL_COVERAGE",
+          "relevance_score": 60
+        },
+        {
+          "topic": "Western Ghats vs Eastern Ghats Agro-climatic systems",
+          "subject": "General Studies",
+          "count": 2,
+          "tag": "UNDERTESTED_SYLLABUS",
+          "relevance_score": 50
+        }
+      ],
+      "difficulties": {
+        "easy_count": 3,
+        "moderate_count": 5,
+        "difficult_count": 2
+      },
+      "cognitive": {
+        "recall": 3,
+        "understand": 4,
+        "apply": 2,
+        "analyse": 1,
+        "multi_step": 0
+      },
+      "formats": [
+        {
+          "format": "DIRECT_FACT",
+          "count": 4
+        },
+        {
+          "format": "STATEMENT_COMBINATION",
+          "count": 3
+        },
+        {
+          "format": "CONCEPTUAL",
+          "count": 2
+        },
+        {
+          "format": "MATCHING",
+          "count": 1
+        },
+        {
+          "format": "ASSERTION_REASON",
+          "count": 0
+        },
+        {
+          "format": "CHRONOLOGY",
+          "count": 0
+        }
+      ],
+      "static_current": {
+        "static_count": 8,
+        "current_count": 2,
+        "linked_count": 0
+      },
+      "state_scope": {
+        "state_count": 4,
+        "india_count": 5,
+        "international_count": 1
+      },
+      "visual_count": 1,
+      "answer_positions": {
+        "A": 3,
+        "B": 3,
+        "C": 2,
+        "D": 2
+      },
+      "pyq_relationships": {
+        "STABLE_CORE_NEW_FACT": 4,
+        "ADJACENT_TO_PYQ": 3,
+        "ROTATIONAL_TOPIC": 1,
+        "CURRENT_EXTENSION": 1,
+        "UNDERTESTED_SYLLABUS": 1
+      }
+    },
+    "pyq_intelligence_status": "SUFFICIENT",
+    "data_provenance": "RETRIEVED_OFFICIAL",
+    "audit_result": {
+      "overall_status": "PASS",
+      "pattern_score": 100,
+      "syllabus_score": 100,
+      "historical_alignment_score": 85,
+      "diversity_score": 92,
+      "non_repeat_score": 100,
+      "format_realism_score": 94,
+      "difficulty_alignment_score": 95,
+      "current_relevance_score": 92,
+      "source_readiness_score": 96,
+      "total_score": 97,
+      "check_results": {
+        "TOTAL_COUNT_CHECK": {
+          "check_name": "TOTAL_COUNT_CHECK",
+          "pass": true,
+          "severity": "CRITICAL",
+          "message": "Exact question total verified: 10/10 slots populated."
+        },
+        "OFFICIAL_PATTERN_CHECK": {
+          "check_name": "OFFICIAL_PATTERN_CHECK",
+          "pass": true,
+          "severity": "CRITICAL",
+          "message": "Full-length blueprint conforms to official gazetted question count (150 Qs)."
+        },
+        "SYLLABUS_COVERAGE_CHECK": {
+          "check_name": "SYLLABUS_COVERAGE_CHECK",
+          "pass": true,
+          "severity": "CRITICAL",
+          "message": "100% of question slots mapped to valid official syllabus topics."
+        },
+        "SUBJECT_DISTRIBUTION_CHECK": {
+          "check_name": "SUBJECT_DISTRIBUTION_CHECK",
+          "pass": true,
+          "severity": "CRITICAL",
+          "message": "Healthy subject breadth: 4 core syllabus disciplines allocated."
+        },
+        "TOPIC_DISTRIBUTION_CHECK": {
+          "check_name": "TOPIC_DISTRIBUTION_CHECK",
+          "pass": true,
+          "severity": "WARN",
+          "message": "Balanced topic spread across 6 distinct syllabus themes."
+        },
+        "FORMAT_DISTRIBUTION_CHECK": {
+          "check_name": "FORMAT_DISTRIBUTION_CHECK",
+          "pass": true,
+          "severity": "INFO",
+          "message": "Question format realism: 4 diverse archetypes (Direct Fact, Statement Combination, Matching, etc.)."
+        },
+        "DIFFICULTY_CHECK": {
+          "check_name": "DIFFICULTY_CHECK",
+          "pass": true,
+          "severity": "CRITICAL",
+          "message": "Difficulty allocation balanced: 3 Easy, 5 Moderate, 2 Difficult."
+        },
+        "COGNITIVE_CHECK": {
+          "check_name": "COGNITIVE_CHECK",
+          "pass": true,
+          "severity": "CRITICAL",
+          "message": "Bloom's cognitive level distribution balanced: 3 Recall, 4 Understand, 2 Apply, 1 Analyse, 0 Multi-Step."
+        },
+        "CURRENT_AFFAIRS_CHECK": {
+          "check_name": "CURRENT_AFFAIRS_CHECK",
+          "pass": true,
+          "severity": "CRITICAL",
+          "message": "Current affairs verified: 2 contemporary slots locked to 2025-11-15 cutoff window."
+        },
+        "VISUAL_CHECK": {
+          "check_name": "VISUAL_CHECK",
+          "pass": true,
+          "severity": "INFO",
+          "message": "Visual requirement satisfied: 1 questions planned for charts, maps, or data diagrams."
+        },
+        "LANGUAGE_CHECK": {
+          "check_name": "LANGUAGE_CHECK",
+          "pass": true,
+          "severity": "CRITICAL",
+          "message": "Language verification passed: Exam medium 'English' enforced."
+        },
+        "ANSWER_POSITION_CHECK": {
+          "check_name": "ANSWER_POSITION_CHECK",
+          "pass": true,
+          "severity": "WARN",
+          "message": "Key balance verified: A:3, B:3, C:2, D:2 (no option bias, peak share 30.0%)."
+        },
+        "NON_REPEAT_CHECK": {
+          "check_name": "NON_REPEAT_CHECK",
+          "pass": true,
+          "severity": "CRITICAL",
+          "message": "Permanent mock duplicate ledger check passed: Zero fact collisions with finalized series mocks."
+        },
+        "PYQ_COPY_RISK_CHECK": {
+          "check_name": "PYQ_COPY_RISK_CHECK",
+          "pass": true,
+          "severity": "INFO",
+          "message": "PYQ non-copy protection active: All slots designated to synthesize NEW answerable facts reflecting PYQ depth without copying questions."
+        },
+        "SOURCE_REQUIREMENT_CHECK": {
+          "check_name": "SOURCE_REQUIREMENT_CHECK",
+          "pass": true,
+          "severity": "WARN",
+          "message": "All slots bound to Level 5 Official or Level 4 Government verifiable source requirements."
+        }
+      },
+      "warnings": [],
+      "errors": [],
+      "recommendations": [
+        "Ensure Question Generation strictly verifies dynamic factual statements against Level 5 Official gazettes."
+      ]
+    },
+    "locked_at": "2026-09-10T04:07:15.995Z"
+  },
+  {
+    "blueprint_id": "bp_e2e_test_mtv08bg9",
+    "exam_id": "tgpsc_group_2_paper_1",
+    "exam_version_id": "tgpsc_g2_v2022",
+    "recruitment_cycle": "Notification 28/2022 (Current Cycle 2024-2025)",
+    "series_id": "series_tgpsc_prenotif_v2022_fl",
+    "preparation_mode": "PRE_NOTIFICATION_PREPARATION",
+    "preparation_basis_id": "pb_tgpsc_group_2_paper_1_pre_notification_preparation_tgpsc_g2_v2022",
+    "mock_number": 2,
+    "test_mode": "FULL_LENGTH",
+    "language": "English",
+    "question_count": 10,
+    "total_marks": 10,
+    "negative_marking": 0.25,
+    "duration_minutes": 15,
+    "current_affairs_cutoff": "2025-11-15",
+    "status": "BLUEPRINT_LOCKED",
+    "blueprint_version": 1,
+    "created_at": "2026-09-10T04:05:37.403Z",
+    "updated_at": "2026-09-10T04:05:37.846Z",
+    "allow_cross_mode_reuse": false,
+    "slots": [
+      {
+        "slot_id": "slot_bp_e2e_test_mtv08bg9_q1",
+        "blueprint_id": "bp_e2e_test_mtv08bg9",
+        "question_number": 1,
+        "subject": "Economy and Development",
+        "topic": "Telangana Socio-Economic Outlook & Budget Highlights",
+        "subtopic": "Sectional Focus: Telangana Socio-Economic Outlook & Budget Highlights",
+        "microtopic": "Telangana Socio-Economic Outlook & Budget Highlights - Key Provisions & Core Analytical Facts",
+        "question_type": "DIRECT_FACT",
+        "question_archetype": "FACTUAL_APPLICATION",
+        "difficulty": "EASY",
+        "cognitive_level": "RECALL",
+        "static_current": "CURRENT",
+        "state_scope": "STATE_SPECIFIC",
+        "core_concept_target": "Telangana Socio-Economic Outlook & Budget Highlights fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Telangana_Socio_Economic_Outlook___Budget_Highlights_concept_2",
+        "source_requirement": "Official Government PIB Release / Gazette / State Portal (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "current_affairs_window": {
+          "window_start": "2024-11-20",
+          "window_end": "2025-11-15",
+          "cutoff_date": "2025-11-15",
+          "category": "ECONOMY"
+        },
+        "pyq_relationship": "CURRENT_EXTENSION",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the mahalakshmi scheme is a flagship welfare initiative of the telangana governm",
+          "statement 1 is correct as mission kakatiya aims to restore minor irrigation tank",
+          "article 21a was inserted into the constitution of india by the 86th constitution",
+          "article 17 of the indian constitution abolishes untouchability and forbids its",
+          "statement 1 is correct the kesavananda bharati judgment established the preambl"
+        ],
+        "avoid_question_fingerprints": [
+          "9c5fb466601c613e",
+          "af53d0eb6bbc5ced",
+          "c46ef2bd201890b6",
+          "55464d9932ae74fb",
+          "2f06d7118ae68955"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "C",
+        "distractor_strategy": "NEAR_FACT",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Contemporary policy/scheme within the 2025-11-15 current-affairs window.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Telangana Socio-Economic Outlook & Budget Highlights",
+        "status": "LOCKED"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtv08bg9_q2",
+        "blueprint_id": "bp_e2e_test_mtv08bg9",
+        "question_number": 2,
+        "subject": "Indian Constitution and Polity",
+        "topic": "Articles 14-32 Fundamental Rights & Judicial Doctrines",
+        "subtopic": "Sectional Focus: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+        "microtopic": "Articles 14-32 Fundamental Rights & Judicial Doctrines - Key Provisions & Core Analytical Facts",
+        "question_type": "DIRECT_FACT",
+        "question_archetype": "FACTUAL_APPLICATION",
+        "difficulty": "EASY",
+        "cognitive_level": "RECALL",
+        "static_current": "STATIC",
+        "state_scope": "STATE_SPECIFIC",
+        "core_concept_target": "Articles 14-32 Fundamental Rights & Judicial Doctrines fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_3",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "UNDERTESTED_SYLLABUS",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the mahalakshmi scheme is a flagship welfare initiative of the telangana governm",
+          "statement 1 is correct as mission kakatiya aims to restore minor irrigation tank",
+          "article 21a was inserted into the constitution of india by the 86th constitution",
+          "article 17 of the indian constitution abolishes untouchability and forbids its",
+          "statement 1 is correct the kesavananda bharati judgment established the preambl"
+        ],
+        "avoid_question_fingerprints": [
+          "9c5fb466601c613e",
+          "af53d0eb6bbc5ced",
+          "c46ef2bd201890b6",
+          "55464d9932ae74fb",
+          "2f06d7118ae68955"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "B",
+        "distractor_strategy": "COMMON_MISCONCEPTION",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Valid gazetted syllabus area under-tested in previous papers; included to prevent candidate memorization.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+        "status": "LOCKED"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtv08bg9_q3",
+        "blueprint_id": "bp_e2e_test_mtv08bg9",
+        "question_number": 3,
+        "subject": "Indian Constitution and Polity",
+        "topic": "Articles 14-32 Fundamental Rights & Judicial Doctrines",
+        "subtopic": "Sectional Focus: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+        "microtopic": "Articles 14-32 Fundamental Rights & Judicial Doctrines - Key Provisions & Core Analytical Facts",
+        "question_type": "DIRECT_FACT",
+        "question_archetype": "FACTUAL_APPLICATION",
+        "difficulty": "EASY",
+        "cognitive_level": "RECALL",
+        "static_current": "STATIC",
+        "state_scope": "STATE_SPECIFIC",
+        "core_concept_target": "Articles 14-32 Fundamental Rights & Judicial Doctrines fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_4",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "UNDERTESTED_SYLLABUS",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the mahalakshmi scheme is a flagship welfare initiative of the telangana governm",
+          "statement 1 is correct as mission kakatiya aims to restore minor irrigation tank",
+          "article 21a was inserted into the constitution of india by the 86th constitution",
+          "article 17 of the indian constitution abolishes untouchability and forbids its",
+          "statement 1 is correct the kesavananda bharati judgment established the preambl"
+        ],
+        "avoid_question_fingerprints": [
+          "9c5fb466601c613e",
+          "af53d0eb6bbc5ced",
+          "c46ef2bd201890b6",
+          "55464d9932ae74fb",
+          "2f06d7118ae68955"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "C",
+        "distractor_strategy": "DATE_CONFUSION",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Valid gazetted syllabus area under-tested in previous papers; included to prevent candidate memorization.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+        "status": "LOCKED"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtv08bg9_q4",
+        "blueprint_id": "bp_e2e_test_mtv08bg9",
+        "question_number": 4,
+        "subject": "History and Cultural Heritage",
+        "topic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+        "subtopic": "Sectional Focus: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+        "microtopic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions - Key Provisions & Core Analytical Facts",
+        "question_type": "DIRECT_FACT",
+        "question_archetype": "FACTUAL_APPLICATION",
+        "difficulty": "MODERATE",
+        "cognitive_level": "UNDERSTAND",
+        "static_current": "STATIC",
+        "state_scope": "STATE_SPECIFIC",
+        "core_concept_target": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_5",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "ROTATIONAL_TOPIC",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the mahalakshmi scheme is a flagship welfare initiative of the telangana governm",
+          "statement 1 is correct as mission kakatiya aims to restore minor irrigation tank",
+          "article 21a was inserted into the constitution of india by the 86th constitution",
+          "article 17 of the indian constitution abolishes untouchability and forbids its",
+          "statement 1 is correct the kesavananda bharati judgment established the preambl"
+        ],
+        "avoid_question_fingerprints": [
+          "9c5fb466601c613e",
+          "af53d0eb6bbc5ced",
+          "c46ef2bd201890b6",
+          "55464d9932ae74fb",
+          "2f06d7118ae68955"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "D",
+        "distractor_strategy": "CONCEPT_REVERSAL",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Official syllabus topic with moderate recent coverage; included for rotational syllabus coverage.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+        "status": "LOCKED"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtv08bg9_q5",
+        "blueprint_id": "bp_e2e_test_mtv08bg9",
+        "question_number": 5,
+        "subject": "History and Cultural Heritage",
+        "topic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+        "subtopic": "Sectional Focus: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+        "microtopic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions - Key Provisions & Core Analytical Facts",
+        "question_type": "STATEMENT_COMBINATION",
+        "question_archetype": "MULTI_STATEMENT_PAIRWISE_EVALUATION",
+        "difficulty": "MODERATE",
+        "cognitive_level": "UNDERSTAND",
+        "static_current": "STATIC",
+        "state_scope": "INDIA_GENERAL",
+        "core_concept_target": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_6",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "ROTATIONAL_TOPIC",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the mahalakshmi scheme is a flagship welfare initiative of the telangana governm",
+          "statement 1 is correct as mission kakatiya aims to restore minor irrigation tank",
+          "article 21a was inserted into the constitution of india by the 86th constitution",
+          "article 17 of the indian constitution abolishes untouchability and forbids its",
+          "statement 1 is correct the kesavananda bharati judgment established the preambl"
+        ],
+        "avoid_question_fingerprints": [
+          "9c5fb466601c613e",
+          "af53d0eb6bbc5ced",
+          "c46ef2bd201890b6",
+          "55464d9932ae74fb",
+          "2f06d7118ae68955"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "A",
+        "distractor_strategy": "NUMERICAL_NEAR_MISS",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Official syllabus topic with moderate recent coverage; included for rotational syllabus coverage.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+        "status": "LOCKED"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtv08bg9_q6",
+        "blueprint_id": "bp_e2e_test_mtv08bg9",
+        "question_number": 6,
+        "subject": "Economy and Development",
+        "topic": "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+        "subtopic": "Sectional Focus: Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+        "microtopic": "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes - Key Provisions & Core Analytical Facts",
+        "question_type": "STATEMENT_COMBINATION",
+        "question_archetype": "MULTI_STATEMENT_PAIRWISE_EVALUATION",
+        "difficulty": "MODERATE",
+        "cognitive_level": "UNDERSTAND",
+        "static_current": "CURRENT",
+        "state_scope": "INDIA_GENERAL",
+        "core_concept_target": "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Rythu_Bandhu___Rythu_Bharosa___Mission_Kakatiya_Schemes_concept_7",
+        "source_requirement": "Official Government PIB Release / Gazette / State Portal (Level 5 Official)",
+        "visual_requirement": true,
+        "visual_type": "BAR_CHART",
+        "current_affairs_window": {
+          "window_start": "2024-11-20",
+          "window_end": "2025-11-15",
+          "cutoff_date": "2025-11-15",
+          "category": "NATIONAL"
+        },
+        "pyq_relationship": "CURRENT_EXTENSION",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the mahalakshmi scheme is a flagship welfare initiative of the telangana governm",
+          "statement 1 is correct as mission kakatiya aims to restore minor irrigation tank",
+          "article 21a was inserted into the constitution of india by the 86th constitution",
+          "article 17 of the indian constitution abolishes untouchability and forbids its",
+          "statement 1 is correct the kesavananda bharati judgment established the preambl"
+        ],
+        "avoid_question_fingerprints": [
+          "9c5fb466601c613e",
+          "af53d0eb6bbc5ced",
+          "c46ef2bd201890b6",
+          "55464d9932ae74fb",
+          "2f06d7118ae68955"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "B",
+        "distractor_strategy": "LEGAL_SECTION_CONFUSION",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Contemporary policy/scheme within the 2025-11-15 current-affairs window.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+        "status": "LOCKED"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtv08bg9_q7",
+        "blueprint_id": "bp_e2e_test_mtv08bg9",
+        "question_number": 7,
+        "subject": "Indian Constitution and Polity",
+        "topic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+        "subtopic": "Sectional Focus: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+        "microtopic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments - Key Provisions & Core Analytical Facts",
+        "question_type": "STATEMENT_COMBINATION",
+        "question_archetype": "MULTI_STATEMENT_PAIRWISE_EVALUATION",
+        "difficulty": "MODERATE",
+        "cognitive_level": "UNDERSTAND",
+        "static_current": "STATIC",
+        "state_scope": "INDIA_GENERAL",
+        "core_concept_target": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_8",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "ROTATIONAL_TOPIC",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the mahalakshmi scheme is a flagship welfare initiative of the telangana governm",
+          "statement 1 is correct as mission kakatiya aims to restore minor irrigation tank",
+          "article 21a was inserted into the constitution of india by the 86th constitution",
+          "article 17 of the indian constitution abolishes untouchability and forbids its",
+          "statement 1 is correct the kesavananda bharati judgment established the preambl"
+        ],
+        "avoid_question_fingerprints": [
+          "9c5fb466601c613e",
+          "af53d0eb6bbc5ced",
+          "c46ef2bd201890b6",
+          "55464d9932ae74fb",
+          "2f06d7118ae68955"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "A",
+        "distractor_strategy": "SAME_CATEGORY",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Official syllabus topic with moderate recent coverage; included for rotational syllabus coverage.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+        "status": "LOCKED"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtv08bg9_q8",
+        "blueprint_id": "bp_e2e_test_mtv08bg9",
+        "question_number": 8,
+        "subject": "Indian Constitution and Polity",
+        "topic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+        "subtopic": "Sectional Focus: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+        "microtopic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments - Key Provisions & Core Analytical Facts",
+        "question_type": "CONCEPTUAL",
+        "question_archetype": "FACTUAL_APPLICATION",
+        "difficulty": "MODERATE",
+        "cognitive_level": "APPLY",
+        "static_current": "STATIC",
+        "state_scope": "INDIA_GENERAL",
+        "core_concept_target": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_9",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "ROTATIONAL_TOPIC",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the mahalakshmi scheme is a flagship welfare initiative of the telangana governm",
+          "statement 1 is correct as mission kakatiya aims to restore minor irrigation tank",
+          "article 21a was inserted into the constitution of india by the 86th constitution",
+          "article 17 of the indian constitution abolishes untouchability and forbids its",
+          "statement 1 is correct the kesavananda bharati judgment established the preambl"
+        ],
+        "avoid_question_fingerprints": [
+          "9c5fb466601c613e",
+          "af53d0eb6bbc5ced",
+          "c46ef2bd201890b6",
+          "55464d9932ae74fb",
+          "2f06d7118ae68955"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "A",
+        "distractor_strategy": "NEAR_FACT",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Official syllabus topic with moderate recent coverage; included for rotational syllabus coverage.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+        "status": "LOCKED"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtv08bg9_q9",
+        "blueprint_id": "bp_e2e_test_mtv08bg9",
+        "question_number": 9,
+        "subject": "General Studies",
+        "topic": "Western Ghats vs Eastern Ghats Agro-climatic systems",
+        "subtopic": "Sectional Focus: Western Ghats vs Eastern Ghats Agro-climatic systems",
+        "microtopic": "Western Ghats vs Eastern Ghats Agro-climatic systems - Key Provisions & Core Analytical Facts",
+        "question_type": "CONCEPTUAL",
+        "question_archetype": "FACTUAL_APPLICATION",
+        "difficulty": "DIFFICULT",
+        "cognitive_level": "APPLY",
+        "static_current": "STATIC",
+        "state_scope": "INDIA_GENERAL",
+        "core_concept_target": "Western Ghats vs Eastern Ghats Agro-climatic systems fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_10",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "UNDERTESTED_SYLLABUS",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the mahalakshmi scheme is a flagship welfare initiative of the telangana governm",
+          "statement 1 is correct as mission kakatiya aims to restore minor irrigation tank",
+          "article 21a was inserted into the constitution of india by the 86th constitution",
+          "article 17 of the indian constitution abolishes untouchability and forbids its",
+          "statement 1 is correct the kesavananda bharati judgment established the preambl"
+        ],
+        "avoid_question_fingerprints": [
+          "9c5fb466601c613e",
+          "af53d0eb6bbc5ced",
+          "c46ef2bd201890b6",
+          "55464d9932ae74fb",
+          "2f06d7118ae68955"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "D",
+        "distractor_strategy": "COMMON_MISCONCEPTION",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Valid gazetted syllabus area under-tested in previous papers; included to prevent candidate memorization.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Western Ghats vs Eastern Ghats Agro-climatic systems",
+        "status": "LOCKED"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtv08bg9_q10",
+        "blueprint_id": "bp_e2e_test_mtv08bg9",
+        "question_number": 10,
+        "subject": "General Studies",
+        "topic": "Western Ghats vs Eastern Ghats Agro-climatic systems",
+        "subtopic": "Sectional Focus: Western Ghats vs Eastern Ghats Agro-climatic systems",
+        "microtopic": "Western Ghats vs Eastern Ghats Agro-climatic systems - Key Provisions & Core Analytical Facts",
+        "question_type": "MATCHING",
+        "question_archetype": "DUAL_COLUMN_RELATIONAL_MATCH",
+        "difficulty": "DIFFICULT",
+        "cognitive_level": "ANALYSE",
+        "static_current": "STATIC",
+        "state_scope": "INTERNATIONAL",
+        "core_concept_target": "Western Ghats vs Eastern Ghats Agro-climatic systems fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_11",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "UNDERTESTED_SYLLABUS",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the mahalakshmi scheme is a flagship welfare initiative of the telangana governm",
+          "statement 1 is correct as mission kakatiya aims to restore minor irrigation tank",
+          "article 21a was inserted into the constitution of india by the 86th constitution",
+          "article 17 of the indian constitution abolishes untouchability and forbids its",
+          "statement 1 is correct the kesavananda bharati judgment established the preambl"
+        ],
+        "avoid_question_fingerprints": [
+          "9c5fb466601c613e",
+          "af53d0eb6bbc5ced",
+          "c46ef2bd201890b6",
+          "55464d9932ae74fb",
+          "2f06d7118ae68955"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "B",
+        "distractor_strategy": "DATE_CONFUSION",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Valid gazetted syllabus area under-tested in previous papers; included to prevent candidate memorization.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Western Ghats vs Eastern Ghats Agro-climatic systems",
+        "status": "LOCKED"
+      }
+    ],
+    "allocation_summary": {
+      "totalQuestions": 10,
+      "sections": [
+        {
+          "section_name": "Current Affairs (Regional, National & International)",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "International Relations and Events",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "General Science in everyday life",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "Environmental Issues and Disaster Management",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "Economy of India and Telangana",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "Geography of India and Telangana",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "History and Cultural Heritage of India & Telangana",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "Indian Constitution and Polity",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "Society, Culture, Heritage, Arts and Literature of Telangana",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "Policies of Telangana State",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "Logical Reasoning, Analytical Ability and Data Interpretation",
+          "count": 0,
+          "official_count": 12
+        },
+        {
+          "section_name": "Basic English (10th Standard)",
+          "count": 0,
+          "official_count": 12
+        }
+      ],
+      "subjects": [
+        {
+          "subject": "Current Affairs (Regional, National & International)",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "International Relations and Events",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "General Science in everyday life",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Environmental Issues and Disaster Management",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Economy of India and Telangana",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Geography of India and Telangana",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "History and Cultural Heritage of India & Telangana",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Indian Constitution and Polity",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Society, Culture, Heritage, Arts and Literature of Telangana",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Policies of Telangana State",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Logical Reasoning, Analytical Ability and Data Interpretation",
+          "count": 0,
+          "target_weight_pct": 0,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Basic English (10th Standard)",
+          "count": 0,
+          "target_weight_pct": 0,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        }
+      ],
+      "topics": [
+        {
+          "topic": "Telangana Socio-Economic Outlook & Budget Highlights",
+          "subject": "Economy and Development",
+          "count": 1,
+          "tag": "CURRENT_EXTENSION",
+          "relevance_score": 40
+        },
+        {
+          "topic": "Articles 14-32 Fundamental Rights & Judicial Doctrines",
+          "subject": "Indian Constitution and Polity",
+          "count": 2,
+          "tag": "UNDERTESTED_SYLLABUS",
+          "relevance_score": 50
+        },
+        {
+          "topic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+          "subject": "History and Cultural Heritage",
+          "count": 2,
+          "tag": "ROTATIONAL_COVERAGE",
+          "relevance_score": 60
+        },
+        {
+          "topic": "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+          "subject": "Economy and Development",
+          "count": 1,
+          "tag": "CURRENT_EXTENSION",
+          "relevance_score": 40
+        },
+        {
+          "topic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+          "subject": "Indian Constitution and Polity",
+          "count": 2,
+          "tag": "ROTATIONAL_COVERAGE",
+          "relevance_score": 60
+        },
+        {
+          "topic": "Western Ghats vs Eastern Ghats Agro-climatic systems",
+          "subject": "General Studies",
+          "count": 2,
+          "tag": "UNDERTESTED_SYLLABUS",
+          "relevance_score": 50
+        }
+      ],
+      "difficulties": {
+        "easy_count": 3,
+        "moderate_count": 5,
+        "difficult_count": 2
+      },
+      "cognitive": {
+        "recall": 3,
+        "understand": 4,
+        "apply": 2,
+        "analyse": 1,
+        "multi_step": 0
+      },
+      "formats": [
+        {
+          "format": "DIRECT_FACT",
+          "count": 4
+        },
+        {
+          "format": "STATEMENT_COMBINATION",
+          "count": 3
+        },
+        {
+          "format": "CONCEPTUAL",
+          "count": 2
+        },
+        {
+          "format": "MATCHING",
+          "count": 1
+        },
+        {
+          "format": "ASSERTION_REASON",
+          "count": 0
+        },
+        {
+          "format": "CHRONOLOGY",
+          "count": 0
+        }
+      ],
+      "static_current": {
+        "static_count": 8,
+        "current_count": 2,
+        "linked_count": 0
+      },
+      "state_scope": {
+        "state_count": 4,
+        "india_count": 5,
+        "international_count": 1
+      },
+      "visual_count": 1,
+      "answer_positions": {
+        "A": 3,
+        "B": 3,
+        "C": 2,
+        "D": 2
+      },
+      "pyq_relationships": {
+        "STABLE_CORE_NEW_FACT": 4,
+        "ADJACENT_TO_PYQ": 3,
+        "ROTATIONAL_TOPIC": 1,
+        "CURRENT_EXTENSION": 1,
+        "UNDERTESTED_SYLLABUS": 1
+      }
+    },
+    "pyq_intelligence_status": "SUFFICIENT",
+    "data_provenance": "RETRIEVED_OFFICIAL",
+    "audit_result": {
+      "overall_status": "PASS",
+      "pattern_score": 100,
+      "syllabus_score": 100,
+      "historical_alignment_score": 85,
+      "diversity_score": 92,
+      "non_repeat_score": 100,
+      "format_realism_score": 94,
+      "difficulty_alignment_score": 95,
+      "current_relevance_score": 92,
+      "source_readiness_score": 96,
+      "total_score": 97,
+      "check_results": {
+        "TOTAL_COUNT_CHECK": {
+          "check_name": "TOTAL_COUNT_CHECK",
+          "pass": true,
+          "severity": "CRITICAL",
+          "message": "Exact question total verified: 10/10 slots populated."
+        },
+        "OFFICIAL_PATTERN_CHECK": {
+          "check_name": "OFFICIAL_PATTERN_CHECK",
+          "pass": true,
+          "severity": "CRITICAL",
+          "message": "Full-length blueprint conforms to official gazetted question count (150 Qs)."
+        },
+        "SYLLABUS_COVERAGE_CHECK": {
+          "check_name": "SYLLABUS_COVERAGE_CHECK",
+          "pass": true,
+          "severity": "CRITICAL",
+          "message": "100% of question slots mapped to valid official syllabus topics."
+        },
+        "SUBJECT_DISTRIBUTION_CHECK": {
+          "check_name": "SUBJECT_DISTRIBUTION_CHECK",
+          "pass": true,
+          "severity": "CRITICAL",
+          "message": "Healthy subject breadth: 4 core syllabus disciplines allocated."
+        },
+        "TOPIC_DISTRIBUTION_CHECK": {
+          "check_name": "TOPIC_DISTRIBUTION_CHECK",
+          "pass": true,
+          "severity": "WARN",
+          "message": "Balanced topic spread across 6 distinct syllabus themes."
+        },
+        "FORMAT_DISTRIBUTION_CHECK": {
+          "check_name": "FORMAT_DISTRIBUTION_CHECK",
+          "pass": true,
+          "severity": "INFO",
+          "message": "Question format realism: 4 diverse archetypes (Direct Fact, Statement Combination, Matching, etc.)."
+        },
+        "DIFFICULTY_CHECK": {
+          "check_name": "DIFFICULTY_CHECK",
+          "pass": true,
+          "severity": "CRITICAL",
+          "message": "Difficulty allocation balanced: 3 Easy, 5 Moderate, 2 Difficult."
+        },
+        "COGNITIVE_CHECK": {
+          "check_name": "COGNITIVE_CHECK",
+          "pass": true,
+          "severity": "CRITICAL",
+          "message": "Bloom's cognitive level distribution balanced: 3 Recall, 4 Understand, 2 Apply, 1 Analyse, 0 Multi-Step."
+        },
+        "CURRENT_AFFAIRS_CHECK": {
+          "check_name": "CURRENT_AFFAIRS_CHECK",
+          "pass": true,
+          "severity": "CRITICAL",
+          "message": "Current affairs verified: 2 contemporary slots locked to 2025-11-15 cutoff window."
+        },
+        "VISUAL_CHECK": {
+          "check_name": "VISUAL_CHECK",
+          "pass": true,
+          "severity": "INFO",
+          "message": "Visual requirement satisfied: 1 questions planned for charts, maps, or data diagrams."
+        },
+        "LANGUAGE_CHECK": {
+          "check_name": "LANGUAGE_CHECK",
+          "pass": true,
+          "severity": "CRITICAL",
+          "message": "Language verification passed: Exam medium 'English' enforced."
+        },
+        "ANSWER_POSITION_CHECK": {
+          "check_name": "ANSWER_POSITION_CHECK",
+          "pass": true,
+          "severity": "WARN",
+          "message": "Key balance verified: A:3, B:3, C:2, D:2 (no option bias, peak share 30.0%)."
+        },
+        "NON_REPEAT_CHECK": {
+          "check_name": "NON_REPEAT_CHECK",
+          "pass": true,
+          "severity": "CRITICAL",
+          "message": "Permanent mock duplicate ledger check passed: Zero fact collisions with finalized series mocks."
+        },
+        "PYQ_COPY_RISK_CHECK": {
+          "check_name": "PYQ_COPY_RISK_CHECK",
+          "pass": true,
+          "severity": "INFO",
+          "message": "PYQ non-copy protection active: All slots designated to synthesize NEW answerable facts reflecting PYQ depth without copying questions."
+        },
+        "SOURCE_REQUIREMENT_CHECK": {
+          "check_name": "SOURCE_REQUIREMENT_CHECK",
+          "pass": true,
+          "severity": "WARN",
+          "message": "All slots bound to Level 5 Official or Level 4 Government verifiable source requirements."
+        }
+      },
+      "warnings": [],
+      "errors": [],
+      "recommendations": [
+        "Ensure Question Generation strictly verifies dynamic factual statements against Level 5 Official gazettes."
+      ]
+    },
+    "locked_at": "2026-09-10T04:05:37.846Z"
+  },
+  {
     "blueprint_id": "bp_appsc_endowment_officer_mains_paper_1_test_mtukz0bb",
     "blueprint_version": 1,
     "exam_id": "appsc_endowment_officer_mains_paper_1",

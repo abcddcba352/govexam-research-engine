@@ -33,7 +33,8 @@ import {
   MockQuestion,
   MockBlueprintRecord,
   PreparationMode,
-  PatternChangeReport
+  PatternChangeReport,
+  VisualSpecification
 } from '../types.ts';
 
 interface MocksScreenProps {
@@ -78,6 +79,32 @@ interface ReadinessInfo {
     no_critical_conflicts?: boolean;
   };
 }
+
+export const QuestionGrayscaleVisual: React.FC<{ visual?: VisualSpecification }> = ({ visual }) => {
+  if (!visual || (!visual.svg_content && !visual.image_url)) return null;
+
+  return (
+    <div className="my-3 flex flex-col items-center justify-center p-3 bg-white border border-slate-200 rounded-lg shadow-2xs max-w-lg mx-auto print:border-slate-800 print:shadow-none print:my-2 print:p-1.5">
+      {visual.svg_content ? (
+        <div 
+          className="w-full flex items-center justify-center overflow-hidden [&>svg]:max-h-64 [&>svg]:w-auto [&>svg]:mx-auto print:[&>svg]:max-h-48"
+          dangerouslySetInnerHTML={{ __html: visual.svg_content }} 
+        />
+      ) : visual.image_url ? (
+        <img 
+          src={visual.image_url} 
+          alt={visual.alt_text || 'Examination Diagram'} 
+          className="max-h-64 object-contain filter grayscale contrast-125 mx-auto print:max-h-48" 
+        />
+      ) : null}
+      {visual.figure_caption && (
+        <div className="text-[11px] font-mono text-slate-600 font-semibold mt-1 text-center border-t border-slate-100 pt-1 w-full print:text-slate-900 print:border-slate-400">
+          {visual.figure_caption}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export const MocksScreen: React.FC<MocksScreenProps> = ({
   exams,
@@ -1305,6 +1332,9 @@ export const MocksScreen: React.FC<MocksScreenProps> = ({
                         {q.question_text}
                       </div>
 
+                      {/* Autonomous Grayscale Diagram / Visual Specification */}
+                      <QuestionGrayscaleVisual visual={q.visual_specification} />
+
                       {/* 4 Options with Approved Key Highlighted */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         {q.options.map((optText, optIdx) => {
@@ -1477,6 +1507,9 @@ export const MocksScreen: React.FC<MocksScreenProps> = ({
                     <div className="text-base text-slate-900 font-medium leading-relaxed whitespace-pre-line bg-slate-50/50 p-4 rounded-lg border border-slate-100">
                       {currentQuestion.question_text}
                     </div>
+
+                    {/* Autonomous Grayscale Diagram / Visual Specification */}
+                    <QuestionGrayscaleVisual visual={currentQuestion.visual_specification} />
 
                     {/* Options List with Key Directly Visible */}
                     <div className="space-y-3">
