@@ -1,0 +1,40 @@
+[
+  {
+    "cluster_id": "cluster_tgpsc_art371d",
+    "exam_id": "tgpsc_group_2_paper_1",
+    "cluster_name": "Article 371-D & Local Cadres Framework",
+    "cluster_type": "SAME_CONCEPT",
+    "core_concept": "Constitutional protection of regional education and public employment quotas in Telangana",
+    "question_ids": [
+      "pyq_tgpsc_2023_q01"
+    ],
+    "questions_preview": [
+      {
+        "id": "pyq_tgpsc_2023_q01",
+        "year": 2023,
+        "number": 1,
+        "text": "Under Article 371-D of the Constitution of India, which of the following provisions was specifically created...",
+        "answer": "Option A: Creation of Special Administrative Tribunal & equitable opportunities"
+      }
+    ]
+  },
+  {
+    "cluster_id": "cluster_tgpsc_kakatiya",
+    "exam_id": "tgpsc_group_2_paper_1",
+    "cluster_name": "Kakatiya Architecture & Heritage Sites",
+    "cluster_type": "SAME_CONCEPT",
+    "core_concept": "Medieval Kakatiya architectural hallmarks, UNESCO World Heritage sites and epigraphs",
+    "question_ids": [
+      "pyq_tgpsc_2023_q02"
+    ],
+    "questions_preview": [
+      {
+        "id": "pyq_tgpsc_2023_q02",
+        "year": 2023,
+        "number": 2,
+        "text": "Consider the statements regarding Ramappa Temple: 1. UNESCO list 2021... 2. Floating bricks... 3. Recharla Rudra 1213 CE...",
+        "answer": "Option C: 1, 2 and 3"
+      }
+    ]
+  }
+]

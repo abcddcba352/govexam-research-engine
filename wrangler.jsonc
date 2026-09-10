@@ -1,0 +1,29 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "govexam-staging",
+  "main": "server/cloudflareWorker.ts",
+  "compatibility_date": "2026-08-04",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "alias": {
+    "iconv-lite": "./server/iconvLiteCompat.cjs",
+    "@napi-rs/canvas": "./server/canvasCompat.cjs"
+  },
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  },
+  "triggers": {"crons": ["*/10 * * * *"]},
+  "kv_namespaces": [{"binding":"GOVEXAM_RESEARCH_STATE","id":"04fcd7b8c2b84948bcfbd248c0ba4ff9"}],
+  "vars": {
+    "NODE_ENV": "staging",
+    "ENVIRONMENT": "staging",
+    "APP_ENV": "staging",
+    "PERSISTENCE_BACKEND": "DATABASE",
+    "GEMINI_PRIMARY_MODEL": "gemini-3.8-flash",
+    "GEMINI_FALLBACK_MODEL": "gemini-3.1-flash-lite",
+    "MODEL_TIER_POLICY": "ALLOW_ECONOMY_FALLBACK_WITH_STRICT_AUDIT"
+  }
+}

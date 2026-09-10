@@ -1,0 +1,6 @@
+{
+  "name": "GovExam Research Engine",
+  "description": "Configurable Research Engine comparing Google Search Grounding, Direct Web, and Hybrid methods for government examination intelligence and official source verification.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

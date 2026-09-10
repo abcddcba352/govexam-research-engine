@@ -1,0 +1,412 @@
+[
+  {
+    "ledger_id": "led_mtujp903_bmjr",
+    "question_hash": "e33e3d53240273b4",
+    "canonical_hash": "e33e3d53240273b4",
+    "normalized_text": "match listi peaks with listii geographical locationstatus listi a anamudi b mahendragiri c doddabetta d jindhagada listii 1 eastern ghats highest peak 2 western ghats highest peak 3 eastern ghats prominent peak 4 nilgiris highest peak choose the correct code from the options given below",
+    "canonical_question_preview": "Match List-I (Peaks) with List-II (Geographical Location/Status):\n\nList-I:\nA. Anamudi\nB. Mahendragiri\nC. Doddabetta\nD. Jindhagada\n\nList-II:\n...",
+    "canonical_full_text": "Match List-I (Peaks) with List-II (Geographical Location/Status):\n\nList-I:\nA. Anamudi\nB. Mahendragiri\nC. Doddabetta\nD. Jindhagada\n\nList-II:\n1. Eastern Ghats (Highest Peak)\n2. Western Ghats (Highest Peak)\n3. Eastern Ghats (Prominent Peak)\n4. Nilgiris (Highest Peak)\n\nChoose the correct code from the options given below:",
+    "core_concept": "match listi peaks with listii geographical",
+    "core_fact": "Anamudi is the highest peak of the Western Ghats (2). Mahendragiri is a prominent peak of the Easter",
+    "semantic_fingerprint": "fp_e33e3d53240273b4",
+    "question_archetype": "FACTUAL",
+    "topic": "Western Ghats vs Eastern Ghats Agro-climatic systems",
+    "subtopic": "Sectional Focus: Western Ghats vs Eastern Ghats Agro-climatic systems",
+    "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtujokty",
+    "mock_ids": [
+      "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtujokty"
+    ],
+    "exam_id": "tgpsc_group_2_paper_1",
+    "first_registered_at": "2026-09-09T20:22:53.907Z",
+    "duplicate_attempts_blocked": 1,
+    "similarity_cluster_key": "western_ghats_vs_eastern_ghats_agro_climatic_systems",
+    "core_fact_representation": {
+      "subject": "General Studies",
+      "topic": "Western Ghats vs Eastern Ghats Agro-climatic systems",
+      "subtopic": "Sectional Focus: Western Ghats vs Eastern Ghats Agro-climatic systems",
+      "entities": [
+        "Western Ghats vs Eastern Ghats Agro-climatic systems fundamental principle and statutory applicability"
+      ],
+      "relation": "statutory_mandate",
+      "property_tested": "Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_11",
+      "object_or_value": "a-2, b-1, c-4, d-3",
+      "correct_answer_concept": "a-2, b-1, c-4, d-3",
+      "fact_fingerprint": "fp_western_ghats_vs_eastern_ghats_agro_climatic_systems_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_11"
+    }
+  },
+  {
+    "ledger_id": "led_mtujp902_c75v",
+    "question_hash": "d094bd0a749c6a98",
+    "canonical_hash": "d094bd0a749c6a98",
+    "normalized_text": "regarding the agroclimatic and geographical characteristics of the western ghats and eastern ghats which of the following statements is correct",
+    "canonical_question_preview": "Regarding the agro-climatic and geographical characteristics of the Western Ghats and Eastern Ghats, which of the following statements is co...",
+    "canonical_full_text": "Regarding the agro-climatic and geographical characteristics of the Western Ghats and Eastern Ghats, which of the following statements is correct?",
+    "core_concept": "agroclimatic geographical characteristics western ghats eastern",
+    "core_fact": "The Western Ghats act as a major barrier to the Arabian Sea monsoon, causing heavy orographic rainfa",
+    "semantic_fingerprint": "fp_d094bd0a749c6a98",
+    "question_archetype": "FACTUAL",
+    "topic": "Western Ghats vs Eastern Ghats Agro-climatic systems",
+    "subtopic": "Sectional Focus: Western Ghats vs Eastern Ghats Agro-climatic systems",
+    "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtujokty",
+    "mock_ids": [
+      "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtujokty"
+    ],
+    "exam_id": "tgpsc_group_2_paper_1",
+    "first_registered_at": "2026-09-09T20:22:53.907Z",
+    "duplicate_attempts_blocked": 0,
+    "similarity_cluster_key": "western_ghats_vs_eastern_ghats_agro_climatic_systems",
+    "core_fact_representation": {
+      "subject": "General Studies",
+      "topic": "Western Ghats vs Eastern Ghats Agro-climatic systems",
+      "subtopic": "Sectional Focus: Western Ghats vs Eastern Ghats Agro-climatic systems",
+      "entities": [
+        "Western Ghats vs Eastern Ghats Agro-climatic systems fundamental principle and statutory applicability"
+      ],
+      "relation": "statutory_mandate",
+      "property_tested": "Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_10",
+      "object_or_value": "the western ghats exhibit a higher degree of biological endemism and orographic precipitation compared to the eastern ghats.",
+      "correct_answer_concept": "the western ghats exhibit a higher degree of biological endemism and orographic precipitation compared to the eastern ghats.",
+      "fact_fingerprint": "fp_western_ghats_vs_eastern_ghats_agro_climatic_systems_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_10"
+    }
+  },
+  {
+    "ledger_id": "led_mtujp902_0c6f",
+    "question_hash": "9d4894a2e5c32479",
+    "canonical_hash": "9d4894a2e5c32479",
+    "normalized_text": "consider the following statements regarding the kakatiya architectural style 1 the thousand pillar temple rudreshwara swamy temple in hanamkonda was commissioned by king ganapati deva in 1163 ce 2 kakatiya temples are renowned for their unique starshaped stellate plan and the use of sandbox foundation techniques for structural stability which of the statements given above are correct",
+    "canonical_question_preview": "Consider the following statements regarding the Kakatiya architectural style:\n1. The Thousand Pillar Temple (Rudreshwara Swamy Temple) in Ha...",
+    "canonical_full_text": "Consider the following statements regarding the Kakatiya architectural style:\n1. The Thousand Pillar Temple (Rudreshwara Swamy Temple) in Hanamkonda was commissioned by King Ganapati Deva in 1163 CE.\n2. Kakatiya temples are renowned for their unique star-shaped (stellate) plan and the use of sand-box foundation techniques for structural stability.\nWhich of the statements given above are correct?",
+    "core_concept": "kakatiya architectural style thousand pillar temple",
+    "core_fact": "Both statements are correct. The Thousand Pillar Temple was built by King Rudra Deva (a Kakatiya rul",
+    "semantic_fingerprint": "fp_9d4894a2e5c32479",
+    "question_archetype": "STATEMENT_ANALYSIS",
+    "topic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+    "subtopic": "Sectional Focus: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+    "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtujokty",
+    "mock_ids": [
+      "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtujokty"
+    ],
+    "exam_id": "tgpsc_group_2_paper_1",
+    "first_registered_at": "2026-09-09T20:22:53.906Z",
+    "duplicate_attempts_blocked": 0,
+    "similarity_cluster_key": "kakatiya_asaf_jahi_dynasty_architecture_inscriptions",
+    "core_fact_representation": {
+      "subject": "History and Cultural Heritage",
+      "topic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+      "subtopic": "Sectional Focus: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+      "entities": [
+        "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions fundamental principle and statutory applicability"
+      ],
+      "relation": "statutory_mandate",
+      "property_tested": "Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_6",
+      "object_or_value": "both 1 and 2",
+      "correct_answer_concept": "both 1 and 2",
+      "fact_fingerprint": "fp_kakatiya_asaf_jahi_dynasty_architecture_inscriptions_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_6"
+    }
+  },
+  {
+    "ledger_id": "led_mtujp902_kqd2",
+    "question_hash": "7e507dd4d0bc3c51",
+    "canonical_hash": "7e507dd4d0bc3c51",
+    "normalized_text": "which of the following architectural styles characterized by a synthesis of european neoclassical elements and traditional indoislamic motifs is most prominently associated with the major public buildings constructed during the asaf jahi dynasty in hyderabad",
+    "canonical_question_preview": "Which of the following architectural styles, characterized by a synthesis of European neoclassical elements and traditional Indo-Islamic mot...",
+    "canonical_full_text": "Which of the following architectural styles, characterized by a synthesis of European neoclassical elements and traditional Indo-Islamic motifs, is most prominently associated with the major public buildings constructed during the Asaf Jahi dynasty in Hyderabad?",
+    "core_concept": "architectural styles characterized synthesis european neoclassical",
+    "core_fact": "The Asaf Jahi rulers, particularly during the late 19th and early 20th centuries, adopted the Indo-S",
+    "semantic_fingerprint": "fp_7e507dd4d0bc3c51",
+    "question_archetype": "FACTUAL",
+    "topic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+    "subtopic": "Sectional Focus: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+    "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtujokty",
+    "mock_ids": [
+      "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtujokty"
+    ],
+    "exam_id": "tgpsc_group_2_paper_1",
+    "first_registered_at": "2026-09-09T20:22:53.906Z",
+    "duplicate_attempts_blocked": 0,
+    "similarity_cluster_key": "kakatiya_asaf_jahi_dynasty_architecture_inscriptions",
+    "core_fact_representation": {
+      "subject": "History and Cultural Heritage",
+      "topic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+      "subtopic": "Sectional Focus: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+      "entities": [
+        "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions fundamental principle and statutory applicability"
+      ],
+      "relation": "statutory_mandate",
+      "property_tested": "Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_5",
+      "object_or_value": "indo-saracenic",
+      "correct_answer_concept": "indo-saracenic",
+      "fact_fingerprint": "fp_kakatiya_asaf_jahi_dynasty_architecture_inscriptions_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_5"
+    }
+  },
+  {
+    "ledger_id": "led_mtujp901_xtva",
+    "question_hash": "dfdea7541075fe8e",
+    "canonical_hash": "dfdea7541075fe8e",
+    "normalized_text": "which of the following principles has been explicitly identified by the supreme court of india as a component of the basic structure of the constitution",
+    "canonical_question_preview": "Which of the following principles has been explicitly identified by the Supreme Court of India as a component of the 'Basic Structure' of th...",
+    "canonical_full_text": "Which of the following principles has been explicitly identified by the Supreme Court of India as a component of the 'Basic Structure' of the Constitution?",
+    "core_concept": "principles been explicitly identified supreme court",
+    "core_fact": "Judicial Review is a fundamental feature of the Indian Constitution and has been declared as part of",
+    "semantic_fingerprint": "fp_dfdea7541075fe8e",
+    "question_archetype": "FACTUAL",
+    "topic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+    "subtopic": "Sectional Focus: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+    "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtujokty",
+    "mock_ids": [
+      "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtujokty"
+    ],
+    "exam_id": "tgpsc_group_2_paper_1",
+    "first_registered_at": "2026-09-09T20:22:53.905Z",
+    "duplicate_attempts_blocked": 0,
+    "similarity_cluster_key": "preamble_basic_structure_doctrine_73rd_74th_amendments",
+    "core_fact_representation": {
+      "subject": "Indian Constitution and Polity",
+      "topic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+      "subtopic": "Sectional Focus: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+      "entities": [
+        "Preamble, Basic Structure Doctrine & 73rd/74th Amendments fundamental principle and statutory applicability"
+      ],
+      "relation": "statutory_mandate",
+      "property_tested": "Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_9",
+      "object_or_value": "judicial review",
+      "correct_answer_concept": "judicial review",
+      "fact_fingerprint": "fp_preamble_basic_structure_doctrine_73rd_74th_amendments_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_9"
+    }
+  },
+  {
+    "ledger_id": "led_mtujp901_a2r8",
+    "question_hash": "2f06d7118ae68955",
+    "canonical_hash": "2f06d7118ae68955",
+    "normalized_text": "consider the following statements regarding the constitution of india 1 the supreme court in the kesavananda bharati case 1973 held that the preamble is an integral part of the constitution and can be amended under article 368 provided the basic structure is not altered 2 the 73rd constitutional amendment act mandates reservation for scs and sts in panchayats but explicitly prohibits the reservation of seats for women in these local bodies which of the statements given above are correct",
+    "canonical_question_preview": "Consider the following statements regarding the Constitution of India:\n\n1. The Supreme Court, in the Kesavananda Bharati case (1973), held t...",
+    "canonical_full_text": "Consider the following statements regarding the Constitution of India:\n\n1. The Supreme Court, in the Kesavananda Bharati case (1973), held that the Preamble is an integral part of the Constitution and can be amended under Article 368, provided the 'Basic Structure' is not altered.\n2. The 73rd Constitutional Amendment Act mandates reservation for SCs and STs in Panchayats, but explicitly prohibits the reservation of seats for women in these local bodies.\n\nWhich of the statements given above are correct?",
+    "core_concept": "constitution india supreme court kesavananda bharati",
+    "core_fact": "Statement 1 is correct; the Kesavananda Bharati judgment established the Preamble as part of the Con",
+    "semantic_fingerprint": "fp_2f06d7118ae68955",
+    "question_archetype": "STATEMENT_ANALYSIS",
+    "topic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+    "subtopic": "Sectional Focus: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+    "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtujokty",
+    "mock_ids": [
+      "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtujokty"
+    ],
+    "exam_id": "tgpsc_group_2_paper_1",
+    "first_registered_at": "2026-09-09T20:22:53.905Z",
+    "duplicate_attempts_blocked": 0,
+    "similarity_cluster_key": "preamble_basic_structure_doctrine_73rd_74th_amendments",
+    "core_fact_representation": {
+      "subject": "Indian Constitution and Polity",
+      "topic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+      "subtopic": "Sectional Focus: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+      "entities": [
+        "Preamble, Basic Structure Doctrine & 73rd/74th Amendments fundamental principle and statutory applicability"
+      ],
+      "relation": "statutory_mandate",
+      "property_tested": "Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_8",
+      "object_or_value": "1 only",
+      "time_scope": "1973",
+      "correct_answer_concept": "1 only",
+      "fact_fingerprint": "fp_preamble_basic_structure_doctrine_73rd_74th_amendments_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_8"
+    }
+  },
+  {
+    "ledger_id": "led_mtujp901_0aqj",
+    "question_hash": "55464d9932ae74fb",
+    "canonical_hash": "55464d9932ae74fb",
+    "normalized_text": "which article of the indian constitution provides for the abolition of untouchability and forbids its practice in any form declaring that the enforcement of any disability arising out of untouchability shall be an offence punishable in accordance with the law",
+    "canonical_question_preview": "Which Article of the Indian Constitution provides for the abolition of 'Untouchability' and forbids its practice in any form, declaring that...",
+    "canonical_full_text": "Which Article of the Indian Constitution provides for the abolition of 'Untouchability' and forbids its practice in any form, declaring that the enforcement of any disability arising out of 'Untouchability' shall be an offence punishable in accordance with the law?",
+    "core_concept": "article indian constitution provides abolition untouchability",
+    "core_fact": "Article 17 of the Indian Constitution abolishes 'Untouchability' and forbids its practice in any for",
+    "semantic_fingerprint": "fp_55464d9932ae74fb",
+    "question_archetype": "FACTUAL",
+    "topic": "Articles 14-32 Fundamental Rights & Judicial Doctrines",
+    "subtopic": "Sectional Focus: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+    "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtujokty",
+    "mock_ids": [
+      "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtujokty"
+    ],
+    "exam_id": "tgpsc_group_2_paper_1",
+    "first_registered_at": "2026-09-09T20:22:53.905Z",
+    "duplicate_attempts_blocked": 0,
+    "similarity_cluster_key": "articles_14_32_fundamental_rights_judicial_doctrines",
+    "core_fact_representation": {
+      "subject": "Indian Constitution and Polity",
+      "topic": "Articles 14-32 Fundamental Rights & Judicial Doctrines",
+      "subtopic": "Sectional Focus: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+      "entities": [
+        "Articles 14-32 Fundamental Rights & Judicial Doctrines fundamental principle and statutory applicability"
+      ],
+      "relation": "statutory_mandate",
+      "property_tested": "Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_4",
+      "object_or_value": "article 17",
+      "correct_answer_concept": "article 17",
+      "fact_fingerprint": "fp_articles_14_32_fundamental_rights_judicial_doctrines_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_4"
+    }
+  },
+  {
+    "ledger_id": "led_mtujp901_asgq",
+    "question_hash": "c46ef2bd201890b6",
+    "canonical_hash": "c46ef2bd201890b6",
+    "normalized_text": "which article of the indian constitution was inserted by the 86th constitutional amendment act 2002 to make free and compulsory education a fundamental right for children between the ages of 6 and 14 years",
+    "canonical_question_preview": "Which Article of the Indian Constitution was inserted by the 86th Constitutional Amendment Act, 2002, to make free and compulsory education ...",
+    "canonical_full_text": "Which Article of the Indian Constitution was inserted by the 86th Constitutional Amendment Act, 2002, to make free and compulsory education a fundamental right for children between the ages of 6 and 14 years?",
+    "core_concept": "article indian constitution inserted 86th constitutional",
+    "core_fact": "Article 21A was inserted into the Constitution of India by the 86th Constitutional Amendment Act, 20",
+    "semantic_fingerprint": "fp_c46ef2bd201890b6",
+    "question_archetype": "FACTUAL",
+    "topic": "Articles 14-32 Fundamental Rights & Judicial Doctrines",
+    "subtopic": "Sectional Focus: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+    "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtujokty",
+    "mock_ids": [
+      "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtujokty"
+    ],
+    "exam_id": "tgpsc_group_2_paper_1",
+    "first_registered_at": "2026-09-09T20:22:53.905Z",
+    "duplicate_attempts_blocked": 0,
+    "similarity_cluster_key": "articles_14_32_fundamental_rights_judicial_doctrines",
+    "core_fact_representation": {
+      "subject": "Indian Constitution and Polity",
+      "topic": "Articles 14-32 Fundamental Rights & Judicial Doctrines",
+      "subtopic": "Sectional Focus: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+      "entities": [
+        "Articles 14-32 Fundamental Rights & Judicial Doctrines fundamental principle and statutory applicability"
+      ],
+      "relation": "statutory_mandate",
+      "property_tested": "Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_3",
+      "object_or_value": "article 21a",
+      "time_scope": "2002",
+      "correct_answer_concept": "article 21a",
+      "fact_fingerprint": "fp_articles_14_32_fundamental_rights_judicial_doctrines_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_3"
+    }
+  },
+  {
+    "ledger_id": "led_mtujp901_ts40",
+    "question_hash": "af53d0eb6bbc5ced",
+    "canonical_hash": "af53d0eb6bbc5ced",
+    "normalized_text": "consider the following statements regarding the irrigation and agricultural support schemes in telangana 1 mission kakatiya focuses on the comprehensive restoration of minor irrigation tanks to enhance groundwater recharge and stabilize the command area 2 the rythu bharosa scheme formerly rythu bandhu provides direct investment support to landowning farmers calculated based on the extent of land cultivated visual representation of tank restoration progress hypothetical data year tanks restored cumulative 2015 8000 2018 25000 2024 46000 which of the statements given above are correct",
+    "canonical_question_preview": "Consider the following statements regarding the irrigation and agricultural support schemes in Telangana:\n\n1. Mission Kakatiya focuses on th...",
+    "canonical_full_text": "Consider the following statements regarding the irrigation and agricultural support schemes in Telangana:\n\n1. Mission Kakatiya focuses on the comprehensive restoration of minor irrigation tanks to enhance groundwater recharge and stabilize the command area.\n2. The Rythu Bharosa scheme (formerly Rythu Bandhu) provides direct investment support to land-owning farmers, calculated based on the extent of land cultivated.\n\nVisual Representation of Tank Restoration Progress (Hypothetical Data):\n\n| Year | Tanks Restored (Cumulative) |\n|---|---|\n| 2015 | 8,000 |\n| 2018 | 25,000 |\n| 2024 | 46,000 |\n\nWhich of the statements given above are correct?",
+    "core_concept": "irrigation agricultural support schemes telangana mission",
+    "core_fact": "Statement 1 is correct as Mission Kakatiya aims to restore minor irrigation tanks to improve agricul",
+    "semantic_fingerprint": "fp_af53d0eb6bbc5ced",
+    "question_archetype": "STATEMENT_ANALYSIS",
+    "topic": "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+    "subtopic": "Sectional Focus: Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+    "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtujokty",
+    "mock_ids": [
+      "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtujokty"
+    ],
+    "exam_id": "tgpsc_group_2_paper_1",
+    "first_registered_at": "2026-09-09T20:22:53.905Z",
+    "duplicate_attempts_blocked": 0,
+    "similarity_cluster_key": "rythu_bandhu_rythu_bharosa_mission_kakatiya_schemes",
+    "core_fact_representation": {
+      "subject": "Economy and Development",
+      "topic": "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+      "subtopic": "Sectional Focus: Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+      "entities": [
+        "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes fundamental principle and statutory applicability"
+      ],
+      "relation": "statutory_mandate",
+      "property_tested": "Family: Rythu_Bandhu___Rythu_Bharosa___Mission_Kakatiya_Schemes_concept_7",
+      "object_or_value": "both 1 and 2",
+      "time_scope": "2015",
+      "correct_answer_concept": "both 1 and 2",
+      "fact_fingerprint": "fp_rythu_bandhu_rythu_bharosa_mission_kakatiya_schemes_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Rythu_Bandhu___Rythu_Bharosa___Mission_Kakatiya_Schemes_concept_7"
+    }
+  },
+  {
+    "ledger_id": "led_mtujp900_vhrg",
+    "question_hash": "9c5fb466601c613e",
+    "canonical_hash": "9c5fb466601c613e",
+    "normalized_text": "which of the following welfare initiatives highlighted in the telangana state budget 202425 is specifically designed to provide free bus travel for women across the state to enhance their mobility and economic participation",
+    "canonical_question_preview": "Which of the following welfare initiatives, highlighted in the Telangana State Budget 2024-25, is specifically designed to provide free bus ...",
+    "canonical_full_text": "Which of the following welfare initiatives, highlighted in the Telangana State Budget 2024-25, is specifically designed to provide free bus travel for women across the state to enhance their mobility and economic participation?",
+    "core_concept": "welfare initiatives highlighted telangana state budget",
+    "core_fact": "The Mahalakshmi Scheme is a flagship welfare initiative of the Telangana government, launched to pro",
+    "semantic_fingerprint": "fp_9c5fb466601c613e",
+    "question_archetype": "FACTUAL",
+    "topic": "Telangana Socio-Economic Outlook & Budget Highlights",
+    "subtopic": "Sectional Focus: Telangana Socio-Economic Outlook & Budget Highlights",
+    "mock_id": "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtujokty",
+    "mock_ids": [
+      "mock_tgpsc_group_2_paper_1_pre_notification_preparation_mtujokty"
+    ],
+    "exam_id": "tgpsc_group_2_paper_1",
+    "first_registered_at": "2026-09-09T20:22:53.904Z",
+    "duplicate_attempts_blocked": 2,
+    "similarity_cluster_key": "telangana_socio_economic_outlook_budget_highlights",
+    "core_fact_representation": {
+      "subject": "Economy and Development",
+      "topic": "Telangana Socio-Economic Outlook & Budget Highlights",
+      "subtopic": "Sectional Focus: Telangana Socio-Economic Outlook & Budget Highlights",
+      "entities": [
+        "Telangana Socio-Economic Outlook & Budget Highlights fundamental principle and statutory applicability"
+      ],
+      "relation": "statutory_mandate",
+      "property_tested": "Family: Telangana_Socio_Economic_Outlook___Budget_Highlights_concept_2",
+      "object_or_value": "mahalakshmi scheme",
+      "time_scope": "2024",
+      "correct_answer_concept": "mahalakshmi scheme",
+      "fact_fingerprint": "fp_telangana_socio_economic_outlook_budget_highlights_fundamental_principle_and_statutory_applicability_statutory_mandate_Family: Telangana_Socio_Economic_Outlook___Budget_Highlights_concept_2"
+    }
+  },
+  {
+    "ledger_id": "led_001",
+    "question_hash": "a1cc9414173d0ad9",
+    "canonical_question_preview": "Under the Constitution of India, which Constitutional Amendment Act substituted Article 371D to provide equitable opportunities...",
+    "exam_id": "tgpsc_group_2_paper_1",
+    "mock_ids": [
+      "mock_tgpsc_g2_p1_01"
+    ],
+    "topic": "Indian Constitution - Special Provisions (Article 371D)",
+    "first_registered_at": "2026-09-05T16:45:18.471Z",
+    "duplicate_attempts_blocked": 19,
+    "similarity_cluster_key": "art_371d_amendment",
+    "canonical_hash": "a1cc9414173d0ad9"
+  },
+  {
+    "ledger_id": "led_002",
+    "question_hash": "c22c0dada7ee4955",
+    "canonical_question_preview": "Which Kakatiya ruler issued the famous Motupalli Pillar Inscription (Abhaya Shasana) granting protective charter...",
+    "exam_id": "tgpsc_group_2_paper_1",
+    "mock_ids": [
+      "mock_tgpsc_g2_p1_01"
+    ],
+    "topic": "History of Telangana - Kakatiya Dynasty",
+    "first_registered_at": "2026-09-05T16:45:18.471Z",
+    "duplicate_attempts_blocked": 3,
+    "similarity_cluster_key": "kakatiya_motupalli_charter",
+    "canonical_hash": "c22c0dada7ee4955"
+  },
+  {
+    "ledger_id": "led_003",
+    "question_hash": "c88c30254a071011",
+    "canonical_question_preview": "Consider the following statements regarding the Gentlemen's Agreement signed on 20th February 1956...",
+    "exam_id": "tgpsc_group_2_paper_1",
+    "mock_ids": [
+      "mock_tgpsc_g2_p1_01"
+    ],
+    "topic": "Telangana Movement - Gentlemen Agreement 1956",
+    "first_registered_at": "2026-09-05T16:45:18.471Z",
+    "duplicate_attempts_blocked": 0,
+    "similarity_cluster_key": "gentlemen_agreement_1956",
+    "canonical_hash": "c88c30254a071011"
+  },
+  {
+    "ledger_id": "led_004",
+    "question_hash": "403c6fd3741e1f0f",
+    "canonical_question_preview": "Under the 73rd Constitutional Amendment Act, 1992, which schedule was added to the Constitution listing 29 functional items...",
+    "exam_id": "tgpsc_group_2_paper_1",
+    "mock_ids": [
+      "mock_tgpsc_g2_p1_01"
+    ],
+    "topic": "Indian Polity - Panchayati Raj",
+    "first_registered_at": "2026-09-05T16:45:18.471Z",
+    "duplicate_attempts_blocked": 0,
+    "similarity_cluster_key": "panchayat_11th_schedule",
+    "canonical_hash": "403c6fd3741e1f0f"
+  }
+]

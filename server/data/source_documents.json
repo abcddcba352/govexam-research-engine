@@ -1,0 +1,11 @@
+[
+  {
+    "document_id": "doc_contract_test_1",
+    "document_type": "SYLLABUS",
+    "title": "TGPSC Group 2 Syllabus Notification",
+    "storage_bucket": "govexam-syllabus",
+    "storage_path": "tgpsc/2022/hash123/syllabus.pdf",
+    "content_hash": "sha256_dummy_hash_for_contract_test_1",
+    "retrieved_at": "2026-09-09T19:26:08.384Z"
+  }
+]

@@ -1,0 +1,17 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+scratch/
+scratch_*.ts
+check_appsc_*.ts
+setup_and_generate_appsc_mock.ts
+.codex-backups/
+powershell.cmd
+staging-*.json
+work/
+supabase/.temp/

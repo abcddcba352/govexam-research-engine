@@ -1,0 +1,280 @@
+[
+  {
+    "preparation_basis_id": "pb_appsc_endowment_officer_screening_paper_1_pre_notification_preparation_appsc_eo_scr_v2021",
+    "exam_id": "appsc_endowment_officer_screening_paper_1",
+    "preparation_mode": "PRE_NOTIFICATION_PREPARATION",
+    "historical_exam_version": "appsc_eo_scr_v2021",
+    "recruitment_cycle": "Notification 24/2021 Cycle",
+    "notification": "24/2021",
+    "syllabus_version": "8 verified topics (Notification 24/2021 Cycle)",
+    "pattern_version": "150 Qs / 150m / -0.33 marks (Version appsc_eo_scr_v2021)",
+    "pyq_intelligence_version": "NO_PYQ_DATA",
+    "last_verified_date": "2026-09-08T00:00:00.000Z",
+    "future_notification_availability": "NOT_YET_RELEASED",
+    "pattern_change_risk": "LOW",
+    "confidence": 98,
+    "source_references": [],
+    "status": "HISTORICAL_BASIS_VERIFIED",
+    "risk_reasons": [
+      "Examination scheme and gazetted syllabus have demonstrated high historical stability."
+    ],
+    "basis_summary": "Grounded on verified historical syllabus and examination scheme from Notification 24/2021 Cycle. Zero unsupported future facts.",
+    "is_active": true,
+    "created_at": "2026-09-09T20:57:54.763Z",
+    "updated_at": "2026-09-09T20:57:54.782Z"
+  },
+  {
+    "preparation_basis_id": "pb_ssc_cgl_tier_1_pre_notification_preparation_ssc_cgl_v2026",
+    "exam_id": "ssc_cgl_tier_1",
+    "preparation_mode": "PRE_NOTIFICATION_PREPARATION",
+    "historical_exam_version": "ssc_cgl_v2026",
+    "recruitment_cycle": "CGL 2026 Cycle",
+    "notification": "Notice_of_adv_cgl_2026",
+    "syllabus_version": "4 verified topics (CGL 2026 Cycle)",
+    "pattern_version": "100 Qs / 60m / -0.5 marks (Version ssc_cgl_v2026)",
+    "pyq_intelligence_version": "LIMITED_DATA",
+    "last_verified_date": "2026-09-09T00:00:00.000Z",
+    "future_notification_availability": "NOT_YET_RELEASED",
+    "pattern_change_risk": "LOW",
+    "confidence": 95,
+    "source_references": [
+      "Notice_CGL_2026_Official.pdf (Official Commission Mirror via educational-portal-mirror.org)",
+      "SSC CGL Official Notice 2026 - Combined Graduate Level Examination, 2026",
+      "SSC CGL Official Notice 2024 - Examination Matrix and Negative Evaluation Rules",
+      "STAFF SELECTION COMMISSION [SSC] - Department of personnel & training"
+    ],
+    "status": "HISTORICAL_BASIS_VERIFIED",
+    "risk_reasons": [
+      "Examination scheme and gazetted syllabus have demonstrated high historical stability."
+    ],
+    "basis_summary": "Grounded on verified historical syllabus and examination scheme from CGL 2026 Cycle. Zero unsupported future facts.",
+    "is_active": true,
+    "created_at": "2026-09-09T19:21:13.583Z",
+    "updated_at": "2026-09-09T19:21:13.583Z"
+  },
+  {
+    "preparation_basis_id": "pb_ssc_cgl_tier_1_pre_notification_preparation_ssc_cgl_tier_1_v1",
+    "exam_id": "ssc_cgl_tier_1",
+    "preparation_mode": "PRE_NOTIFICATION_PREPARATION",
+    "historical_exam_version": "ssc_cgl_tier_1_v1",
+    "recruitment_cycle": "Combined Graduate Level Examination, 2026",
+    "notification": "2026",
+    "syllabus_version": "4 verified topics (Combined Graduate Level Examination, 2026)",
+    "pattern_version": "100 Qs / 60m / -0.5 marks (Version ssc_cgl_tier_1_v1)",
+    "pyq_intelligence_version": "LIMITED_DATA",
+    "last_verified_date": "2026-09-09",
+    "future_notification_availability": "NOT_YET_RELEASED",
+    "pattern_change_risk": "UNKNOWN",
+    "confidence": 78,
+    "source_references": [
+      "Notice_CGL_2026_Official.pdf (Official Commission Mirror via educational-portal-mirror.org)",
+      "SSC CGL Official Notice 2026 - Combined Graduate Level Examination, 2026",
+      "SSC CGL Official Notice 2024 - Examination Matrix and Negative Evaluation Rules",
+      "STAFF SELECTION COMMISSION [SSC] - Department of personnel & training"
+    ],
+    "status": "HISTORICAL_BASIS_PARTIAL",
+    "risk_reasons": [
+      "Pattern stability is unknown until the historical scheme and syllabus are verified."
+    ],
+    "basis_summary": "Historical preparation basis is incomplete (3 item(s) unverified).",
+    "is_active": true,
+    "created_at": "2026-09-09T19:34:01.375Z",
+    "updated_at": "2026-09-09T19:34:01.375Z"
+  },
+  {
+    "preparation_basis_id": "pb_appsc_endowment_officer_mains_paper_1_pre_notification_preparation_appsc_eo_v2021",
+    "exam_id": "appsc_endowment_officer_mains_paper_1",
+    "preparation_mode": "PRE_NOTIFICATION_PREPARATION",
+    "historical_exam_version": "appsc_eo_v2021",
+    "recruitment_cycle": "Notification 24/2021 Cycle",
+    "notification": "24/2021",
+    "syllabus_version": "8 verified topics (Notification 24/2021 Cycle)",
+    "pattern_version": "150 Qs / 150m / -0.33 marks (Version appsc_eo_v2021)",
+    "pyq_intelligence_version": "NO_PYQ_DATA",
+    "last_verified_date": "2026-09-08T00:00:00.000Z",
+    "future_notification_availability": "NOT_YET_RELEASED",
+    "pattern_change_risk": "LOW",
+    "confidence": 98,
+    "source_references": [
+      "https://psc.ap.gov.in/Notification_24_2021.pdf",
+      "APPSC Notification No. 24/2021 - Executive Officer Grade-III in A.P. Endowments Subordinate Service"
+    ],
+    "status": "HISTORICAL_BASIS_VERIFIED",
+    "risk_reasons": [
+      "Examination scheme and gazetted syllabus have demonstrated high historical stability."
+    ],
+    "basis_summary": "Grounded on verified historical syllabus and examination scheme from Notification 24/2021 Cycle. Zero unsupported future facts.",
+    "is_active": true,
+    "created_at": "2026-09-09T20:58:29.034Z",
+    "updated_at": "2026-09-09T20:58:29.034Z"
+  },
+  {
+    "preparation_basis_id": "pb_appsc_group_2_screening_pre_notification_preparation_appsc_g2_v2023",
+    "exam_id": "appsc_group_2_screening",
+    "preparation_mode": "PRE_NOTIFICATION_PREPARATION",
+    "historical_exam_version": "appsc_g2_v2023",
+    "recruitment_cycle": "Notification 11/2023 Cycle",
+    "notification": "11/2023",
+    "syllabus_version": "3 verified topics (Notification 11/2023 Cycle)",
+    "pattern_version": "150 Qs / 150m / -0.33 marks (Version appsc_g2_v2023)",
+    "pyq_intelligence_version": "NO_PYQ_DATA",
+    "last_verified_date": "2026-09-07T17:54:52.823Z",
+    "future_notification_availability": "NOT_YET_RELEASED",
+    "pattern_change_risk": "LOW",
+    "confidence": 95,
+    "source_references": [
+      "APPSC Notification 11/2023 - Group II Services Revised Scheme and Syllabus"
+    ],
+    "status": "HISTORICAL_BASIS_VERIFIED",
+    "risk_reasons": [
+      "Examination scheme and gazetted syllabus have demonstrated high historical stability."
+    ],
+    "basis_summary": "Grounded on verified historical syllabus and examination scheme from Notification 11/2023 Cycle. Zero unsupported future facts.",
+    "is_active": true,
+    "created_at": "2026-09-09T05:30:33.892Z",
+    "updated_at": "2026-09-09T05:30:33.893Z"
+  },
+  {
+    "preparation_basis_id": "pb_tgpsc_group_2_paper_1_pre_notification_preparation_tgpsc_group_2_paper_1_v1",
+    "exam_id": "tgpsc_group_2_paper_1",
+    "preparation_mode": "PRE_NOTIFICATION_PREPARATION",
+    "historical_exam_version": "tgpsc_group_2_paper_1_v1",
+    "recruitment_cycle": "Notification 28/2022 (Current Cycle 2024-2025)",
+    "notification": "Notification",
+    "syllabus_version": "6 verified topics (Notification 28/2022 (Current Cycle 2024-2025))",
+    "pattern_version": "150 Qs / 150m / -0.25 marks (Version tgpsc_group_2_paper_1_v1)",
+    "pyq_intelligence_version": "LIMITED_DATA",
+    "last_verified_date": "2026-09-05T16:25:15.237Z",
+    "future_notification_availability": "NOT_YET_RELEASED",
+    "pattern_change_risk": "LOW",
+    "confidence": 98,
+    "source_references": [
+      "TGPSC Official Notification No. 28/2022 - Scheme of Examination and Syllabi for Group-II Services",
+      "Telangana Extraordinary State Gazette No. 74 - Ad-hoc Rules for Group-II Cadre Selection"
+    ],
+    "status": "HISTORICAL_BASIS_VERIFIED",
+    "risk_reasons": [
+      "Examination scheme and gazetted syllabus have demonstrated high historical stability."
+    ],
+    "basis_summary": "Grounded on verified historical syllabus and examination scheme from Notification 28/2022 (Current Cycle 2024-2025). Zero unsupported future facts.",
+    "is_active": true,
+    "created_at": "2026-09-08T16:25:16.796Z",
+    "updated_at": "2026-09-08T16:25:16.804Z"
+  },
+  {
+    "preparation_basis_id": "pb_tgpsc_group_2_paper_1_custom_practice_tgpsc_g2_v2022",
+    "exam_id": "tgpsc_group_2_paper_1",
+    "preparation_mode": "CUSTOM_PRACTICE",
+    "historical_exam_version": "tgpsc_g2_v2022",
+    "recruitment_cycle": "Notification 28/2022 (Current Cycle 2024-2025)",
+    "notification": "28/2022",
+    "syllabus_version": "6 verified topics (Notification 28/2022 (Current Cycle 2024-2025))",
+    "pattern_version": "150 Qs / 150m / -0.25 marks (Version tgpsc_g2_v2022)",
+    "pyq_intelligence_version": "LIMITED_DATA",
+    "last_verified_date": "2026-09-06T00:00:00.000Z",
+    "future_notification_availability": "NOT_YET_RELEASED",
+    "pattern_change_risk": "MEDIUM",
+    "confidence": 98,
+    "source_references": [
+      "TGPSC Official Notification No. 28/2022 - Scheme of Examination and Syllabi for Group-II Services",
+      "Telangana Extraordinary State Gazette No. 74 - Ad-hoc Rules for Group-II Cadre Selection"
+    ],
+    "status": "HISTORICAL_BASIS_VERIFIED",
+    "risk_reasons": [
+      "Historical pattern revision observed between Notification 20/2015 (Historical Basis 2015-2016) and Notification 28/2022 (Current Cycle 2024-2025)."
+    ],
+    "basis_summary": "Grounded on verified historical syllabus and examination scheme from Notification 28/2022 (Current Cycle 2024-2025). Zero unsupported future facts.",
+    "is_active": true,
+    "created_at": "2026-09-09T17:37:30.916Z",
+    "updated_at": "2026-09-09T17:37:30.919Z"
+  },
+  {
+    "preparation_basis_id": "pb_tgpsc_group_2_paper_1_pre_notification_preparation_tgpsc_g2_v2022",
+    "exam_id": "tgpsc_group_2_paper_1",
+    "preparation_mode": "PRE_NOTIFICATION_PREPARATION",
+    "historical_exam_version": "tgpsc_g2_v2022",
+    "recruitment_cycle": "Notification 28/2022 (Current Cycle 2024-2025)",
+    "notification": "28/2022",
+    "syllabus_version": "6 verified topics (Notification 28/2022 (Current Cycle 2024-2025))",
+    "pattern_version": "150 Qs / 150m / -0.25 marks (Version tgpsc_g2_v2022)",
+    "pyq_intelligence_version": "LIMITED_DATA",
+    "last_verified_date": "2026-09-06T00:00:00.000Z",
+    "future_notification_availability": "NOT_YET_RELEASED",
+    "pattern_change_risk": "HIGH",
+    "confidence": 98,
+    "source_references": [
+      "TGPSC Official Notification No. 28/2022 - Scheme of Examination and Syllabi for Group-II Services",
+      "Telangana Extraordinary State Gazette No. 74 - Ad-hoc Rules for Group-II Cadre Selection"
+    ],
+    "status": "HISTORICAL_BASIS_PARTIAL",
+    "risk_reasons": [
+      "Historical pattern revision observed between Notification 20/2015 (Historical Basis 2015-2016) and Notification 28/2022 (Current Cycle 2024-2025).",
+      "Pattern stability is unknown until the historical scheme and syllabus are verified.",
+      "Conflicting authority/gazette claims require auditor review."
+    ],
+    "basis_summary": "Historical preparation basis is incomplete (2 item(s) unverified).",
+    "is_active": true,
+    "created_at": "2026-09-09T20:22:54.024Z",
+    "updated_at": "2026-09-09T20:22:54.024Z"
+  },
+  {
+    "preparation_basis_id": "pb_restart_mtsv56t9",
+    "exam_id": "exam_restart_mtsv56t9",
+    "preparation_mode": "PRE_NOTIFICATION_PREPARATION",
+    "historical_exam_version": "v2022",
+    "recruitment_cycle": "2026 Cycle",
+    "notification": "NOT_YET_RELEASED",
+    "syllabus_version": "syl_2022",
+    "pattern_version": "pat_2022",
+    "pyq_intelligence_version": "pyq_2022",
+    "last_verified_date": "2026-09-08",
+    "future_notification_availability": "NOT_YET_RELEASED",
+    "pattern_change_risk": "LOW",
+    "confidence": 95,
+    "source_references": [
+      "TGPSC Official Gazetted Rules 2019"
+    ],
+    "status": "HISTORICAL_BASIS_VERIFIED",
+    "basis_summary": "Historical statutory basis verified for pre-notification preparation."
+  },
+  {
+    "preparation_basis_id": "pb_restart_mtsvi84a",
+    "exam_id": "exam_restart_mtsvi84a",
+    "preparation_mode": "PRE_NOTIFICATION_PREPARATION",
+    "historical_exam_version": "v2022",
+    "recruitment_cycle": "2026 Cycle",
+    "notification": "NOT_YET_RELEASED",
+    "syllabus_version": "syl_2022",
+    "pattern_version": "pat_2022",
+    "pyq_intelligence_version": "pyq_2022",
+    "last_verified_date": "2026-09-08",
+    "future_notification_availability": "NOT_YET_RELEASED",
+    "pattern_change_risk": "LOW",
+    "confidence": 95,
+    "source_references": [
+      "TGPSC Official Gazetted Rules 2019"
+    ],
+    "status": "HISTORICAL_BASIS_VERIFIED",
+    "basis_summary": "Historical statutory basis verified for pre-notification preparation."
+  },
+  {
+    "preparation_basis_id": "pb_restart_mtsvimmr",
+    "exam_id": "exam_restart_mtsvimmr",
+    "preparation_mode": "PRE_NOTIFICATION_PREPARATION",
+    "historical_exam_version": "v2022",
+    "recruitment_cycle": "2026 Cycle",
+    "notification": "NOT_YET_RELEASED",
+    "syllabus_version": "syl_2022",
+    "pattern_version": "pat_2022",
+    "pyq_intelligence_version": "pyq_2022",
+    "last_verified_date": "2026-09-08",
+    "future_notification_availability": "NOT_YET_RELEASED",
+    "pattern_change_risk": "LOW",
+    "confidence": 95,
+    "source_references": [
+      "TGPSC Official Gazetted Rules 2019"
+    ],
+    "status": "HISTORICAL_BASIS_VERIFIED",
+    "basis_summary": "Historical statutory basis verified for pre-notification preparation."
+  }
+]
