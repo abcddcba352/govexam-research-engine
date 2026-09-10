@@ -4,6 +4,7 @@ import {
   ExamRecord,
   TestMode
 } from '../../types.ts';
+import { groupExamsByJurisdiction } from '../../utils/examJurisdiction.ts';
 import {
   ShieldCheck,
   Lock,
@@ -118,30 +119,46 @@ export function BlueprintHeader({
             <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-xs">
               <Layers className="w-4 h-4" />
             </div>
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <select
-                  value={selectedExamId}
-                  onChange={(e) => onSelectExam(e.target.value)}
-                  className="font-bold text-base sm:text-lg text-slate-900 bg-transparent border-b border-dashed border-slate-300 hover:border-slate-500 focus:outline-none focus:border-indigo-600 cursor-pointer pr-4"
-                >
-                  {exams.map(ex => (
-                    <option key={ex.exam_id} value={ex.exam_id}>
-                      {ex.title} • {ex.paper}
-                    </option>
-                  ))}
-                </select>
-                {blueprint && getStatusBadge(blueprint.status)}
-              </div>
-              <p className="text-xs text-slate-500 flex items-center gap-2 flex-wrap mt-0.5">
-                <span>Cycle: <strong className="text-slate-700">{currentExam?.active_cycle || 'Current'}</strong></span>
-                <span>•</span>
-                <span>Category: <strong className="text-slate-700">{currentExam?.state_or_central}</strong></span>
-                <span>•</span>
-                <span>Official Pattern: <strong className="text-slate-700">{currentExam?.pattern?.total_questions || 150} Questions ({currentExam?.pattern?.total_marks || 150} Marks)</strong></span>
-              </p>
+            <div className="flex items-center gap-2">
+              {(() => {
+                const { central, states, stateNames } = groupExamsByJurisdiction(exams);
+                return (
+                  <select
+                    value={selectedExamId}
+                    onChange={(e) => onSelectExam(e.target.value)}
+                    className="font-bold text-base sm:text-lg text-slate-900 bg-transparent border-b border-dashed border-slate-300 hover:border-slate-500 focus:outline-none focus:border-indigo-600 cursor-pointer pr-4"
+                  >
+                    {central.length > 0 && (
+                      <optgroup label="🏛️ Central / National (All-India)">
+                        {central.map(ex => (
+                          <option key={ex.exam_id} value={ex.exam_id}>
+                            {ex.title} • {ex.paper}
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
+                    {stateNames.map(stateName => (
+                      <optgroup key={stateName} label={`🗺️ State: ${stateName}`}>
+                        {states[stateName].map(ex => (
+                          <option key={ex.exam_id} value={ex.exam_id}>
+                            {ex.title} • {ex.paper}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                );
+              })()}
+              {blueprint && getStatusBadge(blueprint.status)}
             </div>
           </div>
+          <p className="text-xs text-slate-500 flex items-center gap-2 flex-wrap mt-0.5">
+            <span>Cycle: <strong className="text-slate-700">{currentExam?.active_cycle || 'Current'}</strong></span>
+            <span>•</span>
+            <span>Category: <strong className="text-slate-700">{currentExam?.state_or_central}</strong></span>
+            <span>•</span>
+            <span>Official Pattern: <strong className="text-slate-700">{currentExam?.pattern?.total_questions || 150} Questions ({currentExam?.pattern?.total_marks || 150} Marks)</strong></span>
+          </p>
         </div>
 
         {/* Action Buttons */}

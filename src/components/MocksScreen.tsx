@@ -36,6 +36,7 @@ import {
   PatternChangeReport,
   VisualSpecification
 } from '../types.ts';
+import { groupExamsByJurisdiction } from '../utils/examJurisdiction.ts';
 
 interface MocksScreenProps {
   exams: ExamRecord[];
@@ -133,6 +134,8 @@ export const MocksScreen: React.FC<MocksScreenProps> = ({
   const [isLoadingReadiness, setIsLoadingReadiness] = useState(false);
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
   const [showAuditLogs, setShowAuditLogs] = useState(false);
+
+  const groupedExams = useMemo(() => groupExamsByJurisdiction(exams), [exams]);
   const [lockedBlueprints, setLockedBlueprints] = useState<MockBlueprintRecord[]>([]);
   const [selectedBlueprintId, setSelectedBlueprintId] = useState<string>('');
 
@@ -562,10 +565,23 @@ export const MocksScreen: React.FC<MocksScreenProps> = ({
             onChange={e => setSelectedExamId(e.target.value)}
             className="px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
           >
-            {exams.map(exam => (
-              <option key={exam.exam_id} value={exam.exam_id}>
-                {exam.commission}: {exam.title} ({exam.paper})
-              </option>
+            {groupedExams.central.length > 0 && (
+              <optgroup label="🏛️ Central / National (All-India)">
+                {groupedExams.central.map(exam => (
+                  <option key={exam.exam_id} value={exam.exam_id}>
+                    {exam.commission}: {exam.title} ({exam.paper})
+                  </option>
+                ))}
+              </optgroup>
+            )}
+            {groupedExams.stateNames.map(stateName => (
+              <optgroup key={stateName} label={`🗺️ State: ${stateName}`}>
+                {groupedExams.states[stateName].map(exam => (
+                  <option key={exam.exam_id} value={exam.exam_id}>
+                    {exam.commission}: {exam.title} ({exam.paper})
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </div>

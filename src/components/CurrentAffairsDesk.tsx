@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import type { ExamRecord } from '../types.ts';
 import type { CollectedArticle } from '../currentAffairs.ts';
+import { groupExamsByJurisdiction } from '../utils/examJurisdiction.ts';
 
 export function CurrentAffairsDesk({ exams }: { exams: ExamRecord[] }) {
   const [examId, setExamId] = useState('');
@@ -36,6 +37,9 @@ export function CurrentAffairsDesk({ exams }: { exams: ExamRecord[] }) {
       }
     } catch (error: any) { setError(error.message); } finally { setBusy(false); }
   }
+
+  const grouped = useMemo(() => groupExamsByJurisdiction(exams), [exams]);
+
   return <section className="space-y-5">
     <div className="rounded-xl border border-slate-200 bg-white p-6">
       <h2 className="text-2xl font-bold text-slate-900">Current Affairs Research Desk</h2>
@@ -43,7 +47,21 @@ export function CurrentAffairsDesk({ exams }: { exams: ExamRecord[] }) {
       <div className="mt-5 grid gap-4 md:grid-cols-2">
         <label className="text-sm font-medium">Examination and paper
           <select aria-label="Current affairs examination" disabled={busy} className="mt-1 block w-full rounded-lg border border-slate-300 p-2" value={examId} onChange={e => setExamId(e.target.value)}>
-            <option value="">Select a paper</option>{exams.map(exam => <option key={exam.exam_id} value={exam.exam_id}>{exam.title} — {exam.paper}</option>)}
+            <option value="">Select a paper</option>
+            {grouped.central.length > 0 && (
+              <optgroup label="🏛️ Central / National (All-India)">
+                {grouped.central.map(exam => (
+                  <option key={exam.exam_id} value={exam.exam_id}>{exam.title} — {exam.paper}</option>
+                ))}
+              </optgroup>
+            )}
+            {grouped.stateNames.map(stateName => (
+              <optgroup key={stateName} label={`🗺️ State: ${stateName}`}>
+                {grouped.states[stateName].map(exam => (
+                  <option key={exam.exam_id} value={exam.exam_id}>{exam.title} — {exam.paper}</option>
+                ))}
+              </optgroup>
+            ))}
           </select>
         </label>
         <label className="text-sm font-medium">Preparation cutoff

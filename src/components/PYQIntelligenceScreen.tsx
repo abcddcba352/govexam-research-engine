@@ -10,6 +10,7 @@ import {
 } from '../types.ts';
 import { PYQQuestionInspectorModal } from './PYQQuestionInspectorModal.tsx';
 import { PYQPaperUploadModal } from './PYQPaperUploadModal.tsx';
+import { groupExamsByJurisdiction } from '../utils/examJurisdiction.ts';
 import {
   Brain,
   Layers,
@@ -228,17 +229,35 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
           <div className="flex items-center gap-2.5 flex-wrap">
             <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl">
               <span className="text-xs font-bold text-slate-600">Exam:</span>
-              <select
-                value={selectedExamId}
-                onChange={e => onSelectExam(e.target.value)}
-                className="text-xs font-bold text-slate-900 bg-transparent focus:outline-hidden cursor-pointer"
-              >
-                {exams.map(ex => (
-                  <option key={ex.exam_id} value={ex.exam_id}>
-                    {ex.title}
-                  </option>
-                ))}
-              </select>
+              {(() => {
+                const { central, states, stateNames } = groupExamsByJurisdiction(exams);
+                return (
+                  <select
+                    value={selectedExamId}
+                    onChange={e => onSelectExam(e.target.value)}
+                    className="text-xs font-bold text-slate-900 bg-transparent focus:outline-hidden cursor-pointer"
+                  >
+                    {central.length > 0 && (
+                      <optgroup label="🏛️ Central / National (All-India)">
+                        {central.map(ex => (
+                          <option key={ex.exam_id} value={ex.exam_id}>
+                            {ex.title}
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
+                    {stateNames.map(stateName => (
+                      <optgroup key={stateName} label={`🗺️ State: ${stateName}`}>
+                        {states[stateName].map(ex => (
+                          <option key={ex.exam_id} value={ex.exam_id}>
+                            {ex.title}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                );
+              })()}
             </div>
 
             <button

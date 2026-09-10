@@ -23,6 +23,13 @@ import { FieldVerificationMatrix } from './FieldVerificationMatrix';
 import { RecruitmentCycleManager } from './RecruitmentCycleManager';
 import { AuditorSignoffModal } from './AuditorSignoffModal';
 import { SystemAuditLogsModal } from './SystemAuditLogsModal';
+import {
+  INDIAN_STATES,
+  isCentralExam,
+  getExamState,
+  groupExamsByJurisdiction,
+  filterExamsByJurisdiction
+} from '../utils/examJurisdiction';
 
 interface IntakeScreenProps {
   exams: ExamRecord[];
@@ -36,6 +43,8 @@ interface PresetItem {
   id: string;
   label: string;
   shortTag: string;
+  tier: 'CENTRAL' | 'STATE';
+  state?: string;
   data: ExamIntakeInput;
 }
 
@@ -44,6 +53,8 @@ const PRESET_TEMPLATES: PresetItem[] = [
     id: 'tgpsc_g2',
     label: 'TGPSC Group 2',
     shortTag: 'Telangana',
+    tier: 'STATE',
+    state: 'Telangana',
     data: {
       title: 'TGPSC Group-II Services: Paper I (General Studies & General Abilities)',
       commission: 'Telangana Public Service Commission (TGPSC)',
@@ -78,6 +89,8 @@ const PRESET_TEMPLATES: PresetItem[] = [
     id: 'appsc_g2',
     label: 'APPSC Group 2',
     shortTag: 'Andhra Pradesh',
+    tier: 'STATE',
+    state: 'Andhra Pradesh',
     data: {
       title: 'APPSC Group-II Services: Screening Test (General Studies & Mental Ability)',
       commission: 'Andhra Pradesh Public Service Commission (APPSC)',
@@ -110,6 +123,8 @@ const PRESET_TEMPLATES: PresetItem[] = [
     id: 'appsc_endowment',
     label: 'APPSC Endowment Gr-III',
     shortTag: 'AP Endowments',
+    tier: 'STATE',
+    state: 'Andhra Pradesh',
     data: {
       title: 'APPSC Executive Officer Grade-III: Mains Paper-I (General Studies & Mental Ability)',
       commission: 'Andhra Pradesh Public Service Commission (APPSC)',
@@ -150,6 +165,7 @@ const PRESET_TEMPLATES: PresetItem[] = [
     id: 'ssc_cgl',
     label: 'SSC CGL',
     shortTag: 'Central',
+    tier: 'CENTRAL',
     data: {
       title: 'SSC Combined Graduate Level (CGL): Tier-I',
       commission: 'Staff Selection Commission (SSC)',
@@ -182,6 +198,7 @@ const PRESET_TEMPLATES: PresetItem[] = [
     id: 'rrb_ntpc',
     label: 'RRB NTPC',
     shortTag: 'Railways / Central',
+    tier: 'CENTRAL',
     data: {
       title: 'RRB Non-Technical Popular Categories (NTPC): CBT-1',
       commission: 'Railway Recruitment Boards (RRB)',
@@ -214,6 +231,8 @@ const PRESET_TEMPLATES: PresetItem[] = [
     id: 'tnpsc_g2',
     label: 'TNPSC Group 2',
     shortTag: 'Tamil Nadu',
+    tier: 'STATE',
+    state: 'Tamil Nadu',
     data: {
       title: 'TNPSC Combined Civil Services Examination-II (Group-II & IIA): Prelims',
       commission: 'Tamil Nadu Public Service Commission (TNPSC)',
@@ -247,6 +266,8 @@ const PRESET_TEMPLATES: PresetItem[] = [
     id: 'kerala_psc_degree',
     label: 'Kerala PSC Degree Level',
     shortTag: 'Kerala',
+    tier: 'STATE',
+    state: 'Kerala',
     data: {
       title: 'Kerala PSC Common Preliminary Examination (Graduate Level)',
       commission: 'Kerala Public Service Commission (KPSC)',
@@ -288,6 +309,13 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
 }) => {
   const [showForm, setShowForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Jurisdiction filters & form states
+  const [presetFilterTier, setPresetFilterTier] = useState<'ALL' | 'CENTRAL' | 'STATE'>('ALL');
+  const [registryFilterTier, setRegistryFilterTier] = useState<'ALL' | 'CENTRAL' | 'STATE'>('ALL');
+  const [registrySelectedState, setRegistrySelectedState] = useState<string>('ALL_STATES');
+  const [formJurisdictionType, setFormJurisdictionType] = useState<'CENTRAL' | 'STATE'>('STATE');
+  const [formSelectedState, setFormSelectedState] = useState<string>('Telangana');
 
   // Auditor Sign-off Modal state
   const [verifyingExam, setVerifyingExam] = useState<ExamRecord | null>(null);
@@ -426,6 +454,13 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
         message: `Verified exam profile loaded from database for "${existingVerified.title}". Blueprint and pattern are officially confirmed.`,
         examTitle: existingVerified.title
       });
+      if (isCentralExam(existingVerified)) {
+        setFormJurisdictionType('CENTRAL');
+      } else {
+        setFormJurisdictionType('STATE');
+        const st = getExamState(existingVerified);
+        if (st) setFormSelectedState(st);
+      }
     } else {
       // Shortcut only: Mark PATTERN_STATUS = UNVERIFIED
       setFormData({
@@ -443,6 +478,12 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
         message: `Preset loaded as identification shortcut only. PATTERN_STATUS is marked UNVERIFIED. Official syllabus and negative marking must be verified via the Research Engine before generating mock tests.`,
         examTitle: preset.data.title
       });
+      if (preset.tier === 'CENTRAL') {
+        setFormJurisdictionType('CENTRAL');
+      } else {
+        setFormJurisdictionType('STATE');
+        if (preset.state) setFormSelectedState(preset.state);
+      }
     }
   };
 
@@ -525,19 +566,57 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
               <h2 className="text-lg font-bold text-slate-900">New Examination Intake Specifications</h2>
               <p className="text-xs text-slate-500">Provide official commission details or select a standardized preset template below.</p>
             </div>
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-xs font-semibold text-slate-600 mr-1">Presets:</span>
-              {PRESET_TEMPLATES.map((tpl) => (
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-xs font-semibold text-slate-600 mr-1">Presets:</span>
                 <button
-                  key={tpl.id}
                   type="button"
-                  onClick={() => handleSelectPreset(tpl)}
-                  className="text-xs px-2.5 py-1 rounded-md bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 font-medium border border-slate-200 transition-colors inline-flex items-center gap-1"
+                  onClick={() => setPresetFilterTier('ALL')}
+                  className={`text-xs px-2.5 py-1 rounded-md font-medium border transition-colors cursor-pointer ${
+                    presetFilterTier === 'ALL'
+                      ? 'bg-indigo-600 text-white border-indigo-600 font-bold'
+                      : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+                  }`}
                 >
-                  <span>{tpl.label}</span>
-                  <span className="text-[10px] text-slate-400 font-normal">({tpl.shortTag})</span>
+                  All ({PRESET_TEMPLATES.length})
                 </button>
-              ))}
+                <button
+                  type="button"
+                  onClick={() => setPresetFilterTier('CENTRAL')}
+                  className={`text-xs px-2.5 py-1 rounded-md font-medium border transition-colors cursor-pointer ${
+                    presetFilterTier === 'CENTRAL'
+                      ? 'bg-indigo-600 text-white border-indigo-600 font-bold'
+                      : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+                  }`}
+                >
+                  🏛️ Central ({PRESET_TEMPLATES.filter(p => p.tier === 'CENTRAL').length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPresetFilterTier('STATE')}
+                  className={`text-xs px-2.5 py-1 rounded-md font-medium border transition-colors cursor-pointer ${
+                    presetFilterTier === 'STATE'
+                      ? 'bg-indigo-600 text-white border-indigo-600 font-bold'
+                      : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+                  }`}
+                >
+                  🗺️ State-Wise ({PRESET_TEMPLATES.filter(p => p.tier === 'STATE').length})
+                </button>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-1.5">
+                {PRESET_TEMPLATES.filter(tpl => presetFilterTier === 'ALL' || tpl.tier === presetFilterTier).map((tpl) => (
+                  <button
+                    key={tpl.id}
+                    type="button"
+                    onClick={() => handleSelectPreset(tpl)}
+                    className="text-xs px-2.5 py-1 rounded-md bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 font-medium border border-slate-200 transition-colors inline-flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>{tpl.label}</span>
+                    <span className="text-[10px] text-slate-400 font-normal">({tpl.shortTag})</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -613,15 +692,81 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
             {/* State or Central */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                State / Central Jurisdiction
+                State / Central Jurisdiction *
               </label>
-              <input
-                type="text"
-                value={formData.state_or_central}
-                onChange={e => setFormData({ ...formData, state_or_central: e.target.value })}
-                placeholder="e.g. Telangana, Andhra Pradesh, Central"
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-              />
+              <div className="space-y-1.5">
+                <div className="flex rounded-lg bg-slate-100 p-0.5 text-xs font-semibold">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormJurisdictionType('CENTRAL');
+                      setFormData(prev => ({
+                        ...prev,
+                        state_or_central: 'Central',
+                        commission: prev.commission && prev.commission !== 'Telangana Public Service Commission (TGPSC)'
+                          ? prev.commission
+                          : 'Staff Selection Commission (SSC)'
+                      }));
+                    }}
+                    className={`flex-1 py-1.5 rounded-md text-center transition-all cursor-pointer ${
+                      formJurisdictionType === 'CENTRAL'
+                        ? 'bg-white text-indigo-700 font-bold shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    🏛️ Central
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormJurisdictionType('STATE');
+                      const st = formSelectedState || 'Telangana';
+                      const defaultComm = INDIAN_STATES.find(s => s.name === st)?.defaultCommission || '';
+                      setFormData(prev => ({
+                        ...prev,
+                        state_or_central: st,
+                        commission: prev.commission && !prev.commission.includes('Staff Selection') && !prev.commission.includes('UPSC')
+                          ? prev.commission
+                          : defaultComm
+                      }));
+                    }}
+                    className={`flex-1 py-1.5 rounded-md text-center transition-all cursor-pointer ${
+                      formJurisdictionType === 'STATE'
+                        ? 'bg-white text-indigo-700 font-bold shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    🗺️ State-Wise
+                  </button>
+                </div>
+
+                {formJurisdictionType === 'STATE' ? (
+                  <select
+                    value={formSelectedState}
+                    onChange={e => {
+                      const newSt = e.target.value;
+                      setFormSelectedState(newSt);
+                      const defaultComm = INDIAN_STATES.find(s => s.name === newSt)?.defaultCommission || '';
+                      setFormData(prev => ({
+                        ...prev,
+                        state_or_central: newSt,
+                        commission: defaultComm || prev.commission
+                      }));
+                    }}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer"
+                  >
+                    {INDIAN_STATES.map(s => (
+                      <option key={s.code} value={s.name}>
+                        {s.name} ({s.shortCommission})
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="text-[11px] text-slate-500 py-1">
+                    National commission jurisdiction (SSC, RRB, UPSC, IBPS)
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Post Cadres */}
@@ -794,29 +939,117 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
       )}
 
       {/* Existing Registered Exams Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
-          <div>
-            <h2 className="text-base font-bold text-slate-900">Intake Registry & Active Examinations</h2>
-            <p className="text-xs text-slate-500">Exams currently tracked in the system database with official patterns and syllabus mappings.</p>
-          </div>
-          <span className="text-xs font-semibold px-2.5 py-1 bg-slate-200 text-slate-700 rounded-full">
-            {exams.length} Exams Managed
-          </span>
-        </div>
+      {(() => {
+        const { central: centralExams, states: stateGroups, stateNames } = groupExamsByJurisdiction(exams);
+        const displayedExams = filterExamsByJurisdiction(exams, registryFilterTier, registrySelectedState);
 
-        <div className="divide-y divide-slate-200">
-          {exams.map((exam) => (
-            <div key={exam.exam_id} className="p-6 hover:bg-slate-50/70 transition-colors">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div className="space-y-2 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-indigo-100 text-indigo-800 border border-indigo-200">
-                      {exam.commission}
-                    </span>
-                    <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700">
-                      {exam.state_or_central}
-                    </span>
+        return (
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="p-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50">
+              <div>
+                <h2 className="text-base font-bold text-slate-900">Intake Registry & Active Examinations</h2>
+                <p className="text-xs text-slate-500">Exams currently tracked in the system database with official patterns and syllabus mappings.</p>
+              </div>
+              <span className="text-xs font-semibold px-2.5 py-1 bg-slate-200 text-slate-700 rounded-full">
+                {displayedExams.length} / {exams.length} Exams Shown
+              </span>
+            </div>
+
+            {/* Jurisdiction Filter Bar */}
+            <div className="p-3.5 bg-slate-100/70 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="font-bold text-slate-600 mr-1">Filter Jurisdiction:</span>
+                <button
+                  type="button"
+                  onClick={() => { setRegistryFilterTier('ALL'); setRegistrySelectedState('ALL_STATES'); }}
+                  className={`px-3 py-1.5 rounded-lg font-medium border transition-all cursor-pointer ${
+                    registryFilterTier === 'ALL'
+                      ? 'bg-indigo-600 text-white border-indigo-600 font-bold shadow-xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  All ({exams.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setRegistryFilterTier('CENTRAL'); setRegistrySelectedState('ALL_STATES'); }}
+                  className={`px-3 py-1.5 rounded-lg font-medium border transition-all cursor-pointer ${
+                    registryFilterTier === 'CENTRAL'
+                      ? 'bg-indigo-600 text-white border-indigo-600 font-bold shadow-xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  🏛️ Central ({centralExams.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setRegistryFilterTier('STATE'); }}
+                  className={`px-3 py-1.5 rounded-lg font-medium border transition-all cursor-pointer ${
+                    registryFilterTier === 'STATE'
+                      ? 'bg-indigo-600 text-white border-indigo-600 font-bold shadow-xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  🗺️ State-Wise ({exams.length - centralExams.length})
+                </button>
+              </div>
+
+              {/* If State-Wise, render sub-state filter chips */}
+              {registryFilterTier === 'STATE' && (
+                <div className="flex items-center gap-1 flex-wrap">
+                  <span className="text-[11px] font-semibold text-slate-500 mr-1">State:</span>
+                  <button
+                    type="button"
+                    onClick={() => setRegistrySelectedState('ALL_STATES')}
+                    className={`text-[11px] px-2.5 py-1 rounded-md border transition-all cursor-pointer ${
+                      registrySelectedState === 'ALL_STATES'
+                        ? 'bg-purple-600 text-white border-purple-600 font-bold'
+                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                    }`}
+                  >
+                    All States
+                  </button>
+                  {stateNames.map((st) => (
+                    <button
+                      key={st}
+                      type="button"
+                      onClick={() => setRegistrySelectedState(st)}
+                      className={`text-[11px] px-2.5 py-1 rounded-md border transition-all cursor-pointer ${
+                        registrySelectedState === st
+                          ? 'bg-purple-600 text-white border-purple-600 font-bold'
+                          : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      {st} ({stateGroups[st]?.length || 0})
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="divide-y divide-slate-200">
+              {displayedExams.length === 0 ? (
+                <div className="p-8 text-center text-slate-500 text-sm">
+                  No registered examinations match the selected jurisdiction filter.
+                </div>
+              ) : (
+                displayedExams.map((exam) => (
+                  <div key={exam.exam_id} className="p-6 hover:bg-slate-50/70 transition-colors">
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                      <div className="space-y-2 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          {/* Distinctive Jurisdiction Badge */}
+                          <span className={`px-2.5 py-0.5 rounded text-[11px] font-bold border ${
+                            isCentralExam(exam)
+                              ? 'bg-blue-50 text-blue-800 border-blue-300'
+                              : 'bg-purple-50 text-purple-800 border-purple-300'
+                          }`}>
+                            {isCentralExam(exam) ? '🏛️ Central (National)' : `🗺️ State: ${getExamState(exam) || exam.state_or_central}`}
+                          </span>
+
+                          <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-indigo-100 text-indigo-800 border border-indigo-200">
+                            {exam.commission}
+                          </span>
                     
                     {/* Pattern Status Badge */}
                     <span className={`px-2 py-0.5 rounded text-[11px] font-semibold border ${
@@ -1009,9 +1242,12 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                 </div>
               )}
             </div>
-          ))}
-        </div>
+          ))
+        )}
       </div>
+    </div>
+  );
+})()}
 
       {/* Auditor Verification Modal */}
       {verifyingExam && (

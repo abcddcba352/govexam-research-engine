@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { PreviousPaperRecord, ExamRecord, PreviousPaperOfficialStatus } from '../types.ts';
 import { X, FileText, CheckCircle2, AlertTriangle, KeyRound } from 'lucide-react';
+import { groupExamsByJurisdiction } from '../utils/examJurisdiction.ts';
 
 interface Props {
   exams: ExamRecord[];
@@ -28,6 +29,8 @@ export const PYQPaperUploadModal: React.FC<Props> = ({
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const groupedExams = useMemo(() => groupExamsByJurisdiction(exams), [exams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,10 +112,23 @@ export const PYQPaperUploadModal: React.FC<Props> = ({
               onChange={e => setExamId(e.target.value)}
               className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-blue-600 font-medium text-slate-800"
             >
-              {exams.map(e => (
-                <option key={e.exam_id} value={e.exam_id}>
-                  {e.title} ({e.commission})
-                </option>
+              {groupedExams.central.length > 0 && (
+                <optgroup label="🏛️ Central / National (All-India)">
+                  {groupedExams.central.map(e => (
+                    <option key={e.exam_id} value={e.exam_id}>
+                      {e.title} ({e.commission})
+                    </option>
+                  ))}
+                </optgroup>
+              )}
+              {groupedExams.stateNames.map(stateName => (
+                <optgroup key={stateName} label={`🗺️ State: ${stateName}`}>
+                  {groupedExams.states[stateName].map(e => (
+                    <option key={e.exam_id} value={e.exam_id}>
+                      {e.title} ({e.commission})
+                    </option>
+                  ))}
+                </optgroup>
               ))}
             </select>
           </div>

@@ -1,6 +1,7 @@
-import React,{useEffect,useState} from 'react';
+import React,{useEffect,useState,useMemo} from 'react';
 import type { ExamRecord } from '../types.ts';
 import type { ResearchEvidence } from '../researchCoverage.ts';
+import { groupExamsByJurisdiction } from '../utils/examJurisdiction.ts';
 
 export function ResearchCoverageDesk({exams}:{exams:ExamRecord[]}) {
   const [examId,setExamId]=useState('');const [cutoff,setCutoff]=useState(new Date().toISOString().slice(0,10));
@@ -26,12 +27,32 @@ export function ResearchCoverageDesk({exams}:{exams:ExamRecord[]}) {
     }catch(e:any){setError(e.message);}finally{setBusy(false);}
   }
   const date=(value?:string)=>value?new Date(value).toLocaleString():'No completed run yet';
+  const grouped = useMemo(() => groupExamsByJurisdiction(exams), [exams]);
+
   return <section className="space-y-5">
     <div className="rounded-xl border border-slate-200 bg-white p-6">
       <h2 className="text-2xl font-bold text-slate-900">Syllabus Coverage & Research</h2>
       <p className="mt-2 text-sm text-slate-600">Track every registered subject and topic. Collected sources are research material; answer verification and paper readiness are assessed separately.</p>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
-        <label className="text-sm font-medium">Examination and paper<select aria-label="Coverage examination" disabled={busy} value={examId} onChange={e=>{setExamId(e.target.value);setNotice('');}} className="mt-1 block w-full rounded-lg border p-2"><option value="">Select a paper</option>{exams.map(e=><option key={e.exam_id} value={e.exam_id}>{e.title} — {e.paper}</option>)}</select></label>
+        <label className="text-sm font-medium">Examination and paper
+          <select aria-label="Coverage examination" disabled={busy} value={examId} onChange={e=>{setExamId(e.target.value);setNotice('');}} className="mt-1 block w-full rounded-lg border p-2">
+            <option value="">Select a paper</option>
+            {grouped.central.length > 0 && (
+              <optgroup label="🏛️ Central / National (All-India)">
+                {grouped.central.map(e => (
+                  <option key={e.exam_id} value={e.exam_id}>{e.title} — {e.paper}</option>
+                ))}
+              </optgroup>
+            )}
+            {grouped.stateNames.map(stateName => (
+              <optgroup key={stateName} label={`🗺️ State: ${stateName}`}>
+                {grouped.states[stateName].map(e => (
+                  <option key={e.exam_id} value={e.exam_id}>{e.title} — {e.paper}</option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+        </label>
         <label className="text-sm font-medium">Preparation cutoff<input aria-label="Coverage cutoff" disabled={busy} type="date" max={new Date().toISOString().slice(0,10)} value={cutoff} onChange={e=>setCutoff(e.target.value)} className="mt-1 block rounded-lg border p-2"/></label>
       </div>
     </div>
