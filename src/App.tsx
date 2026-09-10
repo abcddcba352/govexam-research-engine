@@ -44,12 +44,14 @@ const DuplicateLedgerScreen = lazy(() => import('./components/DuplicateLedgerScr
 const SourcesScreen = lazy(() => import('./components/SourcesScreen.tsx').then(m => ({ default: m.SourcesScreen })));
 const PYQIntelligenceScreen = lazy(() => import('./components/PYQIntelligenceScreen.tsx').then(m => ({ default: m.PYQIntelligenceScreen })));
 const BlueprintStudioScreen = lazy(() => import('./components/BlueprintStudioScreen.tsx').then(m => ({ default: m.BlueprintStudioScreen })));
+import { ConductingBoardExplorer } from './components/common/ConductingBoardExplorer.tsx';
 import {
   INDIAN_STATES,
   CENTRAL_EXAM_PRESETS,
   isCentralExam,
   getExamState,
-  filterExamsByJurisdiction
+  filterExamsByJurisdiction,
+  getBoardForExam
 } from './utils/examJurisdiction.ts';
 
 const COMMON_EXAM_PRESETS = [
@@ -72,6 +74,7 @@ export default function App() {
   const [selectedMode, setSelectedMode] = useState<ResearchMode>('HYBRID');
   const [jurisdictionTier, setJurisdictionTier] = useState<'CENTRAL' | 'STATE'>('STATE');
   const [selectedState, setSelectedState] = useState<string>('Telangana');
+  const [selectedBoardId, setSelectedBoardId] = useState<string>('tgpsc');
   
   // Direct Web inputs
   const [userUrls, setUserUrls] = useState<string[]>([]);
@@ -271,6 +274,8 @@ export default function App() {
         const st = getExamState(matchedExam);
         if (st) setSelectedState(st);
       }
+      const board = getBoardForExam(matchedExam);
+      if (board) setSelectedBoardId(board.id);
     }
     setResearchExamId(matchedExam ? run.exam_id : undefined);
     setSelectedMode(run.research_mode);
@@ -289,6 +294,8 @@ export default function App() {
         const st = getExamState(selectedExam);
         if (st) setSelectedState(st);
       }
+      const board = getBoardForExam(selectedExam);
+      if (board) setSelectedBoardId(board.id);
     }
     const exactQuery = selectedExam ? buildExamResearchQuery(selectedExam) : query;
     setExamQuery(exactQuery);
@@ -499,95 +506,56 @@ export default function App() {
         {/* SCREEN 2: RESEARCH STUDIO */}
         {activeTab === 'STUDIO' && (
           <div className="space-y-6">
+            {/* Hierarchical Conducting Board Explorer */}
+            <ConductingBoardExplorer
+              exams={exams}
+              jurisdictionTier={jurisdictionTier}
+              onJurisdictionChange={(tier) => {
+                setJurisdictionTier(tier);
+                if (tier === 'CENTRAL') {
+                  setSelectedBoardId('ssc');
+                  setExamQuery('SSC CGL Tier 1');
+                } else {
+                  setSelectedBoardId('tgpsc');
+                  setExamQuery('TGPSC Group 2 Paper 1');
+                }
+                setResearchExamId(undefined);
+              }}
+              selectedState={selectedState}
+              onStateChange={(st) => {
+                setSelectedState(st);
+                if (st === 'Telangana') setSelectedBoardId('tgpsc');
+                else if (st === 'Andhra Pradesh') setSelectedBoardId('appsc');
+                else setSelectedBoardId(`${st.toLowerCase().replace(/\s+/g, '_')}_psc`);
+                const defaultEx = INDIAN_STATES.find(s => s.name === st)?.popularExams[0] || `${st} PSC Exam`;
+                setExamQuery(defaultEx);
+                setResearchExamId(undefined);
+              }}
+              selectedBoardId={selectedBoardId}
+              onSelectBoard={(boardId) => setSelectedBoardId(boardId)}
+              onSelectExam={(examTitle, matchedDbExam) => {
+                setExamQuery(examTitle);
+                setResearchExamId(matchedDbExam?.exam_id);
+              }}
+              onLaunchResearch={(query, examId) => {
+                setExamQuery(query);
+                setResearchExamId(examId);
+                void handleStartResearch(undefined, query, examId);
+              }}
+              onOpenMocks={(examId) => handleNavigateToMocksFromIntake(examId)}
+            />
+
             {/* Input & Mode Selector Card */}
             <div className="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-2xs space-y-5">
-              {/* Common Exam Input Section */}
-              <div>
-                {/* Jurisdiction Tier Switcher: Central vs. State-Wise */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200/90 mb-3.5">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                      <Building2 className="w-3.5 h-3.5 text-indigo-600" />
-                      Jurisdiction:
-                    </span>
-                    <div className="inline-flex rounded-lg bg-slate-200/80 p-0.5 text-xs font-semibold">
-                      <button
-                        type="button"
-                        id="jurisdiction-central-btn"
-                        onClick={() => {
-                          setJurisdictionTier('CENTRAL');
-                          setExamQuery('SSC CGL Tier 1');
-                          setResearchExamId(undefined);
-                        }}
-                        className={`px-3 py-1.5 rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${
-                          jurisdictionTier === 'CENTRAL'
-                            ? 'bg-white text-indigo-800 shadow-xs font-bold'
-                            : 'text-slate-600 hover:text-slate-900'
-                        }`}
-                      >
-                        <span>🏛️ Central (National)</span>
-                      </button>
-                      <button
-                        type="button"
-                        id="jurisdiction-state-btn"
-                        onClick={() => {
-                          setJurisdictionTier('STATE');
-                          const defaultEx = INDIAN_STATES.find(s => s.name === selectedState)?.popularExams[0] || `${selectedState} PSC Exam`;
-                          setExamQuery(defaultEx);
-                          setResearchExamId(undefined);
-                        }}
-                        className={`px-3 py-1.5 rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${
-                          jurisdictionTier === 'STATE'
-                            ? 'bg-white text-indigo-800 shadow-xs font-bold'
-                            : 'text-slate-600 hover:text-slate-900'
-                        }`}
-                      >
-                        <span>🗺️ State-Wise</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* If State-Wise, render State Selector */}
-                  {jurisdictionTier === 'STATE' ? (
-                    <div className="flex items-center gap-2">
-                      <label htmlFor="state-selector-input" className="text-xs font-bold text-slate-600 shrink-0">Select State:</label>
-                      <select
-                        id="state-selector-input"
-                        value={selectedState}
-                        onChange={(e) => {
-                          const newState = e.target.value;
-                          setSelectedState(newState);
-                          const stateData = INDIAN_STATES.find(s => s.name === newState);
-                          if (stateData && stateData.popularExams.length > 0) {
-                            setExamQuery(stateData.popularExams[0]);
-                          } else {
-                            setExamQuery(`${newState} PSC Exam`);
-                          }
-                          setResearchExamId(undefined);
-                        }}
-                        className="text-xs font-bold bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer shadow-2xs"
-                      >
-                        {INDIAN_STATES.map((state) => (
-                          <option key={state.code} value={state.name}>
-                            {state.name} ({state.shortCommission})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  ) : (
-                    <span className="text-[11px] text-slate-500 font-medium hidden sm:inline">
-                      Includes SSC, RRB Railways, UPSC, Banking & Central Boards
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex items-center justify-between mb-2">
+              {/* Active Search Query Section */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
                   <label htmlFor="exam-query-input" className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                    <BookOpen className="w-3.5 h-3.5 text-blue-600" />
-                    Target Examination Input ({jurisdictionTier === 'CENTRAL' ? 'Central / National' : `State: ${selectedState}`})
+                    <Search className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Active Research Query / Custom Notification</span>
                   </label>
                   <span className="text-[11px] text-slate-500">
-                    Enter commission, paper, or short exam phrase
+                    Selected from board branch above, or enter custom query
                   </span>
                 </div>
 
@@ -597,11 +565,7 @@ export default function App() {
                     <input
                       id="exam-query-input"
                       type="text"
-                      placeholder={
-                        jurisdictionTier === 'CENTRAL'
-                          ? 'e.g. "SSC CGL Tier 1", "RRB NTPC CBT-1", "UPSC Civil Services Prelims"'
-                          : `e.g. "${selectedState} Group 2 Paper 1" or "${selectedState} AEE"`
-                      }
+                      placeholder='e.g. "TGPSC Group 2 Paper 1", "TSLPRB Police SI", "SSC CGL Tier 1"'
                       value={examQuery}
                       onChange={(e) => { setExamQuery(e.target.value); setResearchExamId(undefined); }}
                       onKeyDown={(e) => {
@@ -631,71 +595,6 @@ export default function App() {
                     )}
                   </button>
                 </div>
-
-                {/* Filtered Presets for the Active Jurisdiction / State */}
-                {(() => {
-                  const activePresets = jurisdictionTier === 'CENTRAL'
-                    ? CENTRAL_EXAM_PRESETS
-                    : (INDIAN_STATES.find(s => s.name === selectedState)?.popularExams || []);
-
-                  const matchingExamsInDb = exams.filter(e => {
-                    if (jurisdictionTier === 'CENTRAL') return isCentralExam(e);
-                    return getExamState(e) === selectedState;
-                  });
-
-                  return (
-                    <div className="mt-3 space-y-2">
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <span className="text-[11px] font-semibold text-slate-500 mr-1">
-                          {jurisdictionTier === 'CENTRAL' ? '🏛️ Central Presets:' : `🗺️ ${selectedState} Presets:`}
-                        </span>
-                        {activePresets.map((preset) => (
-                          <button
-                            key={preset}
-                            type="button"
-                            onClick={() => {
-                              setExamQuery(preset);
-                              setResearchExamId(undefined);
-                            }}
-                            className={`text-[11px] px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
-                              examQuery === preset
-                                ? 'bg-blue-50 text-blue-800 border-blue-300 font-semibold'
-                                : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:text-slate-900'
-                            }`}
-                          >
-                            {preset}
-                          </button>
-                        ))}
-                      </div>
-
-                      {/* Matching Registered Database Exams Quick Selection */}
-                      {matchingExamsInDb.length > 0 && (
-                        <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-slate-100">
-                          <span className="text-[11px] font-semibold text-emerald-700 mr-1">
-                            Registered in System ({matchingExamsInDb.length}):
-                          </span>
-                          {matchingExamsInDb.map((ex) => (
-                            <button
-                              key={ex.exam_id}
-                              type="button"
-                              onClick={() => {
-                                setExamQuery(buildExamResearchQuery(ex));
-                                setResearchExamId(ex.exam_id);
-                              }}
-                              className={`text-[11px] px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
-                                researchExamId === ex.exam_id
-                                  ? 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold'
-                                  : 'bg-emerald-50/60 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
-                              }`}
-                            >
-                              {ex.title}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })()}
               </div>
 
               {/* Research Mode Selector */}

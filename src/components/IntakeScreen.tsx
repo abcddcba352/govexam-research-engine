@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Building2,
   FileCheck2,
@@ -28,7 +28,11 @@ import {
   isCentralExam,
   getExamState,
   groupExamsByJurisdiction,
-  filterExamsByJurisdiction
+  filterExamsByJurisdiction,
+  getBoardsForState,
+  getCentralBoards,
+  getBoardForExam,
+  ConductingBoardInfo
 } from '../utils/examJurisdiction';
 
 interface IntakeScreenProps {
@@ -49,6 +53,38 @@ interface PresetItem {
 }
 
 const PRESET_TEMPLATES: PresetItem[] = [
+  {
+    id: 'tslprb_si',
+    label: 'TS Police SI',
+    shortTag: 'TS Police',
+    tier: 'STATE',
+    state: 'Telangana',
+    data: {
+      title: 'Telangana State Police Sub-Inspector (SI): Preliminary Written Test',
+      commission: 'Telangana State Level Police Recruitment Board (TSLPRB)',
+      state_or_central: 'Telangana',
+      post: 'Sub-Inspector of Police (Civil / AR / TSSP / Communications)',
+      stage: 'Preliminary Written Test (PWT)',
+      paper: 'Single Paper: Arithmetic, Reasoning & General Studies (200 Questions)',
+      recruitment_cycle: 'Notification 41/2022 Cycle',
+      total_questions: 200,
+      duration_minutes: 180,
+      marks_per_question: 1,
+      negative_marking_rate: 0.20,
+      sections: [
+        'Arithmetic and Test of Reasoning / Mental Ability (100 Questions)',
+        'General Studies: Indian & Telangana History, Geography, Polity (100 Questions)'
+      ],
+      syllabus_topics: [
+        'Arithmetic & Reasoning (Number Systems, Time & Work, Coding-Decoding)',
+        'Telangana Movement, Statehood & Culture',
+        'Indian Constitution & General Science'
+      ],
+      mediums: ['English', 'Telugu', 'Urdu'],
+      target_date: '2025-11-15',
+      notes: 'Official TSLPRB Police SI format: 200 questions, 1/5th negative marking (0.20 penalty)'
+    }
+  },
   {
     id: 'tgpsc_g2',
     label: 'TGPSC Group 2',
@@ -314,8 +350,17 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
   const [presetFilterTier, setPresetFilterTier] = useState<'ALL' | 'CENTRAL' | 'STATE'>('ALL');
   const [registryFilterTier, setRegistryFilterTier] = useState<'ALL' | 'CENTRAL' | 'STATE'>('ALL');
   const [registrySelectedState, setRegistrySelectedState] = useState<string>('ALL_STATES');
+  const [registrySelectedBoard, setRegistrySelectedBoard] = useState<string>('ALL_BOARDS');
   const [formJurisdictionType, setFormJurisdictionType] = useState<'CENTRAL' | 'STATE'>('STATE');
   const [formSelectedState, setFormSelectedState] = useState<string>('Telangana');
+  const [formSelectedBoardId, setFormSelectedBoardId] = useState<string>('tgpsc');
+
+  const availableFormBoards = useMemo(() => {
+    if (formJurisdictionType === 'CENTRAL') {
+      return getCentralBoards();
+    }
+    return getBoardsForState(formSelectedState);
+  }, [formJurisdictionType, formSelectedState]);
 
   // Auditor Sign-off Modal state
   const [verifyingExam, setVerifyingExam] = useState<ExamRecord | null>(null);
@@ -649,7 +694,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                 <button
                   type="button"
                   onClick={() => onLaunchResearch(formData.title || presetNotice.examTitle, 'HYBRID')}
-                  className="shrink-0 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-semibold text-xs transition-colors inline-flex items-center gap-1.5 shadow-xs"
+                  className="shrink-0 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-semibold text-xs transition-colors inline-flex items-center gap-1.5 shadow-xs cursor-pointer"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>Verify via Research Engine</span>
@@ -669,27 +714,12 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                 required
                 value={formData.title}
                 onChange={e => setFormData({ ...formData, title: e.target.value })}
-                placeholder="e.g. TGPSC Group-II Services: Paper I (General Studies & General Abilities)"
+                placeholder="e.g. TSLPRB Police Sub-Inspector (SCT SI Civil / Tech): Paper I"
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
             </div>
 
-            {/* Commission */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                Recruiting Commission / Authority *
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.commission}
-                onChange={e => setFormData({ ...formData, commission: e.target.value })}
-                placeholder="e.g. Telangana Public Service Commission (TGPSC)"
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-              />
-            </div>
-
-            {/* State or Central */}
+            {/* State / Central Jurisdiction */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                 State / Central Jurisdiction *
@@ -700,12 +730,13 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                     type="button"
                     onClick={() => {
                       setFormJurisdictionType('CENTRAL');
+                      const cBoards = getCentralBoards();
+                      const firstBoard = cBoards[0];
+                      setFormSelectedBoardId(firstBoard.id);
                       setFormData(prev => ({
                         ...prev,
                         state_or_central: 'Central',
-                        commission: prev.commission && prev.commission !== 'Telangana Public Service Commission (TGPSC)'
-                          ? prev.commission
-                          : 'Staff Selection Commission (SSC)'
+                        commission: firstBoard.name
                       }));
                     }}
                     className={`flex-1 py-1.5 rounded-md text-center transition-all cursor-pointer ${
@@ -721,13 +752,13 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                     onClick={() => {
                       setFormJurisdictionType('STATE');
                       const st = formSelectedState || 'Telangana';
-                      const defaultComm = INDIAN_STATES.find(s => s.name === st)?.defaultCommission || '';
+                      const sBoards = getBoardsForState(st);
+                      const firstBoard = sBoards[0];
+                      if (firstBoard) setFormSelectedBoardId(firstBoard.id);
                       setFormData(prev => ({
                         ...prev,
                         state_or_central: st,
-                        commission: prev.commission && !prev.commission.includes('Staff Selection') && !prev.commission.includes('UPSC')
-                          ? prev.commission
-                          : defaultComm
+                        commission: firstBoard?.name || ''
                       }));
                     }}
                     className={`flex-1 py-1.5 rounded-md text-center transition-all cursor-pointer ${
@@ -746,11 +777,13 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                     onChange={e => {
                       const newSt = e.target.value;
                       setFormSelectedState(newSt);
-                      const defaultComm = INDIAN_STATES.find(s => s.name === newSt)?.defaultCommission || '';
+                      const sBoards = getBoardsForState(newSt);
+                      const firstBoard = sBoards[0];
+                      if (firstBoard) setFormSelectedBoardId(firstBoard.id);
                       setFormData(prev => ({
                         ...prev,
                         state_or_central: newSt,
-                        commission: defaultComm || prev.commission
+                        commission: firstBoard?.name || ''
                       }));
                     }}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer"
@@ -763,13 +796,88 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                   </select>
                 ) : (
                   <div className="text-[11px] text-slate-500 py-1">
-                    National commission jurisdiction (SSC, RRB, UPSC, IBPS)
+                    National commission jurisdiction (SSC, RRB, UPSC, IBPS, NITs)
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Post Cadres */}
+            {/* Conducting Authority / Board Branch */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                Conducting Authority / Board Branch *
+              </label>
+              <select
+                value={formSelectedBoardId}
+                onChange={e => {
+                  const bId = e.target.value;
+                  setFormSelectedBoardId(bId);
+                  const selectedBoard = availableFormBoards.find(b => b.id === bId);
+                  if (selectedBoard) {
+                    setFormData(prev => ({
+                      ...prev,
+                      commission: selectedBoard.name
+                    }));
+                  }
+                }}
+                className="w-full px-3 py-2 border border-indigo-300 rounded-lg text-sm bg-indigo-50/40 font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer"
+              >
+                {availableFormBoards.map(b => (
+                  <option key={b.id} value={b.id}>
+                    {b.icon} {b.shortName} - {b.name}
+                  </option>
+                ))}
+              </select>
+
+              {/* Known posts under selected board */}
+              {(() => {
+                const currentBoard = availableFormBoards.find(b => b.id === formSelectedBoardId);
+                if (!currentBoard || currentBoard.exams.length === 0) return null;
+                return (
+                  <div className="mt-2">
+                    <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                      Quick Post Fill under {currentBoard.shortName}:
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {currentBoard.exams.map((ex, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => {
+                            setFormData(prev => ({
+                              ...prev,
+                              title: `${currentBoard.shortName} ${ex.title}: Paper I`,
+                              post: ex.title,
+                              commission: currentBoard.name
+                            }));
+                          }}
+                          className="text-[10px] px-2 py-0.5 rounded bg-slate-100 hover:bg-indigo-100 hover:text-indigo-700 text-slate-700 border border-slate-200 transition-colors cursor-pointer"
+                        >
+                          {ex.title}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Commission */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                Recruiting Commission Full Title *
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.commission}
+                onChange={e => setFormData({ ...formData, commission: e.target.value })}
+                placeholder="e.g. Telangana State Level Police Recruitment Board (TSLPRB)"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            </div>
+
+            {/* Target Post Cadres */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                 Target Post Cadres <span className="text-slate-400 font-normal lowercase">(optional)</span>
@@ -778,12 +886,12 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                 type="text"
                 value={formData.post}
                 onChange={e => setFormData({ ...formData, post: e.target.value })}
-                placeholder="e.g. Municipal Commissioner (defaults to title if empty)"
+                placeholder="e.g. Police Sub-Inspector / Station House Officer"
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
             </div>
 
-            {/* Cycle */}
+            {/* Notification / Cycle */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                 Notification / Recruitment Cycle
@@ -882,6 +990,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                   className="w-full px-3 py-1.5 border border-slate-300 rounded text-sm bg-white"
                 >
                   <option value={0}>0 (No negative marks)</option>
+                  <option value={0.20}>1/5th (0.20 penalty) - TGPRB Police Recruitment</option>
                   <option value={0.25}>1/4th (0.25 penalty) - TGPSC Standard</option>
                   <option value={0.33}>1/3rd (0.33 penalty) - APPSC / UPSC</option>
                   <option value={0.50}>1/2 (0.50 penalty) - SSC CGL Tier 1</option>
@@ -941,14 +1050,28 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
       {/* Existing Registered Exams Table */}
       {(() => {
         const { central: centralExams, states: stateGroups, stateNames } = groupExamsByJurisdiction(exams);
-        const displayedExams = filterExamsByJurisdiction(exams, registryFilterTier, registrySelectedState);
+        const baseFilteredExams = filterExamsByJurisdiction(exams, registryFilterTier, registrySelectedState);
+
+        // Find available boards for current jurisdiction context
+        const contextBoards = registryFilterTier === 'CENTRAL'
+          ? getCentralBoards()
+          : registryFilterTier === 'STATE' && registrySelectedState !== 'ALL_STATES'
+          ? getBoardsForState(registrySelectedState)
+          : [];
+
+        const displayedExams = registrySelectedBoard === 'ALL_BOARDS'
+          ? baseFilteredExams
+          : baseFilteredExams.filter(exam => {
+              const b = getBoardForExam(exam);
+              return b?.id === registrySelectedBoard;
+            });
 
         return (
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="p-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50">
               <div>
                 <h2 className="text-base font-bold text-slate-900">Intake Registry & Active Examinations</h2>
-                <p className="text-xs text-slate-500">Exams currently tracked in the system database with official patterns and syllabus mappings.</p>
+                <p className="text-xs text-slate-500">Exams grouped and organized by conducting board authorities and commissions.</p>
               </div>
               <span className="text-xs font-semibold px-2.5 py-1 bg-slate-200 text-slate-700 rounded-full">
                 {displayedExams.length} / {exams.length} Exams Shown
@@ -961,7 +1084,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                 <span className="font-bold text-slate-600 mr-1">Filter Jurisdiction:</span>
                 <button
                   type="button"
-                  onClick={() => { setRegistryFilterTier('ALL'); setRegistrySelectedState('ALL_STATES'); }}
+                  onClick={() => { setRegistryFilterTier('ALL'); setRegistrySelectedState('ALL_STATES'); setRegistrySelectedBoard('ALL_BOARDS'); }}
                   className={`px-3 py-1.5 rounded-lg font-medium border transition-all cursor-pointer ${
                     registryFilterTier === 'ALL'
                       ? 'bg-indigo-600 text-white border-indigo-600 font-bold shadow-xs'
@@ -972,7 +1095,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => { setRegistryFilterTier('CENTRAL'); setRegistrySelectedState('ALL_STATES'); }}
+                  onClick={() => { setRegistryFilterTier('CENTRAL'); setRegistrySelectedState('ALL_STATES'); setRegistrySelectedBoard('ALL_BOARDS'); }}
                   className={`px-3 py-1.5 rounded-lg font-medium border transition-all cursor-pointer ${
                     registryFilterTier === 'CENTRAL'
                       ? 'bg-indigo-600 text-white border-indigo-600 font-bold shadow-xs'
@@ -983,7 +1106,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => { setRegistryFilterTier('STATE'); }}
+                  onClick={() => { setRegistryFilterTier('STATE'); setRegistrySelectedBoard('ALL_BOARDS'); }}
                   className={`px-3 py-1.5 rounded-lg font-medium border transition-all cursor-pointer ${
                     registryFilterTier === 'STATE'
                       ? 'bg-indigo-600 text-white border-indigo-600 font-bold shadow-xs'
@@ -1000,7 +1123,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                   <span className="text-[11px] font-semibold text-slate-500 mr-1">State:</span>
                   <button
                     type="button"
-                    onClick={() => setRegistrySelectedState('ALL_STATES')}
+                    onClick={() => { setRegistrySelectedState('ALL_STATES'); setRegistrySelectedBoard('ALL_BOARDS'); }}
                     className={`text-[11px] px-2.5 py-1 rounded-md border transition-all cursor-pointer ${
                       registrySelectedState === 'ALL_STATES'
                         ? 'bg-purple-600 text-white border-purple-600 font-bold'
@@ -1013,7 +1136,7 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                     <button
                       key={st}
                       type="button"
-                      onClick={() => setRegistrySelectedState(st)}
+                      onClick={() => { setRegistrySelectedState(st); setRegistrySelectedBoard('ALL_BOARDS'); }}
                       className={`text-[11px] px-2.5 py-1 rounded-md border transition-all cursor-pointer ${
                         registrySelectedState === st
                           ? 'bg-purple-600 text-white border-purple-600 font-bold'
@@ -1027,10 +1150,54 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
               )}
             </div>
 
+            {/* Conducting Board Branch Sub-Filter */}
+            {contextBoards.length > 0 && (
+              <div className="px-4 py-2.5 bg-amber-50/70 border-b border-amber-200 flex items-center gap-1.5 flex-wrap text-xs">
+                <span className="font-bold text-amber-900 mr-1 flex items-center gap-1">
+                  <span>🏢</span>
+                  <span>Conducting Board Branch:</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setRegistrySelectedBoard('ALL_BOARDS')}
+                  className={`px-2.5 py-1 rounded-md border text-xs transition-all cursor-pointer ${
+                    registrySelectedBoard === 'ALL_BOARDS'
+                      ? 'bg-amber-700 text-white border-amber-700 font-bold shadow-xs'
+                      : 'bg-white text-amber-900 border-amber-200 hover:bg-amber-100'
+                  }`}
+                >
+                  All Boards ({baseFilteredExams.length})
+                </button>
+                {contextBoards.map(board => {
+                  const count = baseFilteredExams.filter(e => getBoardForExam(e)?.id === board.id).length;
+                  return (
+                    <button
+                      key={board.id}
+                      type="button"
+                      onClick={() => setRegistrySelectedBoard(board.id)}
+                      className={`px-2.5 py-1 rounded-md border text-xs transition-all inline-flex items-center gap-1.5 cursor-pointer ${
+                        registrySelectedBoard === board.id
+                          ? 'bg-amber-700 text-white border-amber-700 font-bold shadow-xs'
+                          : 'bg-white text-slate-700 border-amber-200 hover:bg-amber-100'
+                      }`}
+                    >
+                      <span>{board.icon}</span>
+                      <span className="font-medium">{board.shortName}</span>
+                      <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                        registrySelectedBoard === board.id ? 'bg-amber-800 text-white' : 'bg-amber-100 text-amber-800'
+                      }`}>
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
             <div className="divide-y divide-slate-200">
               {displayedExams.length === 0 ? (
                 <div className="p-8 text-center text-slate-500 text-sm">
-                  No registered examinations match the selected jurisdiction filter.
+                  No registered examinations match the selected jurisdiction or board filter.
                 </div>
               ) : (
                 displayedExams.map((exam) => (
@@ -1046,6 +1213,18 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                           }`}>
                             {isCentralExam(exam) ? '🏛️ Central (National)' : `🗺️ State: ${getExamState(exam) || exam.state_or_central}`}
                           </span>
+
+                          {/* Conducting Board Badge */}
+                          {(() => {
+                            const board = getBoardForExam(exam);
+                            if (!board) return null;
+                            return (
+                              <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-300 inline-flex items-center gap-1">
+                                <span>{board.icon}</span>
+                                <span>{board.shortName}</span>
+                              </span>
+                            );
+                          })()}
 
                           <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-indigo-100 text-indigo-800 border border-indigo-200">
                             {exam.commission}
