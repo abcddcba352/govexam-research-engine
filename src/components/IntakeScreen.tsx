@@ -453,12 +453,20 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title || !formData.commission) return;
+    if (!formData.title?.trim() || !formData.commission?.trim()) {
+      alert('Please provide both Examination Title and Recruiting Commission.');
+      return;
+    }
 
     setIsSubmitting(true);
     try {
       const payload: ExamIntakeInput = {
         ...formData,
+        title: formData.title.trim(),
+        commission: formData.commission.trim(),
+        post: formData.post?.trim() || formData.title.trim(),
+        paper: formData.paper?.trim() || 'Paper-I',
+        recruitment_cycle: formData.recruitment_cycle?.trim() || 'Current Notification',
         sections: rawSections.split('\n').map(s => s.trim()).filter(Boolean),
         syllabus_topics: rawTopics.split('\n').map(s => s.trim()).filter(Boolean),
         mediums: rawMediums.split(',').map(s => s.trim()).filter(Boolean),
@@ -470,13 +478,16 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error('Intake submission failed');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({} as any));
+        throw new Error(errData.error || `Failed to register exam intake (HTTP ${res.status})`);
+      }
       const data = await res.json();
       onIntakeCreated(data.exam);
       setShowForm(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert('Failed to register exam intake.');
+      alert(err.message || 'Failed to register exam intake.');
     } finally {
       setIsSubmitting(false);
     }
@@ -616,13 +627,13 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
             {/* Post Cadres */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                Target Post Cadres
+                Target Post Cadres <span className="text-slate-400 font-normal lowercase">(optional)</span>
               </label>
               <input
                 type="text"
                 value={formData.post}
                 onChange={e => setFormData({ ...formData, post: e.target.value })}
-                placeholder="e.g. Municipal Commissioner, Sub-Registrar, ACTO"
+                placeholder="e.g. Municipal Commissioner (defaults to title if empty)"
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               />
             </div>

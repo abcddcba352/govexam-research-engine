@@ -57,6 +57,16 @@ try {
  assert.equal(fresh.paper,row.paper);assert.equal(fresh.pattern.negative_marking_rate,0.33);
  const retry=await (await post('/api/intake/create',intake)).json();assert.equal(retry.exam.exam_id,fresh.exam_id);assert.equal(stored.length,1);
  });
+ await test('intake succeeds with only title and commission by falling back gracefully',async()=>{
+    const response=await post('/api/intake/create',{title:'tgpsc aee civil',commission:'tgpsc'});
+    assert.equal(response.status,201);
+    const result=await response.json();
+    assert.equal(result.exam.title,'tgpsc aee civil');
+    assert.equal(result.exam.commission,'tgpsc');
+    assert.equal(result.exam.post,'tgpsc aee civil');
+    assert.equal(result.exam.paper,'Paper-I');
+    assert.equal(result.exam.recruitment_cycle,'Current Notification');
+  });
  await test('incomplete Paper II generation returns 409 before any mock is created',async()=>{
  const response=await post('/api/mocks/generate',{exam_id:stored[0].exam_id,preparation_mode:'PRE_NOTIFICATION_PREPARATION'});
  assert.equal(response.status,409);const result=await response.json();assert.equal(result.readiness.can_generate,false);assert.equal(mockWrites,0);

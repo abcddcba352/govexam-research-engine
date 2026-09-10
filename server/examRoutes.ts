@@ -112,10 +112,24 @@ export function registerExamRoutes(app: Express) {
   })));
   app.post('/api/intake/create', examEndpoint(req => {
     const input = req.body;
-    if (!input || !['title', 'commission', 'post', 'paper', 'recruitment_cycle'].every(
-      key => typeof input[key] === 'string' && input[key].trim())) {
-      return { status: 400, body: { error: 'Exam title, commission, post, paper and preparation cycle are required.' } };
+    if (!input || typeof input !== 'object') {
+      return { status: 400, body: { error: 'Request body is required.' } };
     }
+    if (typeof input.title !== 'string' || !input.title.trim()) {
+      return { status: 400, body: { error: 'Examination Title is required.' } };
+    }
+    if (typeof input.commission !== 'string' || !input.commission.trim()) {
+      return { status: 400, body: { error: 'Recruiting Commission / Authority is required.' } };
+    }
+
+    input.title = input.title.trim();
+    input.commission = input.commission.trim();
+    input.post = typeof input.post === 'string' && input.post.trim() ? input.post.trim() : input.title;
+    input.paper = typeof input.paper === 'string' && input.paper.trim() ? input.paper.trim() : 'Paper-I';
+    input.recruitment_cycle = typeof input.recruitment_cycle === 'string' && input.recruitment_cycle.trim() ? input.recruitment_cycle.trim() : 'Current Notification';
+    input.stage = typeof input.stage === 'string' && input.stage.trim() ? input.stage.trim() : 'Written Examination';
+    input.state_or_central = typeof input.state_or_central === 'string' && input.state_or_central.trim() ? input.state_or_central.trim() : 'State';
+
     for (const key of ['total_questions', 'duration_minutes', 'marks_per_question', 'negative_marking_rate']) {
       if (input[key] !== undefined && (!Number.isFinite(input[key]) || input[key] < 0)) {
         return { status: 400, body: { error: `Invalid ${key}.` } };
