@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState, useRef } from 'react';
 import {
   Building2,
   MapPin,
@@ -239,26 +239,46 @@ export const ExamHierarchyFilter: React.FC<ExamHierarchyFilterProps> = ({
   // Keep stage and paper in sync when activeExam changes
   useEffect(() => {
     if (availableStages.length > 0) {
-      if (!availableStages.some(s => s.stage_id === selectedStageId)) {
-        setSelectedStageId(availableStages[0].stage_id);
-      }
+      setSelectedStageId(prev => {
+        if (!availableStages.some(s => s.stage_id === prev)) {
+          return availableStages[0].stage_id;
+        }
+        return prev;
+      });
     }
-  }, [availableStages, selectedStageId]);
+  }, [availableStages]);
 
   useEffect(() => {
     if (availablePapers.length > 0) {
-      if (!availablePapers.some(p => p.paper_id === selectedPaperId)) {
-        setSelectedPaperId(availablePapers[0].paper_id);
-      }
+      setSelectedPaperId(prev => {
+        if (!availablePapers.some(p => p.paper_id === prev)) {
+          return availablePapers[0].paper_id;
+        }
+        return prev;
+      });
     }
-  }, [availablePapers, selectedPaperId]);
+  }, [availablePapers]);
+
+  // Use a ref for the callback so it never appears in effect deps
+  const onPaperChangeRef = useRef(onPaperChange);
+  onPaperChangeRef.current = onPaperChange;
+
+  // Track previous values to avoid re-firing when objects are referentially different but logically equal
+  const prevNotifiedRef = useRef<{ stageId: string; paperId: string }>({ stageId: '', paperId: '' });
 
   // Notify parent of active paper whenever activeStage or activePaper updates
   useEffect(() => {
-    if (onPaperChange) {
-      onPaperChange(activeStage || null, activePaper || null);
+    const stageId = activeStage?.stage_id || '';
+    const paperId = activePaper?.paper_id || '';
+    // Only notify if something actually changed
+    if (prevNotifiedRef.current.stageId === stageId && prevNotifiedRef.current.paperId === paperId) {
+      return;
     }
-  }, [activeStage, activePaper, onPaperChange]);
+    prevNotifiedRef.current = { stageId, paperId };
+    if (onPaperChangeRef.current) {
+      onPaperChangeRef.current(activeStage || null, activePaper || null);
+    }
+  }, [activeStage, activePaper]);
 
   // Helper to switch exam_id if an exact paper is registered as a standalone ExamRecord
   const findAndSelectMatchingExam = (stageId: string, paperId: string) => {
