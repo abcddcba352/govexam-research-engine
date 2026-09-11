@@ -41,6 +41,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { CleanMockStudio } from './components/CleanMockStudio.tsx';
+import { GeminiApiKeysModal } from './components/GeminiApiKeysModal.tsx';
 
 // These audit workspaces are only needed after the user changes tabs. Loading
 // them on demand keeps the research/intake screen responsive on slower devices.
@@ -430,6 +431,23 @@ export default function App() {
 
           {/* Clean Navigation Bar */}
           <nav className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-semibold overflow-x-auto">
+            {/* GEMINI KEYS ADMIN POOL */}
+            <button
+              type="button"
+              id="nav-gemini-keys-btn"
+              onClick={() => setIsGeminiKeysModalOpen(true)}
+              className="px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-bold border border-indigo-200"
+              title="Configure Google Gemini API Keys & Automatic Failover"
+            >
+              <Key className="w-3.5 h-3.5 text-indigo-600" />
+              <span>🔑 Gemini Keys</span>
+              {geminiKeyCount > 0 && (
+                <span className="bg-indigo-600 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full">
+                  {geminiKeyCount}
+                </span>
+              )}
+            </button>
+
             {/* 1. MOCK GENERATOR (DEFAULT & PRIMARY) */}
             <button
               type="button"
@@ -703,6 +721,12 @@ export default function App() {
           </span>
         </div>
       </footer>
+
+      <GeminiApiKeysModal
+        isOpen={isGeminiKeysModalOpen}
+        onClose={() => setIsGeminiKeysModalOpen(false)}
+        onKeysChanged={fetchGeminiKeyCount}
+      />
     </div>
   );
 }
