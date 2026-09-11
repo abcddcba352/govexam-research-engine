@@ -634,10 +634,7 @@ export default function App() {
           <PYQIntelligenceScreen
             exams={exams}
             selectedExamId={selectedPYQExamId || exams[0]?.exam_id || 'tgpsc_group2_paper1'}
-            onSelectExam={(id) => {
-              setSelectedPYQExamId(id);
-              fetchExams();
-            }}
+            onSelectExam={setSelectedPYQExamId}
           />
         )}
 
