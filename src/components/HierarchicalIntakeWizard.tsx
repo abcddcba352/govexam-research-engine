@@ -864,20 +864,6 @@ export const HierarchicalIntakeWizard: React.FC<HierarchicalIntakeWizardProps> =
                 </span>
               </div>
 
-              {/* Post Cadres & Recruitment Cycle */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Target Post Cadre(s)
-                </label>
-                <input
-                  type="text"
-                  value={targetPost}
-                  onChange={e => setTargetPost(e.target.value)}
-                  placeholder="e.g. Police Constable (Civil / AR / TSSP / Communications)"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                />
-              </div>
-
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                   Recruitment Year / Cycle
@@ -889,48 +875,6 @@ export const HierarchicalIntakeWizard: React.FC<HierarchicalIntakeWizardProps> =
                   placeholder="e.g. 2026 Notification (Cycle 41/2022)"
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 />
-              </div>
-            </div>
-
-            {/* State Exam Catalog & Mock Series Logic Preview */}
-            <div className="p-4 rounded-xl border border-slate-200 bg-gradient-to-r from-slate-50 to-indigo-50/40 space-y-2.5">
-              <div className="flex items-center justify-between gap-2 flex-wrap">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-indigo-600" />
-                  <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                    State Exam Catalog & Mock Series Structure
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 border border-indigo-200 uppercase">
-                    Category: {stateCatalogMeta.examKind}
-                  </span>
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700">
-                    {stateCatalogMeta.stateCode || 'IN'}
-                  </span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-                <div className="p-2.5 bg-white rounded-lg border border-slate-200 space-y-1">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Catalog Heading & Slug</span>
-                  <p className="font-bold text-slate-900">{stateCatalogMeta.heading}</p>
-                  <p className="font-mono text-[11px] text-slate-500 truncate">slug: {stateCatalogMeta.catalogSlug}</p>
-                </div>
-                <div className="p-2.5 bg-white rounded-lg border border-slate-200 space-y-1">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Mock Test Series Title Preview</span>
-                  <p className="font-bold text-indigo-900 truncate" title={stateCatalogMeta.sampleMockTitle}>
-                    {stateCatalogMeta.sampleMockTitle}
-                  </p>
-                  <p className="text-[11px] text-slate-600 truncate" title={stateCatalogMeta.sampleStudentTitle}>
-                    Student: {stateCatalogMeta.sampleStudentTitle}
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-2.5 bg-white rounded-lg border border-slate-200 text-[11px] text-slate-600 space-y-0.5">
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">Aspirant Portal Description</span>
-                <p className="text-slate-700 font-medium">{stateCatalogMeta.fallbackDescription}</p>
               </div>
             </div>
 
