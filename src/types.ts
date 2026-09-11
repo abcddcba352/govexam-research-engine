@@ -12,6 +12,11 @@ export interface ExamIdentification {
   structure_scheme?: ExamStructureScheme;
 }
 
+export interface SubjectLanguageException {
+  subject: string;
+  language: string; // e.g. "English Only", "Telugu Only", "Urdu Only", "Hindi Only"
+}
+
 export interface ExamStagePaper {
   paper_id: string;
   paper_number?: string;
@@ -26,6 +31,8 @@ export interface ExamStagePaper {
   applicable_branch?: string;
   is_common_paper?: boolean;
   language_mediums?: string[];
+  languages?: string[];
+  exceptions?: SubjectLanguageException[];
   language_i_options?: string[];
   language_ii?: string;
   syllabus_reference?: string;
@@ -343,6 +350,8 @@ export interface ExamPattern {
   negative_marking_rate: number; // e.g. 0.25 (1/4) or 0.33 (1/3) or 0
   sections: string[];
   mediums: string[];
+  languages?: string[];
+  exceptions?: SubjectLanguageException[];
   canonical_subjects?: CanonicalSubjectInfo[];
 }
 
@@ -371,6 +380,8 @@ export interface ExamRecord {
   paper: string;
   recruitment_cycle: string;
   pattern: ExamPattern;
+  languages?: string[];
+  exceptions?: SubjectLanguageException[];
   syllabus_topics: string[];
   status: ExamStatus;
   exam_profile_status: ExamProfileStatus;
@@ -432,6 +443,8 @@ export interface ExamIntakeInput {
   sections: string[];
   syllabus_topics: string[];
   mediums: string[];
+  languages?: string[];
+  exceptions?: SubjectLanguageException[];
   target_date?: string;
   notes?: string;
   exam_profile_status?: ExamProfileStatus;

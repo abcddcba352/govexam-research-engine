@@ -457,6 +457,8 @@ export function createExamFromIntake(input: ExamIntakeInput): ExamRecord {
     heading: input.heading || catalogMeta.heading,
     fallback_title: input.fallback_title || catalogMeta.fallbackTitle,
     fallback_description: input.fallback_description || catalogMeta.fallbackDescription,
+    languages: input.languages || input.mediums || (['Telangana', 'Andhra Pradesh'].includes(input.state_or_central) ? ['Telugu', 'English'] : ['English']),
+    exceptions: input.exceptions || [],
     pattern: {
       total_questions: input.total_questions ?? 0,
       duration_minutes: input.duration_minutes ?? 0,
@@ -464,7 +466,9 @@ export function createExamFromIntake(input: ExamIntakeInput): ExamRecord {
       marks_per_question: input.marks_per_question ?? 0,
       negative_marking_rate: input.negative_marking_rate ?? 0,
       sections: input.sections && input.sections.length > 0 ? input.sections : [],
-      mediums: input.mediums && input.mediums.length > 0 ? input.mediums : []
+      mediums: input.mediums && input.mediums.length > 0 ? input.mediums : (input.languages || (['Telangana', 'Andhra Pradesh'].includes(input.state_or_central) ? ['Telugu', 'English'] : ['English'])),
+      languages: input.languages || input.mediums || (['Telangana', 'Andhra Pradesh'].includes(input.state_or_central) ? ['Telugu', 'English'] : ['English']),
+      exceptions: input.exceptions || []
     },
     syllabus_topics: input.syllabus_topics && input.syllabus_topics.length > 0
       ? input.syllabus_topics
@@ -582,8 +586,12 @@ export function updateExamRecord(
   if (updates.recruitment_cycle) exam.recruitment_cycle = updates.recruitment_cycle;
   if (updates.active_cycle) exam.active_cycle = updates.active_cycle;
   if (updates.syllabus_topics) exam.syllabus_topics = updates.syllabus_topics;
+  if (updates.languages) exam.languages = updates.languages;
+  if (updates.exceptions) exam.exceptions = updates.exceptions;
   if (updates.pattern) {
     exam.pattern = { ...exam.pattern, ...updates.pattern };
+    if (updates.pattern.languages && !updates.languages) exam.languages = updates.pattern.languages;
+    if (updates.pattern.exceptions && !updates.exceptions) exam.exceptions = updates.pattern.exceptions;
   }
   if (updates.stages) {
     exam.stages = updates.stages;

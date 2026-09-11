@@ -20,9 +20,11 @@ import {
   UploadCloud,
   Loader2,
   Check,
-  Award
+  Award,
+  Languages,
+  Globe
 } from 'lucide-react';
-import type { ExamIntakeInput, ExamRecord, ExamStage, ExamStagePaper } from '../types.ts';
+import type { ExamIntakeInput, ExamRecord, ExamStage, ExamStagePaper, SubjectLanguageException } from '../types.ts';
 import {
   INDIAN_STATES,
   getBoardsForState,
@@ -129,6 +131,56 @@ export const HierarchicalIntakeWizard: React.FC<HierarchicalIntakeWizardProps> =
     setBranches(prev => prev.filter(b => b !== branchToRemove));
   };
 
+  // Exam Default Languages (Changeable: e.g. Telugu / English for state)
+  const [examLanguages, setExamLanguages] = useState<string[]>(['Telugu', 'English']);
+  const [newLanguageInput, setNewLanguageInput] = useState<string>('');
+
+  // Subject Language Exceptions (e.g. General English -> English Only)
+  const [exceptions, setExceptions] = useState<SubjectLanguageException[]>([
+    { subject: 'General English', language: 'English Only' }
+  ]);
+  const [newExceptionSubject, setNewExceptionSubject] = useState<string>('');
+  const [newExceptionLang, setNewExceptionLang] = useState<string>('English Only');
+
+  const handleAddLanguage = (langToAdd?: string) => {
+    const l = (langToAdd || newLanguageInput).trim();
+    if (!l) return;
+    if (!examLanguages.some(existing => existing.toLowerCase() === l.toLowerCase())) {
+      setExamLanguages(prev => [...prev, l]);
+    }
+    setNewLanguageInput('');
+  };
+
+  const handleRemoveLanguage = (langToRemove: string) => {
+    if (examLanguages.length <= 1) {
+      alert('At least one exam language is required.');
+      return;
+    }
+    setExamLanguages(prev => prev.filter(l => l !== langToRemove));
+  };
+
+  const handleAddException = () => {
+    const s = newExceptionSubject.trim();
+    const l = newExceptionLang.trim();
+    if (!s) {
+      alert('Please specify a subject name for the exception.');
+      return;
+    }
+    if (!l) {
+      alert('Please specify a language for the exception.');
+      return;
+    }
+    setExceptions(prev => {
+      const filtered = prev.filter(ex => ex.subject.toLowerCase() !== s.toLowerCase());
+      return [...filtered, { subject: s, language: l }];
+    });
+    setNewExceptionSubject('');
+  };
+
+  const handleRemoveException = (idx: number) => {
+    setExceptions(prev => prev.filter((_, i) => i !== idx));
+  };
+
   // State Exam Catalog Metadata & Mock Series Naming
   const stateCatalogMeta = useMemo(() => {
     return deriveStateExamCatalogMetadata({
@@ -173,6 +225,23 @@ export const HierarchicalIntakeWizard: React.FC<HierarchicalIntakeWizardProps> =
       ]
     }
   ]);
+
+  // List of discovered subjects across all stages for the Exceptions datalist
+  const allDiscoveredSubjects = useMemo(() => {
+    const set = new Set<string>();
+    set.add('General English');
+    set.add('General Telugu');
+    set.add('General Hindi');
+    set.add('Urdu Language');
+    set.add('Basic English');
+    stages.forEach(s => {
+      s.papers.forEach(p => {
+        p.sections?.forEach(sec => set.add(sec));
+        p.syllabus_topics?.forEach(t => set.add(t));
+      });
+    });
+    return Array.from(set);
+  }, [stages]);
 
   // Stage Management
   const handleAddStage = () => {
@@ -427,7 +496,9 @@ export const HierarchicalIntakeWizard: React.FC<HierarchicalIntakeWizardProps> =
         negative_marking_rate: firstPaper.negative_marking_rate ?? 0.25,
         sections: allSections.length > 0 ? allSections : ['General Studies'],
         syllabus_topics: firstPaper.syllabus_topics?.length?firstPaper.syllabus_topics:allSections,
-        mediums: [selectedMedium],
+        mediums: examLanguages.length > 0 ? examLanguages : [selectedMedium],
+        languages: examLanguages,
+        exceptions: exceptions,
         notes: `Selected paper: ${paperIdentity}. Language II: ${firstPaper.language_ii||'Requires review'}. Syllabus reference: ${firstPaper.syllabus_reference||'Requires research'}. ${discoveryMessage}`,
         stages: stages,
         specializations: hasBranches ? branches : undefined,
@@ -977,9 +1048,200 @@ export const HierarchicalIntakeWizard: React.FC<HierarchicalIntakeWizardProps> =
               {(()=>{const p=stages.flatMap(s=>s.papers).find(p=>p.paper_id===(selectedPaperId||stages[0]?.papers[0]?.paper_id));return <>
                 {!!p?.language_i_options?.length&&<label className="block text-sm">Language I <select aria-label="Language I" value={p.language_i_options.includes(languageI)?languageI:p.language_i_options[0]} onChange={e=>setLanguageI(e.target.value)} className="border rounded p-2">{p.language_i_options.map(l=><option key={l}>{l}</option>)}</select></label>}
                 {p?.language_ii&&<p className="text-sm">Language II: {p.language_ii}</p>}
-                <label className="block text-sm">Question medium <select aria-label="Question medium" value={p?.language_mediums?.includes(questionMedium)?questionMedium:p?.language_mediums?.[0]||questionMedium} onChange={e=>setQuestionMedium(e.target.value)} className="border rounded p-2">{(p?.language_mediums?.length?p.language_mediums:['English','Telugu','Hindi']).map(l=><option key={l}>{l}</option>)}</select></label>
+                <label className="block text-sm">Question medium <select aria-label="Question medium" value={examLanguages.includes(questionMedium)?questionMedium:examLanguages[0]||questionMedium} onChange={e=>setQuestionMedium(e.target.value)} className="border rounded p-2">{(examLanguages.length?examLanguages:['English','Telugu','Hindi']).map(l=><option key={l}>{l}</option>)}</select></label>
                 {p?.syllabus_reference&&<a href={p.syllabus_reference} target="_blank" rel="noreferrer" className="text-sm underline">Official paper and language syllabus</a>}
               </>})()}
+            </div>
+
+            {/* Exam Languages & Subject Language Exceptions Manager */}
+            <div className="rounded-2xl border border-indigo-200 bg-gradient-to-r from-indigo-50/40 via-white to-slate-50 p-4 space-y-4 shadow-2xs">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-indigo-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <Languages className="w-4 h-4 text-indigo-600" />
+                  <h4 className="text-sm font-bold text-slate-900">
+                    Exam Mediums & Subject Language Exceptions
+                  </h4>
+                </div>
+                <span className="text-[11px] text-slate-500 font-medium">
+                  State default (e.g. Telugu / English) with subject-level rules (e.g. English subject in English Only)
+                </span>
+              </div>
+
+              {/* 1. Exam Default Languages (Changeable) */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+                    Default Exam Question Languages
+                  </label>
+                  <span className="text-[10px] text-slate-400">Click x to remove or use quick buttons to add</span>
+                </div>
+
+                {/* Quick Add Language Buttons */}
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase mr-1">Quick Add:</span>
+                  {['Telugu', 'English', 'Urdu', 'Hindi', 'Tamil', 'Kannada', 'Marathi'].map(lang => (
+                    <button
+                      key={lang}
+                      type="button"
+                      onClick={() => handleAddLanguage(lang)}
+                      className={`text-[11px] px-2.5 py-1 rounded-md border font-semibold transition-all cursor-pointer ${
+                        examLanguages.includes(lang)
+                          ? 'bg-indigo-50 border-indigo-300 text-indigo-700'
+                          : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100'
+                      }`}
+                    >
+                      + {lang}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Active Exam Languages Chips */}
+                <div className="flex items-center gap-2 flex-wrap pt-1">
+                  {examLanguages.map(l => (
+                    <span
+                      key={l}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-indigo-600 text-white text-xs font-bold shadow-2xs"
+                    >
+                      <Globe className="w-3 h-3 text-indigo-200" />
+                      <span>{l}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveLanguage(l)}
+                        className="text-indigo-200 hover:text-white ml-0.5 cursor-pointer"
+                        title="Remove Language"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+
+                  {/* Custom Language input */}
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="text"
+                      value={newLanguageInput}
+                      onChange={e => setNewLanguageInput(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddLanguage(); } }}
+                      placeholder="Add custom language..."
+                      className="text-xs px-2.5 py-1 border border-slate-300 rounded-md focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleAddLanguage()}
+                      className="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-md cursor-pointer"
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. Exceptions Section (Subject-Specific Languages) */}
+              <div className="pt-3 border-t border-indigo-100 space-y-2.5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <div>
+                    <h5 className="text-xs font-bold text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
+                      <span>Exceptions</span>
+                      <span className="text-[11px] font-normal lowercase text-slate-500">
+                        (subject-specific language overrides)
+                      </span>
+                    </h5>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Define subjects that differ from default exam languages (e.g. State paper is Telugu & English, but General English is English Only, General Telugu is Telugu Only).
+                    </p>
+                  </div>
+                </div>
+
+                {/* Exception Creator Controls */}
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-12 gap-2 items-end">
+                  <div className="sm:col-span-6">
+                    <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">
+                      Subject / Section
+                    </label>
+                    <input
+                      type="text"
+                      list="discovered-subjects-list"
+                      value={newExceptionSubject}
+                      onChange={e => setNewExceptionSubject(e.target.value)}
+                      placeholder="e.g. General English, General Telugu, Urdu..."
+                      className="w-full text-xs px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg font-medium focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                    />
+                    <datalist id="discovered-subjects-list">
+                      {allDiscoveredSubjects.map(s => (
+                        <option key={s} value={s} />
+                      ))}
+                    </datalist>
+                  </div>
+
+                  <div className="sm:col-span-4">
+                    <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">
+                      Respective Language
+                    </label>
+                    <input
+                      type="text"
+                      list="exception-lang-presets"
+                      value={newExceptionLang}
+                      onChange={e => setNewExceptionLang(e.target.value)}
+                      placeholder="e.g. English Only"
+                      className="w-full text-xs px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg font-semibold focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                    />
+                    <datalist id="exception-lang-presets">
+                      <option value="English Only" />
+                      <option value="Telugu Only" />
+                      <option value="Urdu Only" />
+                      <option value="Hindi Only" />
+                      <option value="Bilingual (Telugu & English)" />
+                      <option value="Tamil Only" />
+                      <option value="Kannada Only" />
+                    </datalist>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <button
+                      type="button"
+                      onClick={handleAddException}
+                      className="w-full py-1.5 px-3 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-lg shadow-2xs cursor-pointer flex items-center justify-center gap-1"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Active Exceptions List */}
+                <div className="space-y-1.5">
+                  {exceptions.length === 0 ? (
+                    <div className="p-2.5 rounded-lg bg-slate-50 border border-dashed border-slate-200 text-center text-xs text-slate-400">
+                      No language exceptions configured. All subjects will be provided in default languages ({examLanguages.join(', ')}).
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {exceptions.map((ex, idx) => (
+                        <div
+                          key={`${ex.subject}_${idx}`}
+                          className="flex items-center justify-between p-2 rounded-lg bg-amber-50/70 border border-amber-200 text-xs"
+                        >
+                          <div className="truncate pr-2">
+                            <span className="font-bold text-slate-900">{ex.subject}</span>
+                            <span className="mx-1.5 text-slate-400">➔</span>
+                            <span className="font-bold text-amber-800 bg-amber-100/80 px-2 py-0.5 rounded text-[11px]">
+                              {ex.language}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveException(idx)}
+                            className="text-amber-700 hover:text-rose-600 p-1 cursor-pointer"
+                            title="Remove exception"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
             <div className="border-b border-slate-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
@@ -1279,6 +1541,34 @@ export const HierarchicalIntakeWizard: React.FC<HierarchicalIntakeWizardProps> =
                             placeholder="e.g. General Science, History of India, Telangana Movement..."
                             className="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs font-mono text-slate-800 focus:ring-1 focus:ring-indigo-500"
                           />
+                          {(paper.sections && paper.sections.length > 0) && (
+                            <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                              {paper.sections.map((sec, secIdx) => {
+                                const ex = exceptions.find(e => e.subject.toLowerCase() === sec.toLowerCase());
+                                return (
+                                  <span
+                                    key={`${sec}_${secIdx}`}
+                                    className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-semibold border ${
+                                      ex
+                                        ? 'bg-amber-50 text-amber-900 border-amber-300'
+                                        : 'bg-slate-100 text-slate-700 border-slate-200'
+                                    }`}
+                                  >
+                                    <span>{sec}</span>
+                                    {ex ? (
+                                      <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-amber-200/90 text-amber-900">
+                                        {ex.language}
+                                      </span>
+                                    ) : (
+                                      <span className="text-[10px] text-slate-400">
+                                        ({examLanguages.join('/')})
+                                      </span>
+                                    )}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}

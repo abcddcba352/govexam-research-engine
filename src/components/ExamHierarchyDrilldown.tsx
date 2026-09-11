@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Layers,
   FileText,
@@ -15,9 +15,11 @@ import {
   CheckCircle2,
   AlertCircle,
   Settings,
-  Youtube
+  Youtube,
+  Languages,
+  Globe
 } from 'lucide-react';
-import { ExamRecord, ExamStage, ExamStagePaper, ExamStructureScheme } from '../types';
+import { ExamRecord, ExamStage, ExamStagePaper, ExamStructureScheme, SubjectLanguageException } from '../types';
 
 interface ExamHierarchyDrilldownProps {
   exam: ExamRecord;
@@ -55,14 +57,104 @@ export const ExamHierarchyDrilldown: React.FC<ExamHierarchyDrilldownProps> = ({
 
   const [newSubjectInputs, setNewSubjectInputs] = useState<Record<string, string>>({}); // `${stageId}__${paperId}` -> text
 
+  // Language & Exceptions state
+  const initialLanguages: string[] = (exam.languages && exam.languages.length > 0)
+    ? exam.languages
+    : (exam.pattern?.languages && exam.pattern.languages.length > 0)
+    ? exam.pattern.languages
+    : (exam.pattern?.mediums && exam.pattern.mediums.length > 0)
+    ? exam.pattern.mediums
+    : ['Telugu', 'English'];
+
+  const initialExceptions: SubjectLanguageException[] = (exam.exceptions && exam.exceptions.length > 0)
+    ? exam.exceptions
+    : exam.pattern?.exceptions || [];
+
   const [isEditingPattern, setIsEditingPattern] = useState<boolean>(false);
   const [patternForm, setPatternForm] = useState({
     total_questions: exam.pattern?.total_questions ?? 150,
     duration_minutes: exam.pattern?.duration_minutes ?? 150,
     total_marks: exam.pattern?.total_marks ?? 150,
     negative_marking_rate: exam.pattern?.negative_marking_rate ?? 0.25,
-    mediums: (exam.pattern?.mediums || ['English', 'Telugu']).join(', ')
+    mediums: initialLanguages.join(', '),
+    languages: initialLanguages,
+    exceptions: initialExceptions
   });
+
+  const [newExceptionSubject, setNewExceptionSubject] = useState<string>('');
+  const [newExceptionLang, setNewExceptionLang] = useState<string>('English Only');
+  const [newLangInput, setNewLangInput] = useState<string>('');
+
+  const handleAddLanguage = (langToAdd?: string) => {
+    const l = (langToAdd || newLangInput).trim();
+    if (!l) return;
+    if (!patternForm.languages.some(existing => existing.toLowerCase() === l.toLowerCase())) {
+      const updatedLangs = [...patternForm.languages, l];
+      setPatternForm(prev => ({
+        ...prev,
+        languages: updatedLangs,
+        mediums: updatedLangs.join(', ')
+      }));
+    }
+    setNewLangInput('');
+  };
+
+  const handleRemoveLanguage = (langToRemove: string) => {
+    if (patternForm.languages.length <= 1) {
+      alert('At least one exam language is required.');
+      return;
+    }
+    const updatedLangs = patternForm.languages.filter(l => l !== langToRemove);
+    setPatternForm(prev => ({
+      ...prev,
+      languages: updatedLangs,
+      mediums: updatedLangs.join(', ')
+    }));
+  };
+
+  const handleAddException = () => {
+    const s = newExceptionSubject.trim();
+    const l = newExceptionLang.trim();
+    if (!s) {
+      alert('Please specify a subject for the exception.');
+      return;
+    }
+    if (!l) {
+      alert('Please specify a language for the exception.');
+      return;
+    }
+    setPatternForm(prev => {
+      const filtered = prev.exceptions.filter(e => e.subject.toLowerCase() !== s.toLowerCase());
+      return {
+        ...prev,
+        exceptions: [...filtered, { subject: s, language: l }]
+      };
+    });
+    setNewExceptionSubject('');
+  };
+
+  const handleRemoveException = (idx: number) => {
+    setPatternForm(prev => ({
+      ...prev,
+      exceptions: prev.exceptions.filter((_, i) => i !== idx)
+    }));
+  };
+
+  // Discovered subjects across all papers for quick selection
+  const allDiscoveredSubjects = useMemo(() => {
+    const set = new Set<string>();
+    set.add('General English');
+    set.add('General Telugu');
+    set.add('General Hindi');
+    set.add('Urdu Language');
+    set.add('Basic English');
+    stages.forEach(s => {
+      s.papers.forEach(p => {
+        p.sections?.forEach(sec => set.add(sec));
+      });
+    });
+    return Array.from(set);
+  }, [stages]);
 
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<{ type: 'SUCCESS' | 'ERROR'; text: string } | null>(null);
@@ -316,7 +408,10 @@ export const ExamHierarchyDrilldown: React.FC<ExamHierarchyDrilldownProps> = ({
     setIsSaving(true);
     setStatusMessage(null);
     try {
-      const mediumsList = patternForm.mediums.split(',').map(m => m.trim()).filter(Boolean);
+      const mediumsList = patternForm.languages.length > 0
+        ? patternForm.languages
+        : patternForm.mediums.split(',').map(m => m.trim()).filter(Boolean);
+
       const updatedPattern = {
         total_questions: Number(patternForm.total_questions) || 0,
         duration_minutes: Number(patternForm.duration_minutes) || 0,
@@ -324,13 +419,19 @@ export const ExamHierarchyDrilldown: React.FC<ExamHierarchyDrilldownProps> = ({
         marks_per_question: Number(patternForm.total_questions) > 0 ? (Number(patternForm.total_marks) / Number(patternForm.total_questions)) : 1,
         negative_marking_rate: Number(patternForm.negative_marking_rate) || 0,
         mediums: mediumsList,
+        languages: mediumsList,
+        exceptions: patternForm.exceptions,
         sections: exam.pattern?.sections || exam.syllabus_topics || []
       };
 
       const res = await fetch(`/api/exams/${exam.exam_id}/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pattern: updatedPattern })
+        body: JSON.stringify({
+          pattern: updatedPattern,
+          languages: mediumsList,
+          exceptions: patternForm.exceptions
+        })
       });
       if (!res.ok) throw new Error('Failed to update examination pattern');
       const data = await res.json();
@@ -338,7 +439,7 @@ export const ExamHierarchyDrilldown: React.FC<ExamHierarchyDrilldownProps> = ({
         onUpdateExam(data.exam);
       }
       setIsEditingPattern(false);
-      setStatusMessage({ type: 'SUCCESS', text: 'Exam pattern updated successfully.' });
+      setStatusMessage({ type: 'SUCCESS', text: 'Exam pattern and language exceptions updated successfully.' });
     } catch (err: any) {
       setStatusMessage({ type: 'ERROR', text: err.message || 'Pattern update failed.' });
     } finally {
@@ -358,6 +459,17 @@ export const ExamHierarchyDrilldown: React.FC<ExamHierarchyDrilldownProps> = ({
             <span className="text-xs font-semibold text-slate-500">
               {stages.length} Stages • {stages.reduce((acc, s) => acc + (s.papers?.length || 0), 0)} Papers
             </span>
+            <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+              Languages: {(patternForm.languages && patternForm.languages.length > 0 ? patternForm.languages : ['English']).join(' / ')}
+            </span>
+            {patternForm.exceptions && patternForm.exceptions.length > 0 && (
+              <span
+                className="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200"
+                title={patternForm.exceptions.map(e => `${e.subject}: ${e.language}`).join(', ')}
+              >
+                {patternForm.exceptions.length} Exception{patternForm.exceptions.length > 1 ? 's' : ''}
+              </span>
+            )}
             {exam.study_materials && exam.study_materials.length > 0 && (
               <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-red-50 text-red-700 border border-red-200 inline-flex items-center gap-1">
                 <Youtube className="w-3 h-3 text-red-600" />
@@ -495,6 +607,179 @@ export const ExamHierarchyDrilldown: React.FC<ExamHierarchyDrilldownProps> = ({
                 placeholder="English, Telugu, Urdu"
                 className="w-full bg-white border border-slate-300 rounded px-2.5 py-1 font-semibold"
               />
+            </div>
+          </div>
+
+          {/* Exam Default Languages & Subject Exceptions Manager */}
+          <div className="pt-2.5 border-t border-slate-200 space-y-3">
+            {/* 1. Exam Default Languages (Changeable) */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-[10px] uppercase font-bold text-slate-700 flex items-center gap-1.5">
+                  <Languages className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Exam Default Languages / Mediums</span>
+                </label>
+                <span className="text-[10px] text-slate-400">Click x to remove or quick add</span>
+              </div>
+
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[10px] font-bold text-slate-400 uppercase mr-1">Quick Add:</span>
+                {['Telugu', 'English', 'Urdu', 'Hindi', 'Tamil', 'Kannada', 'Marathi'].map(lang => (
+                  <button
+                    key={lang}
+                    type="button"
+                    onClick={() => handleAddLanguage(lang)}
+                    className={`text-[10px] px-2 py-0.5 rounded border font-semibold transition-all cursor-pointer ${
+                      patternForm.languages.includes(lang)
+                        ? 'bg-indigo-50 border-indigo-300 text-indigo-700'
+                        : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100'
+                    }`}
+                  >
+                    + {lang}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                {patternForm.languages.map(l => (
+                  <span
+                    key={l}
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-indigo-600 text-white text-[11px] font-bold shadow-2xs"
+                  >
+                    <Globe className="w-3 h-3 text-indigo-200" />
+                    <span>{l}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveLanguage(l)}
+                      className="text-indigo-200 hover:text-white ml-0.5 cursor-pointer"
+                      title="Remove Language"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+
+                <div className="flex items-center gap-1">
+                  <input
+                    type="text"
+                    value={newLangInput}
+                    onChange={e => setNewLangInput(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddLanguage(); } }}
+                    placeholder="Add language..."
+                    className="text-xs px-2 py-0.5 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleAddLanguage()}
+                    className="px-2 py-0.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded cursor-pointer"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Exceptions Section (Subject-Specific Languages) */}
+            <div className="pt-2 border-t border-slate-200 space-y-2">
+              <div>
+                <h5 className="text-[11px] font-bold text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
+                  <span>Exceptions</span>
+                  <span className="text-[10px] font-normal lowercase text-slate-500">
+                    (subject-specific language overrides)
+                  </span>
+                </h5>
+                <p className="text-[10px] text-slate-500 mt-0.5">
+                  e.g., Exam default is Telugu & English, but General English subject must be English Only; General Telugu must be Telugu Only.
+                </p>
+              </div>
+
+              {/* Exception Creator Controls */}
+              <div className="p-2.5 bg-white rounded-lg border border-slate-200 grid grid-cols-1 sm:grid-cols-12 gap-2 items-end">
+                <div className="sm:col-span-6">
+                  <label className="text-[9px] font-bold text-slate-500 uppercase block mb-0.5">
+                    Subject / Section
+                  </label>
+                  <input
+                    type="text"
+                    list="drilldown-subjects-list"
+                    value={newExceptionSubject}
+                    onChange={e => setNewExceptionSubject(e.target.value)}
+                    placeholder="e.g. General English, Basic English..."
+                    className="w-full text-xs px-2 py-1 bg-slate-50 border border-slate-300 rounded font-medium focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                  />
+                  <datalist id="drilldown-subjects-list">
+                    {allDiscoveredSubjects.map(s => (
+                      <option key={s} value={s} />
+                    ))}
+                  </datalist>
+                </div>
+
+                <div className="sm:col-span-4">
+                  <label className="text-[9px] font-bold text-slate-500 uppercase block mb-0.5">
+                    Respective Language
+                  </label>
+                  <input
+                    type="text"
+                    list="drilldown-exception-langs"
+                    value={newExceptionLang}
+                    onChange={e => setNewExceptionLang(e.target.value)}
+                    placeholder="e.g. English Only"
+                    className="w-full text-xs px-2 py-1 bg-slate-50 border border-slate-300 rounded font-semibold focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                  />
+                  <datalist id="drilldown-exception-langs">
+                    <option value="English Only" />
+                    <option value="Telugu Only" />
+                    <option value="Urdu Only" />
+                    <option value="Hindi Only" />
+                    <option value="Bilingual (Telugu & English)" />
+                  </datalist>
+                </div>
+
+                <div className="sm:col-span-2">
+                  <button
+                    type="button"
+                    onClick={handleAddException}
+                    className="w-full py-1 px-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded shadow-2xs cursor-pointer flex items-center justify-center gap-1"
+                  >
+                    <Plus className="w-3 h-3" />
+                    <span>Add</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Active Exceptions List */}
+              <div className="space-y-1">
+                {patternForm.exceptions.length === 0 ? (
+                  <div className="p-2 rounded bg-white border border-dashed border-slate-200 text-center text-[11px] text-slate-400">
+                    No exceptions configured. All subjects will use default languages ({patternForm.languages.join(', ')}).
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                    {patternForm.exceptions.map((ex, idx) => (
+                      <div
+                        key={`${ex.subject}_${idx}`}
+                        className="flex items-center justify-between p-1.5 px-2 rounded bg-amber-50 border border-amber-200 text-xs"
+                      >
+                        <div className="truncate pr-1">
+                          <span className="font-bold text-slate-900">{ex.subject}</span>
+                          <span className="mx-1 text-slate-400">➔</span>
+                          <span className="font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded text-[10px]">
+                            {ex.language}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveException(idx)}
+                          className="text-amber-700 hover:text-rose-600 p-0.5 cursor-pointer"
+                          title="Remove exception"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -895,6 +1180,21 @@ export const ExamHierarchyDrilldown: React.FC<ExamHierarchyDrilldownProps> = ({
                                                   <span className="font-medium text-slate-800 truncate" title={subject}>
                                                     {subject}
                                                   </span>
+                                                  {(() => {
+                                                    const ex = (patternForm.exceptions || []).find(e => e.subject.toLowerCase() === subject.toLowerCase());
+                                                    if (ex) {
+                                                      return (
+                                                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300 shrink-0">
+                                                          {ex.language}
+                                                        </span>
+                                                      );
+                                                    }
+                                                    return (
+                                                      <span className="px-1.5 py-0.5 rounded text-[9px] font-medium bg-slate-100 text-slate-500 shrink-0">
+                                                        {(patternForm.languages || ['Telugu', 'English']).join('/')}
+                                                      </span>
+                                                    );
+                                                  })()}
                                                 </div>
 
                                                 <div className="flex items-center gap-1 shrink-0">

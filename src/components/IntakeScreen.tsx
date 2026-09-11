@@ -27,7 +27,6 @@ import {
   Youtube
 } from 'lucide-react';
 import { ExamIntakeInput, ExamRecord, ResearchMode, CriticalFactName, ExamPatternVersion, ExamStage, ExamStagePaper, ExamStructureScheme } from '../types';
-import { FieldVerificationMatrix } from './FieldVerificationMatrix';
 import { RecruitmentCycleManager } from './RecruitmentCycleManager';
 import { ExamStagesManager } from './ExamStagesManager';
 import { ExamHierarchyDrilldown } from './ExamHierarchyDrilldown';
@@ -1425,13 +1424,24 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+                        <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto flex-wrap">
                           <span className="text-xs font-bold px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full border border-indigo-200">
                             {stageCount} {stageCount === 1 ? 'Stage' : 'Stages'} • {paperCount} {paperCount === 1 ? 'Paper' : 'Papers'}
                           </span>
                           <span className="text-xs font-medium px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full border border-slate-200">
                             {exam.pattern.total_questions} Qs • {exam.pattern.duration_minutes} Mins
                           </span>
+                          <span className="text-xs font-semibold px-2.5 py-1 bg-emerald-50 text-emerald-800 rounded-full border border-emerald-200">
+                            {(exam.languages || exam.pattern.languages || exam.pattern.mediums || ['English']).join(' / ')}
+                          </span>
+                          {((exam.exceptions || exam.pattern.exceptions || []).length > 0) && (
+                            <span
+                              className="text-xs font-semibold px-2 py-0.5 bg-amber-50 text-amber-800 rounded-full border border-amber-200"
+                              title={(exam.exceptions || exam.pattern.exceptions || []).map(e => `${e.subject}: ${e.language}`).join(', ')}
+                            >
+                              {(exam.exceptions || exam.pattern.exceptions || []).length} Exception{((exam.exceptions || exam.pattern.exceptions || []).length > 1 ? 's' : '')}
+                            </span>
+                          )}
                         </div>
                       </button>
                     </div>
@@ -1450,24 +1460,6 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                         {/* Auxiliary Verification Matrix & Cycle Manager Tabs */}
                         <div className="pt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
                           <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => toggleExamSection(exam.exam_id, 'MATRIX')}
-                              className={`px-3 py-1.5 rounded-lg font-semibold border transition-all flex items-center gap-1.5 cursor-pointer ${
-                                expandedExamSections[exam.exam_id] === 'MATRIX'
-                                  ? 'bg-slate-800 text-white border-slate-800 shadow-xs'
-                                  : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
-                              }`}
-                            >
-                              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                              <span>Field-Level Matrix (12 Facts)</span>
-                              {expandedExamSections[exam.exam_id] === 'MATRIX' ? (
-                                <ChevronUp className="w-3.5 h-3.5 ml-0.5 opacity-70" />
-                              ) : (
-                                <ChevronDown className="w-3.5 h-3.5 ml-0.5 opacity-70" />
-                              )}
-                            </button>
-
                             <button
                               type="button"
                               onClick={() => toggleExamSection(exam.exam_id, 'CYCLES')}
@@ -1509,20 +1501,6 @@ export const IntakeScreen: React.FC<IntakeScreenProps> = ({
                             Active Cycle: <strong className="text-slate-800">{exam.active_cycle || exam.recruitment_cycle}</strong>
                           </div>
                         </div>
-
-                        {/* Sub-Panel: Field Verification Matrix */}
-                        {expandedExamSections[exam.exam_id] === 'MATRIX' && (
-                          <div className="mt-3 animate-in fade-in">
-                            <FieldVerificationMatrix
-                              exam={exam}
-                              onVerifyFact={(factName, label, val) =>
-                                handleOpenVerifyModal(exam, { key: factName, label, currentValue: val })
-                              }
-                              onOpenFullSignoff={() => handleOpenVerifyModal(exam)}
-                              onLaunchResearch={() => onLaunchResearch(exam.title, 'HYBRID', exam.exam_id)}
-                            />
-                          </div>
-                        )}
 
                         {/* Sub-Panel: Recruitment Cycle Manager */}
                         {expandedExamSections[exam.exam_id] === 'CYCLES' && (
