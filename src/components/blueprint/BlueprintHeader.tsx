@@ -6,7 +6,7 @@ import {
   ExamStage,
   ExamStagePaper
 } from '../../types.ts';
-import { groupExamsByJurisdiction } from '../../utils/examJurisdiction.ts';
+import { groupExamsByJurisdiction, getCleanExamTitle } from '../../utils/examJurisdiction.ts';
 import { BlueprintHierarchyFilter } from './BlueprintHierarchyFilter.tsx';
 import {
   ShieldCheck,
@@ -126,7 +126,7 @@ export function BlueprintHeader({
             </div>
             <div className="flex items-center gap-2">
               <h2 className="font-bold text-base sm:text-lg text-slate-900">
-                {currentExam?.title || 'Examination Blueprint'}
+                {getCleanExamTitle(currentExam) || 'Examination Blueprint'}
               </h2>
               {blueprint && getStatusBadge(blueprint.status)}
             </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import type { ExamRecord } from '../../types.ts';
-import { getBoardForExam, groupExamsByJurisdiction } from '../../utils/examJurisdiction.ts';
+import { getBoardForExam, groupExamsByJurisdiction, getCleanExamTitle } from '../../utils/examJurisdiction.ts';
 
 export interface GroupedExamSelectProps {
   exams: ExamRecord[];
@@ -45,7 +45,7 @@ export const GroupedExamSelect: React.FC<GroupedExamSelectProps> = ({
             const prefix = board ? `[${board.shortName}] ` : '';
             return (
               <option key={ex.exam_id} value={ex.exam_id}>
-                {prefix}{ex.title}{showPaper && ex.paper ? ` • ${ex.paper}` : ''}
+                {prefix}{getCleanExamTitle(ex)}{showPaper && ex.paper ? ` • ${ex.paper}` : ''}
               </option>
             );
           })}
@@ -59,7 +59,7 @@ export const GroupedExamSelect: React.FC<GroupedExamSelectProps> = ({
             const prefix = board ? `[${board.shortName}] ` : '';
             return (
               <option key={ex.exam_id} value={ex.exam_id}>
-                {prefix}{ex.title}{showPaper && ex.paper ? ` • ${ex.paper}` : ''}
+                {prefix}{getCleanExamTitle(ex)}{showPaper && ex.paper ? ` • ${ex.paper}` : ''}
               </option>
             );
           })}

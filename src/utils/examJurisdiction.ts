@@ -1048,3 +1048,33 @@ export function filterExamsByJurisdiction(
     return getExamState(e) === selectedState;
   });
 }
+
+/**
+ * Strips paper, stage, and test suffixes from an exam title to return ONLY the clean Exam Name.
+ * e.g.:
+ * - "APPSC Group-II Services: Screening Test (General Studies & Mental Ability)" -> "APPSC Group-II Services"
+ * - "APPSC Executive Officer (Grade-III) Mains: Paper-I (General Studies & Mental Ability)" -> "APPSC Executive Officer (Grade-III)"
+ * - "TGPSC Group-II Services: Paper I (General Studies & General Abilities)" -> "TGPSC Group-II Services"
+ * - "SSC Combined Graduate Level (CGL) Examination: Tier-I" -> "SSC Combined Graduate Level (CGL) Examination"
+ */
+export function getCleanExamTitle(
+  examOrTitle: ExamRecord | { title?: string; structure_scheme?: { exam_name?: string } } | string | undefined | null
+): string {
+  if (!examOrTitle) return '';
+  const title = typeof examOrTitle === 'string' ? examOrTitle : (examOrTitle.title || '');
+  if (!title) return '';
+
+  const clean = title
+    // Strip ": Paper ...", ": Screening ...", ": Mains ...", ": Tier ...", ": Preliminary ..."
+    .replace(/\s*[:\-–—]\s*(?:Paper|Screening|Mains|Preliminary|Prelims|Tier|Part|PWT|Objective|Written)[\s\S]*/i, '')
+    // Also handle cases like "APPSC Executive Officer (Grade-III) Mains: ..." or "APPSC Executive Officer (Grade-III) Screening Test: ..."
+    .replace(/\s+(?:Mains|Screening(?:\s+Test)?|Preliminary(?:\s+Written\s+Test)?|Prelims)\s*[:\-–—]?[\s\S]*/i, '')
+    // Also strip generic " - Preliminary Written Test (PWT) 2026"
+    .replace(/\s*-\s*Preliminary\s+Written\s+Test[\s\S]*/i, '')
+    // Also strip trailing "(General Studies...)" or similar paper parentheticals if any left
+    .replace(/\s*\((?:General Studies|Screening Test|Paper|Tier|Part)[\s\S]*?\)/gi, '')
+    .trim();
+
+  return clean || title;
+}
+

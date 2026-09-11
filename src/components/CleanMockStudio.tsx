@@ -20,6 +20,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import type { ExamRecord, MockTestRecord, MockQuestion } from '../types.ts';
+import { getCleanExamTitle } from '../utils/examJurisdiction.ts';
 
 interface CleanMockStudioProps {
   exams: ExamRecord[];
@@ -327,7 +328,7 @@ export const CleanMockStudio: React.FC<CleanMockStudioProps> = ({
             >
               {exams.map(ex => (
                 <option key={ex.exam_id} value={ex.exam_id}>
-                  {ex.title} ({ex.commission})
+                  {getCleanExamTitle(ex)} ({ex.commission})
                 </option>
               ))}
             </select>

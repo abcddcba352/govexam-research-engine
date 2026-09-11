@@ -17,6 +17,7 @@ import {
   Plus
 } from 'lucide-react';
 import { ExamRecord, StudyMaterialItem } from '../types';
+import { getCleanExamTitle } from '../utils/examJurisdiction';
 
 interface YoutubeMaterialExtractorProps {
   exams: ExamRecord[];
@@ -176,7 +177,7 @@ export const YoutubeMaterialExtractor: React.FC<YoutubeMaterialExtractorProps> =
             >
               {exams.map(e => (
                 <option key={e.exam_id} value={e.exam_id}>
-                  {e.title}
+                  {getCleanExamTitle(e)}
                 </option>
               ))}
             </select>
