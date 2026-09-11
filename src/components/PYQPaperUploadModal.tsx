@@ -25,7 +25,7 @@ import {
   Check,
   Edit3
 } from 'lucide-react';
-import { groupExamsByJurisdiction } from '../utils/examJurisdiction.ts';
+import { groupExamsByJurisdiction, INDIAN_STATES, CENTRAL_CONDUCTING_BOARDS, STATE_CONDUCTING_BOARDS, getExamState, isCentralExam } from '../utils/examJurisdiction.ts';
 
 const COMMON_SUBJECT_PRESETS = [
   'Indian Polity & Constitution',
@@ -62,16 +62,19 @@ export const PYQPaperUploadModal: React.FC<Props> = ({
   const [customExamBoard, setCustomExamBoard] = useState('');
   const [customExamStage, setCustomExamStage] = useState('Preliminary / Objective Examination');
 
-  // Custom Subjects
-  const [customSubjects, setCustomSubjects] = useState<string[]>([
-    'Indian Polity & Constitution',
-    'Indian Economy & Development',
-    'History & Culture',
-    'Geography & Environment',
-    'General Science & Technology',
-    'Arithmetic & Reasoning'
-  ]);
-  const [newSubjectInput, setNewSubjectInput] = useState('');
+  // Hierarchy Selection States
+  const [selectedState, setSelectedState] = useState<string>(() => {
+    const initExam = exams.find(e => e.exam_id === selectedExamId) || exams[0];
+    if (!initExam) return 'Telangana';
+    return isCentralExam(initExam) ? 'CENTRAL' : (getExamState(initExam) || 'Telangana');
+  });
+
+  const [selectedBoard, setSelectedBoard] = useState<string>(() => {
+    const initExam = exams.find(e => e.exam_id === selectedExamId) || exams[0];
+    return initExam?.commission || 'ALL_BOARDS';
+  });
+
+  const [stageName, setStageName] = useState<string>('Preliminary / Objective Examination');
   const [aiMatchSubjects, setAiMatchSubjects] = useState(true);
 
   // Paper details
@@ -95,39 +98,112 @@ export const PYQPaperUploadModal: React.FC<Props> = ({
 
   const groupedExams = useMemo(() => groupExamsByJurisdiction(exams), [exams]);
 
-  // Real-time detection of question count
+  // Real-time detection of question count (safe line-by-line, no catastrophic backtracking)
   const detectedQuestionCount = useMemo(() => {
     if (!pastedText.trim()) return 0;
-    const matches = pastedText.match(/(?:^|\n)(?=(?:Q(?:\.|\s*|uestion\s*)|\(?\d+\)?[\.\:\)]))\s*/gi);
-    return matches ? matches.length : 0;
+    const lines = pastedText.split('\n');
+    return lines.filter(l => /^\s*(Q\s*\d+|Question\s*\d+|\(?\d+\)?[\.\:\)])/i.test(l)).length;
   }, [pastedText]);
 
-  // Handle subject add / remove
-  const handleAddSubject = () => {
-    const trimmed = newSubjectInput.trim();
-    if (!trimmed) return;
-    if (!customSubjects.some(s => s.toLowerCase() === trimmed.toLowerCase())) {
-      setCustomSubjects(prev => [...prev, trimmed]);
+  // Current active exam object
+  const activeExam = useMemo(() => exams.find(e => e.exam_id === examId) || exams[0], [exams, examId]);
+
+  // Boards available for currently selected State / Central
+  const availableBoards = useMemo(() => {
+    if (selectedState === 'CENTRAL') {
+      const centralBoards = CENTRAL_CONDUCTING_BOARDS.map(b => b.shortName);
+      const examCommissions = exams.filter(e => isCentralExam(e)).map(e => e.commission);
+      return Array.from(new Set([...centralBoards, ...examCommissions])).filter(Boolean).sort();
     }
-    setNewSubjectInput('');
-  };
+    const stateBoards = (STATE_CONDUCTING_BOARDS[selectedState] || []).map(b => b.shortName);
+    const examCommissions = exams.filter(e => getExamState(e) === selectedState).map(e => e.commission);
+    return Array.from(new Set([...stateBoards, ...examCommissions])).filter(Boolean).sort();
+  }, [selectedState, exams]);
 
-  const handleRemoveSubject = (index: number) => {
-    setCustomSubjects(prev => prev.filter((_, i) => i !== index));
-  };
+  // Exams filtered by selected State and selected Board
+  const filteredExams = useMemo(() => {
+    return exams.filter(e => {
+      const matchState = selectedState === 'CENTRAL' ? isCentralExam(e) : getExamState(e) === selectedState;
+      if (!matchState) return false;
+      if (!selectedBoard || selectedBoard === 'ALL_BOARDS') return true;
+      return (e.commission || '').toLowerCase().includes(selectedBoard.toLowerCase()) ||
+             selectedBoard.toLowerCase().includes((e.commission || '').toLowerCase());
+    });
+  }, [exams, selectedState, selectedBoard]);
 
-  const handleQuickAddPreset = (preset: string) => {
-    if (!customSubjects.some(s => s.toLowerCase() === preset.toLowerCase())) {
-      setCustomSubjects(prev => [...prev, preset]);
+  // Available stages from the active exam
+  const availableStages = useMemo(() => {
+    if (activeExam?.stages && activeExam.stages.length > 0) {
+      return activeExam.stages.map(s => s.stage_name);
+    }
+    if (activeExam?.structure_scheme?.stages && activeExam.structure_scheme.stages.length > 0) {
+      return activeExam.structure_scheme.stages.map(s => s.stage_name);
+    }
+    if (activeExam?.stage) {
+      return [activeExam.stage];
+    }
+    return ['Preliminary Written Test', 'Mains Examination', 'Interview'];
+  }, [activeExam]);
+
+  // Available papers from the active exam under the selected stage
+  const availablePapers = useMemo(() => {
+    const allStages = activeExam?.stages || activeExam?.structure_scheme?.stages || [];
+    const matchedStage = allStages.find(s => s.stage_name.toLowerCase() === stageName.toLowerCase()) || allStages[0];
+    if (matchedStage?.papers && matchedStage.papers.length > 0) {
+      return matchedStage.papers.map(p => p.title);
+    }
+    if (activeExam?.paper) {
+      return [activeExam.paper];
+    }
+    return ['Paper-I: General Studies and General Abilities', 'Paper-II: Domain Specific'];
+  }, [activeExam, stageName]);
+
+  // Handle State Change
+  const handleStateChange = (newState: string) => {
+    setSelectedState(newState);
+    setSelectedBoard('ALL_BOARDS');
+    const match = exams.find(e => newState === 'CENTRAL' ? isCentralExam(e) : getExamState(e) === newState);
+    if (match) {
+      setExamId(match.exam_id);
+      syncExamStagesAndPapers(match);
     }
   };
 
-  // Populate subjects if user selects an existing exam that has syllabus topics
+  // Handle Board Change
+  const handleBoardChange = (newBoard: string) => {
+    setSelectedBoard(newBoard);
+    if (newBoard !== 'ALL_BOARDS') {
+      const match = exams.find(e => {
+        const matchState = selectedState === 'CENTRAL' ? isCentralExam(e) : getExamState(e) === selectedState;
+        return matchState && ((e.commission || '').toLowerCase().includes(newBoard.toLowerCase()) ||
+                              newBoard.toLowerCase().includes((e.commission || '').toLowerCase()));
+      });
+      if (match) {
+        setExamId(match.exam_id);
+        syncExamStagesAndPapers(match);
+      }
+    }
+  };
+
+  // Sync stage and paper whenever exam changes
+  const syncExamStagesAndPapers = (targetExam: ExamRecord) => {
+    const stgs = targetExam.stages || targetExam.structure_scheme?.stages || [];
+    if (stgs.length > 0) {
+      setStageName(stgs[0].stage_name);
+      if (stgs[0].papers && stgs[0].papers.length > 0) {
+        setPaperName(stgs[0].papers[0].title);
+      }
+    } else if (targetExam.stage) {
+      setStageName(targetExam.stage);
+      if (targetExam.paper) setPaperName(targetExam.paper);
+    }
+  };
+
   const handleExamChange = (newExamId: string) => {
     setExamId(newExamId);
     const matched = exams.find(e => e.exam_id === newExamId);
-    if (matched && matched.syllabus_topics && matched.syllabus_topics.length > 0) {
-      setCustomSubjects(matched.syllabus_topics);
+    if (matched) {
+      syncExamStagesAndPapers(matched);
     }
   };
 
@@ -215,7 +291,7 @@ Explanation: Sikkim is bounded by Tibet (China) to the north, Bhutan to the east
           exam_id: useCustomExam ? 'new' : examId,
           exam_title: useCustomExam ? customExamTitle.trim() : undefined,
           exam_board: useCustomExam ? customExamBoard.trim() : undefined,
-          exam_stage: useCustomExam ? customExamStage.trim() : undefined,
+          exam_stage: useCustomExam ? customExamStage.trim() : stageName,
           paper_name: paperName,
           exam_date: examDate,
           year: Number(year),
@@ -223,7 +299,7 @@ Explanation: Sikkim is bounded by Tibet (China) to the north, Bhutan to the east
           booklet_code: bookletCode,
           raw_text: pastedText,
           format: 'RAW_TEXT',
-          custom_subjects: customSubjects,
+          custom_subjects: undefined,
           ai_match_subjects: aiMatchSubjects
         };
 
@@ -538,74 +614,219 @@ Explanation: Sikkim is bounded by Tibet (China) to the north, Bhutan to the east
             </div>
           )}
 
-          {/* 1. TARGET EXAMINATION DETAILS */}
-          <div className="space-y-3 p-3.5 rounded-xl bg-slate-50/80 border border-slate-200">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-slate-800">Target Examination</span>
+          {/* 1. TARGET EXAMINATION HIERARCHY (STATE -> BOARD -> EXAM -> STAGE -> PAPER) */}
+          <div className="space-y-3.5 p-4 rounded-xl bg-slate-50/90 border border-slate-200">
+            <div className="flex items-center justify-between border-b border-slate-200/80 pb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-blue-600"></div>
+                <span className="font-bold text-slate-800 text-xs sm:text-sm">Target Examination Hierarchy</span>
+              </div>
               <button
                 type="button"
                 onClick={() => setUseCustomExam(!useCustomExam)}
-                className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold cursor-pointer flex items-center gap-1"
+                className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold cursor-pointer flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-indigo-200 shadow-2xs hover:bg-indigo-50 transition-colors"
               >
                 <Edit3 className="w-3 h-3" />
-                <span>{useCustomExam ? '← Choose Existing Exam' : '+ Enter New Exam Details'}</span>
+                <span>{useCustomExam ? '← Choose Existing Exam' : '+ Enter Custom Hierarchy'}</span>
               </button>
             </div>
 
             {useCustomExam ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-1">
                 <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Exam Title *</label>
+                  <label className="font-bold text-slate-700 block mb-1">1. State / Jurisdiction *</label>
                   <input
                     type="text"
-                    value={customExamTitle}
-                    onChange={e => setCustomExamTitle(e.target.value)}
-                    placeholder="e.g. TGPSC Group 1 Prelims, SSC CGL"
+                    value={selectedState}
+                    onChange={e => setSelectedState(e.target.value)}
+                    placeholder="e.g. Telangana, Andhra Pradesh, Central"
                     className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-blue-600 font-medium text-slate-800 text-xs"
                     required
                   />
                 </div>
                 <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Commission / Board</label>
+                  <label className="font-bold text-slate-700 block mb-1">2. Board / Commission *</label>
                   <input
                     type="text"
                     value={customExamBoard}
                     onChange={e => setCustomExamBoard(e.target.value)}
-                    placeholder="e.g. TGPSC, APPSC, UPSC, SSC"
+                    placeholder="e.g. TGPSC, APPSC, SSC, UPSC"
                     className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-blue-600 font-medium text-slate-800 text-xs"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">3. Exam Name *</label>
+                  <input
+                    type="text"
+                    value={customExamTitle}
+                    onChange={e => setCustomExamTitle(e.target.value)}
+                    placeholder="e.g. Group-I Services, CGL"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-blue-600 font-medium text-slate-800 text-xs"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">4. Exam Stage *</label>
+                  <input
+                    type="text"
+                    value={customExamStage}
+                    onChange={e => setCustomExamStage(e.target.value)}
+                    placeholder="e.g. Preliminary Written Test, Mains"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-blue-600 font-medium text-slate-800 text-xs"
+                    required
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="font-bold text-slate-700 block mb-1">5. Paper Name *</label>
+                  <input
+                    type="text"
+                    value={paperName}
+                    onChange={e => setPaperName(e.target.value)}
+                    placeholder="e.g. Paper-I: General Studies and General Abilities"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-blue-600 font-medium text-slate-800 text-xs"
+                    required
                   />
                 </div>
               </div>
             ) : (
-              <div>
-                <select
-                  value={examId}
-                  onChange={e => handleExamChange(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-blue-600 font-medium text-slate-800 text-xs cursor-pointer"
-                >
-                  {groupedExams.central.length > 0 && (
-                    <optgroup label="🏛️ Central / National (All-India)">
-                      {groupedExams.central.map(e => (
-                        <option key={e.exam_id} value={e.exam_id}>
-                          {e.title} ({e.commission})
+              <div className="space-y-3">
+                {/* 5 HIERARCHY SELECTORS */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  {/* FIELD 1: STATE */}
+                  <div>
+                    <label className="font-bold text-slate-700 block mb-1 flex items-center justify-between">
+                      <span>1. State / Jurisdiction</span>
+                      <span className="text-[10px] text-blue-600 font-normal">Level 1</span>
+                    </label>
+                    <select
+                      value={selectedState}
+                      onChange={e => handleStateChange(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-blue-600 font-medium text-slate-800 text-xs cursor-pointer shadow-2xs"
+                    >
+                      <option value="CENTRAL">🏛️ Central / All-India (SSC, RRB, UPSC, Banking)</option>
+                      {INDIAN_STATES.map(st => (
+                        <option key={st.code} value={st.name}>
+                          🗺️ {st.name} ({st.shortCommission})
                         </option>
                       ))}
-                    </optgroup>
-                  )}
-                  {groupedExams.stateNames.map(stateName => (
-                    <optgroup key={stateName} label={`🗺️ State: ${stateName}`}>
-                      {groupedExams.states[stateName].map(e => (
-                        <option key={e.exam_id} value={e.exam_id}>
-                          {e.title} ({e.commission})
+                    </select>
+                  </div>
+
+                  {/* FIELD 2: BOARD */}
+                  <div>
+                    <label className="font-bold text-slate-700 block mb-1 flex items-center justify-between">
+                      <span>2. Board / Commission</span>
+                      <span className="text-[10px] text-blue-600 font-normal">Level 2</span>
+                    </label>
+                    <select
+                      value={selectedBoard}
+                      onChange={e => handleBoardChange(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-blue-600 font-medium text-slate-800 text-xs cursor-pointer shadow-2xs"
+                    >
+                      <option value="ALL_BOARDS">All Boards in {selectedState}</option>
+                      {availableBoards.map(board => (
+                        <option key={board} value={board}>
+                          {board}
                         </option>
                       ))}
-                    </optgroup>
-                  ))}
-                </select>
+                    </select>
+                  </div>
+
+                  {/* FIELD 3: EXAM */}
+                  <div className="sm:col-span-2 md:col-span-1">
+                    <label className="font-bold text-slate-700 block mb-1 flex items-center justify-between">
+                      <span>3. Examination</span>
+                      <span className="text-[10px] text-blue-600 font-normal">Level 3</span>
+                    </label>
+                    <select
+                      value={examId}
+                      onChange={e => handleExamChange(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-blue-600 font-medium text-slate-800 text-xs cursor-pointer shadow-2xs"
+                    >
+                      {filteredExams.length > 0 ? (
+                        filteredExams.map(e => (
+                          <option key={e.exam_id} value={e.exam_id}>
+                            {e.title} ({e.commission})
+                          </option>
+                        ))
+                      ) : (
+                        exams.map(e => (
+                          <option key={e.exam_id} value={e.exam_id}>
+                            {e.title} ({e.commission})
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </div>
+
+                  {/* FIELD 4: STAGE */}
+                  <div>
+                    <label className="font-bold text-slate-700 block mb-1 flex items-center justify-between">
+                      <span>4. Exam Stage</span>
+                      <span className="text-[10px] text-blue-600 font-normal">Level 4</span>
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={stageName}
+                        onChange={e => {
+                          setStageName(e.target.value);
+                          const allStages = activeExam?.stages || activeExam?.structure_scheme?.stages || [];
+                          const matchedStage = allStages.find(s => s.stage_name.toLowerCase() === e.target.value.toLowerCase());
+                          if (matchedStage?.papers && matchedStage.papers.length > 0) {
+                            setPaperName(matchedStage.papers[0].title);
+                          }
+                        }}
+                        className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-blue-600 font-medium text-slate-800 text-xs cursor-pointer shadow-2xs"
+                      >
+                        {availableStages.map(stg => (
+                          <option key={stg} value={stg}>
+                            {stg}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* FIELD 5: PAPER */}
+                  <div className="sm:col-span-2">
+                    <label className="font-bold text-slate-700 block mb-1 flex items-center justify-between">
+                      <span>5. Paper Name</span>
+                      <span className="text-[10px] text-blue-600 font-normal">Level 5</span>
+                    </label>
+                    <div className="flex gap-2">
+                      {availablePapers.length > 1 && (
+                        <select
+                          value={availablePapers.includes(paperName) ? paperName : 'custom'}
+                          onChange={e => {
+                            if (e.target.value !== 'custom') setPaperName(e.target.value);
+                          }}
+                          className="w-1/2 px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-blue-600 font-medium text-slate-800 text-xs cursor-pointer shadow-2xs"
+                        >
+                          {availablePapers.map(p => (
+                            <option key={p} value={p}>
+                              {p}
+                            </option>
+                          ))}
+                          <option value="custom">✎ Enter Custom Paper Name</option>
+                        </select>
+                      )}
+                      <input
+                        type="text"
+                        value={paperName}
+                        onChange={e => setPaperName(e.target.value)}
+                        placeholder="e.g. Paper-I: General Studies and General Abilities"
+                        className="flex-1 px-3 py-2 bg-white border border-slate-300 rounded-lg focus:outline-blue-600 font-medium text-slate-800 text-xs shadow-2xs"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {/* Shift, Year & AI Auto-Categorize Toggle */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 border-t border-slate-200/80">
               <div>
                 <label className="font-bold text-slate-700 block mb-1 flex items-center gap-1">
                   <Calendar className="w-3.5 h-3.5 text-slate-500" />
@@ -621,107 +842,44 @@ Explanation: Sikkim is bounded by Tibet (China) to the north, Bhutan to the east
                 />
               </div>
 
-              <div className="sm:col-span-2">
-                <label className="font-bold text-slate-700 block mb-1">Paper Title</label>
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">Session / Shift</label>
                 <input
                   type="text"
-                  value={paperName}
-                  onChange={e => setPaperName(e.target.value)}
-                  placeholder="e.g. Paper-I: General Studies"
+                  value={shift}
+                  onChange={e => setShift(e.target.value)}
+                  placeholder="e.g. Forenoon (10:00 AM - 12:30 PM)"
+                  className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg focus:outline-blue-600 text-slate-800 text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">Booklet Series / Code</label>
+                <input
+                  type="text"
+                  value={bookletCode}
+                  onChange={e => setBookletCode(e.target.value)}
+                  placeholder="e.g. Series-A, Code-1"
                   className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg focus:outline-blue-600 text-slate-800 text-xs"
                 />
               </div>
             </div>
-          </div>
 
-          {/* 2. CUSTOM SUBJECT NAMES MANAGER */}
-          <div className="p-3.5 rounded-xl bg-indigo-50/50 border border-indigo-200/80 space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="font-bold text-slate-800 flex items-center gap-1.5">
-                  <Tag className="w-3.5 h-3.5 text-indigo-600" />
-                  Canonical Subjects for Weightage Matching ({customSubjects.length})
+            {/* AI Auto Classification Info */}
+            <div className="pt-1 flex items-center justify-between">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={aiMatchSubjects}
+                  onChange={e => setAiMatchSubjects(e.target.checked)}
+                  className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer"
+                />
+                <span className="text-xs font-bold text-indigo-900 flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                  Auto-classify questions using syllabus topics derived from official exam structure
                 </span>
-                <p className="text-[11px] text-slate-500 mt-0.5">
-                  Questions will be strictly classified into these subjects using Gemini AI.
-                </p>
-              </div>
+              </label>
             </div>
-
-            {/* Input to add subject */}
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={newSubjectInput}
-                onChange={e => setNewSubjectInput(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleAddSubject();
-                  }
-                }}
-                placeholder="Type a subject name (e.g. Indian Polity, Telangana History) and press Add"
-                className="flex-1 px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs focus:outline-indigo-600"
-              />
-              <button
-                type="button"
-                onClick={handleAddSubject}
-                disabled={!newSubjectInput.trim()}
-                className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-bold rounded-lg transition-colors cursor-pointer flex items-center gap-1 shrink-0"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Add</span>
-              </button>
-            </div>
-
-            {/* Subject Chips */}
-            <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pt-1">
-              {customSubjects.map((subj, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-indigo-200 text-indigo-900 text-xs font-semibold shadow-2xs group"
-                >
-                  <span>{subj}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveSubject(index)}
-                    className="text-slate-400 hover:text-rose-600 transition-colors ml-0.5"
-                    title="Remove subject"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              ))}
-            </div>
-
-            {/* Quick Presets */}
-            <div className="flex flex-wrap items-center gap-1 text-[11px] text-slate-500 pt-1">
-              <span className="font-semibold text-slate-600">Quick add:</span>
-              {COMMON_SUBJECT_PRESETS.map((preset) => (
-                <button
-                  key={preset}
-                  type="button"
-                  onClick={() => handleQuickAddPreset(preset)}
-                  className="px-2 py-0.5 rounded bg-white hover:bg-indigo-100 border border-slate-200 text-slate-700 hover:text-indigo-800 transition-colors cursor-pointer text-[10px]"
-                >
-                  + {preset}
-                </button>
-              ))}
-            </div>
-
-            {/* AI Matching Toggle */}
-            <label className="flex items-center gap-2 pt-1 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={aiMatchSubjects}
-                onChange={e => setAiMatchSubjects(e.target.checked)}
-                className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer"
-              />
-              <span className="text-xs font-bold text-indigo-900 flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                Auto-classify questions & compute syllabus weightage using Gemini AI
-              </span>
-            </label>
           </div>
 
           {/* TAB 1: PASTE QUESTION TEXT */}

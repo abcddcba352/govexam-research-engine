@@ -530,8 +530,28 @@ ${payload.raw_text!.substring(0, 15000)}
   }
 
   // 3. GEMINI QUESTION-TO-SUBJECT MATCHING
-  // If subjects were provided and AI matching is enabled (default true)
-  const candidateSubjects = rawSubjects.length > 0 ? rawSubjects : [];
+  // If subjects were provided or can be derived from the target exam's syllabus / sections
+  let candidateSubjects = rawSubjects.length > 0 ? [...rawSubjects] : [];
+  if (candidateSubjects.length === 0 && examId) {
+    const matchedExam = getExams().find(e => e.exam_id === examId);
+    if (matchedExam) {
+      const examTopics = matchedExam.syllabus_topics || matchedExam.pattern?.sections || [];
+      // Also look into the specific stage / paper sections if available
+      const paperSections: string[] = [];
+      matchedExam.stages?.forEach(s => {
+        s.papers?.forEach(p => {
+          if (p.sections && p.sections.length > 0) {
+            paperSections.push(...p.sections);
+          }
+        });
+      });
+      const merged = [...new Set([...paperSections, ...examTopics])].filter(Boolean);
+      if (merged.length > 0) {
+        candidateSubjects = merged;
+      }
+    }
+  }
+
   let geminiClassificationSuccess = false;
   let modelUsedForMatching = 'Heuristic Classification';
 

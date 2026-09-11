@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Layers,
   FileText,
@@ -42,6 +42,19 @@ export const ExamHierarchyDrilldown: React.FC<ExamHierarchyDrilldownProps> = ({
     : [];
 
   const [stages, setStages] = useState<ExamStage[]>(initialStages);
+
+  // Sync internal stages state whenever parent exam stages update
+  useEffect(() => {
+    const updatedStages = (exam.stages && exam.stages.length > 0)
+      ? exam.stages
+      : (exam.structure_scheme?.stages && exam.structure_scheme.stages.length > 0)
+      ? exam.structure_scheme.stages
+      : [];
+    if (updatedStages.length > 0) {
+      setStages(updatedStages);
+    }
+  }, [exam.stages, exam.structure_scheme]);
+
   const [expandedStageIds, setExpandedStageIds] = useState<Record<string, boolean>>({});
   const [expandedPaperIds, setExpandedPaperIds] = useState<Record<string, boolean>>({});
 
@@ -1021,45 +1034,103 @@ export const ExamHierarchyDrilldown: React.FC<ExamHierarchyDrilldownProps> = ({
                                   </button>
 
                                   {isEditingPaper ? (
-                                    <div className="flex items-center gap-2 flex-1" onClick={e => e.stopPropagation()}>
-                                      <input
-                                        type="text"
-                                        value={paperForm.paper_number || ''}
-                                        onChange={e => setPaperForm({ ...paperForm, paper_number: e.target.value })}
-                                        className="w-20 font-mono text-[11px] font-bold bg-slate-100 border border-slate-300 rounded px-1.5 py-0.5"
-                                        placeholder="Paper-I"
-                                      />
-                                      <input
-                                        type="text"
-                                        value={paperForm.title || ''}
-                                        onChange={e => setPaperForm({ ...paperForm, title: e.target.value })}
-                                        className="flex-1 text-xs font-bold text-slate-900 bg-white border border-slate-300 rounded px-2 py-0.5"
-                                        placeholder="Paper Title"
-                                      />
-                                      <select
-                                        value={paperForm.type || 'OBJECTIVE'}
-                                        onChange={e => setPaperForm({ ...paperForm, type: e.target.value as any })}
-                                        className="text-[11px] bg-white border border-slate-300 rounded px-1.5 py-0.5"
-                                      >
-                                        <option value="OBJECTIVE">OBJECTIVE (MCQ)</option>
-                                        <option value="DESCRIPTIVE">DESCRIPTIVE</option>
-                                        <option value="PHYSICAL_TEST">PHYSICAL TEST</option>
-                                        <option value="SKILL_TEST">SKILL / TYPING</option>
-                                      </select>
-                                      <button
-                                        type="button"
-                                        onClick={() => handleSaveEditPaper(stage.stage_id, paper.paper_id)}
-                                        className="p-1 bg-emerald-600 text-white rounded hover:bg-emerald-700"
-                                      >
-                                        <Check className="w-3.5 h-3.5" />
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => setEditingPaperKey(null)}
-                                        className="p-1 bg-slate-200 text-slate-700 rounded hover:bg-slate-300"
-                                      >
-                                        <X className="w-3.5 h-3.5" />
-                                      </button>
+                                    <div className="flex flex-wrap items-center gap-2 flex-1 p-2 bg-slate-50 rounded-lg border border-indigo-200" onClick={e => e.stopPropagation()}>
+                                      <div className="flex items-center gap-1.5 flex-1 min-w-[200px]">
+                                        <input
+                                          type="text"
+                                          value={paperForm.paper_number || ''}
+                                          onChange={e => setPaperForm({ ...paperForm, paper_number: e.target.value })}
+                                          className="w-20 font-mono text-[11px] font-bold bg-white border border-slate-300 rounded px-1.5 py-1"
+                                          placeholder="Paper-I"
+                                        />
+                                        <input
+                                          type="text"
+                                          value={paperForm.title || ''}
+                                          onChange={e => setPaperForm({ ...paperForm, title: e.target.value })}
+                                          className="flex-1 text-xs font-bold text-slate-900 bg-white border border-slate-300 rounded px-2 py-1"
+                                          placeholder="Paper Title"
+                                        />
+                                        <select
+                                          value={paperForm.type || 'OBJECTIVE'}
+                                          onChange={e => setPaperForm({ ...paperForm, type: e.target.value as any })}
+                                          className="text-[11px] bg-white border border-slate-300 rounded px-2 py-1"
+                                        >
+                                          <option value="OBJECTIVE">OBJECTIVE (MCQ)</option>
+                                          <option value="DESCRIPTIVE">DESCRIPTIVE</option>
+                                          <option value="PHYSICAL_TEST">PHYSICAL TEST</option>
+                                          <option value="SKILL_TEST">SKILL / TYPING</option>
+                                        </select>
+                                      </div>
+
+                                      <div className="flex items-center gap-1.5 flex-wrap">
+                                        <div className="flex items-center gap-1">
+                                          <span className="text-[10px] uppercase font-bold text-slate-500">Qs:</span>
+                                          <input
+                                            type="number"
+                                            min={1}
+                                            value={paperForm.total_questions ?? 150}
+                                            onChange={e => setPaperForm({ ...paperForm, total_questions: parseInt(e.target.value) || 0 })}
+                                            className="w-16 text-xs bg-white border border-slate-300 rounded px-1.5 py-1 font-semibold text-slate-800"
+                                          />
+                                        </div>
+
+                                        <div className="flex items-center gap-1">
+                                          <span className="text-[10px] uppercase font-bold text-slate-500">Marks:</span>
+                                          <input
+                                            type="number"
+                                            min={1}
+                                            value={paperForm.total_marks ?? 150}
+                                            onChange={e => setPaperForm({ ...paperForm, total_marks: parseInt(e.target.value) || 0 })}
+                                            className="w-16 text-xs bg-white border border-slate-300 rounded px-1.5 py-1 font-semibold text-slate-800"
+                                          />
+                                        </div>
+
+                                        <div className="flex items-center gap-1">
+                                          <span className="text-[10px] uppercase font-bold text-slate-500">Mins:</span>
+                                          <input
+                                            type="number"
+                                            min={10}
+                                            value={paperForm.duration_minutes ?? 150}
+                                            onChange={e => setPaperForm({ ...paperForm, duration_minutes: parseInt(e.target.value) || 0 })}
+                                            className="w-16 text-xs bg-white border border-slate-300 rounded px-1.5 py-1 font-semibold text-slate-800"
+                                          />
+                                        </div>
+
+                                        <div className="flex items-center gap-1">
+                                          <span className="text-[10px] uppercase font-bold text-slate-500">Penalty:</span>
+                                          <select
+                                            value={paperForm.negative_marking_rate ?? 0.25}
+                                            onChange={e => setPaperForm({ ...paperForm, negative_marking_rate: parseFloat(e.target.value) })}
+                                            className="text-[11px] bg-white border border-slate-300 rounded px-1.5 py-1"
+                                          >
+                                            <option value={0}>0.00 (No Neg)</option>
+                                            <option value={0.20}>-0.20 (1/5th)</option>
+                                            <option value={0.25}>-0.25 (1/4th)</option>
+                                            <option value={0.33}>-0.33 (1/3rd)</option>
+                                          </select>
+                                        </div>
+
+                                        <div className="flex items-center gap-1 ml-auto">
+                                          <button
+                                            type="button"
+                                            onClick={() => handleSaveEditPaper(stage.stage_id, paper.paper_id)}
+                                            className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold flex items-center gap-1 shadow-2xs cursor-pointer"
+                                            title="Save Paper Changes"
+                                          >
+                                            <Check className="w-3.5 h-3.5" />
+                                            <span>Save</span>
+                                          </button>
+                                          <button
+                                            type="button"
+                                            onClick={() => setEditingPaperKey(null)}
+                                            className="px-2.5 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-xs font-semibold cursor-pointer"
+                                            title="Cancel"
+                                          >
+                                            <X className="w-3.5 h-3.5" />
+                                            <span>Cancel</span>
+                                          </button>
+                                        </div>
+                                      </div>
                                     </div>
                                   ) : (
                                     <div className="flex items-center gap-2 flex-wrap text-xs">

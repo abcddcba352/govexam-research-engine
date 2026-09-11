@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   ExamRecord,
   PreviousPaperRecord,
@@ -71,6 +71,12 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
   // Hierarchy Stage & Paper
   const [activeStage, setActiveStage] = useState<ExamStage | null>(null);
   const [activePaper, setActivePaper] = useState<ExamStagePaper | null>(null);
+
+  // Stable callback to avoid infinite re-render loop in ExamHierarchyFilter
+  const handleHierarchyPaperChange = useCallback((stage: ExamStage | null, paper: ExamStagePaper | null) => {
+    setActiveStage(stage);
+    setActivePaper(paper);
+  }, []);
 
   // Inspector & Ingestion Modals
   const [selectedQuestion, setSelectedQuestion] = useState<PYQQuestionRecord | null>(null);
@@ -307,10 +313,7 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
           exams={exams}
           selectedExamId={selectedExamId}
           onSelectExam={onSelectExam}
-          onPaperChange={(stage, paper) => {
-            setActiveStage(stage);
-            setActivePaper(paper);
-          }}
+          onPaperChange={handleHierarchyPaperChange}
           title="Past Paper & Question Bank Hierarchy Filter"
           subtitle="Filter through the official hierarchy: State ➔ Board ➔ Exam ➔ Stage ➔ Paper"
           badgeLabel="State ➔ Board ➔ Exam ➔ Paper"

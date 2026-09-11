@@ -147,10 +147,37 @@ export function registerExamRoutes(app: Express) {
         return { status: 400, body: { error: `Invalid ${key}.` } };
       }
     }
-    // Retrying the same intake must not create duplicate exams.
+    // Retrying or updating the same intake applies updates rather than returning stale data.
     const existing = getExams().find(e => e.title === input.title && e.commission === input.commission &&
       e.paper === input.paper && e.recruitment_cycle === input.recruitment_cycle);
-    if (existing) return { body: { success: true, exam: existing, existing: true } };
+    if (existing) {
+      if (input.stages && Array.isArray(input.stages)) {
+        updateExamStages(existing.exam_id, input.stages, input.structure_scheme);
+      }
+      const updated = updateExamRecord(existing.exam_id, {
+        post: input.post,
+        stage: input.stage,
+        syllabus_topics: input.syllabus_topics,
+        languages: input.languages || input.mediums,
+        exceptions: input.exceptions,
+        pattern: {
+          total_questions: input.total_questions ?? existing.pattern.total_questions,
+          duration_minutes: input.duration_minutes ?? existing.pattern.duration_minutes,
+          total_marks: (input.total_questions ?? existing.pattern.total_questions) * (input.marks_per_question ?? existing.pattern.marks_per_question ?? 1),
+          marks_per_question: input.marks_per_question ?? existing.pattern.marks_per_question,
+          negative_marking_rate: input.negative_marking_rate ?? existing.pattern.negative_marking_rate,
+          sections: input.sections && input.sections.length > 0 ? input.sections : existing.pattern.sections,
+          mediums: input.mediums || input.languages || existing.pattern.mediums,
+          languages: input.languages || input.mediums || existing.pattern.languages,
+          exceptions: input.exceptions || existing.pattern.exceptions
+        },
+        stages: input.stages || existing.stages,
+        structure_scheme: input.structure_scheme || existing.structure_scheme,
+        target_date: input.target_date || existing.target_date,
+        preparation_mode: input.preparation_mode || existing.preparation_mode
+      });
+      return { body: { success: true, exam: updated || existing, updated: true } };
+    }
     return { status: 201, body: { success: true, exam: createExamFromIntake(input) } };
   }));
   app.post('/api/research/run', examEndpoint(async req => {
