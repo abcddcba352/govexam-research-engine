@@ -1,5 +1,118 @@
 [
   {
+    "profile_id": "intel_exam_telangana_police_constable_mtx2a2vl_mtx6ivyz",
+    "exam_id": "exam_telangana_police_constable_mtx2a2vl",
+    "recruitment_cycle": "Current Cycle",
+    "analysis_date": "2026-09-11T16:37:20.603Z",
+    "papers_analysed_count": 1,
+    "questions_analysed_count": 2,
+    "answers_verified_count": 2,
+    "visual_questions_count": 0,
+    "unverified_questions_count": 0,
+    "subject_distribution": [
+      {
+        "subject": "General Studies",
+        "count": 2,
+        "percentage": 100
+      }
+    ],
+    "topic_distribution": [
+      {
+        "subject": "General Studies",
+        "topic": "Imported PYQ Question",
+        "subtopic": "Examination Item",
+        "sample_size": 1,
+        "question_count": 2,
+        "observed_pyq_weight": 100,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "CYCLICAL",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      }
+    ],
+    "subtopic_distribution": [],
+    "format_distribution": [
+      {
+        "format": "DIRECT_FACT",
+        "count": 2,
+        "percentage": 100,
+        "years_observed": [
+          2024
+        ],
+        "confidence": 90
+      }
+    ],
+    "difficulty_distribution": {
+      "easy_pct": 0,
+      "moderate_pct": 100,
+      "difficult_pct": 0
+    },
+    "cognitive_distribution": {
+      "recall_pct": 0,
+      "understand_pct": 100,
+      "apply_pct": 0,
+      "analyse_pct": 0,
+      "multi_step_pct": 0
+    },
+    "static_vs_current": {
+      "static_pct": 100,
+      "current_pct": 0,
+      "link_pct": 0,
+      "typical_window_months": "6 - 12 Months preceding examination"
+    },
+    "state_vs_national": {
+      "state_specific_pct": 100,
+      "india_general_pct": 0,
+      "international_pct": 0
+    },
+    "visual_ratio": 0,
+    "distractor_style_distribution": {
+      "NEAR_FACT": 2
+    },
+    "answer_position_distribution": {
+      "A": 1,
+      "B": 0,
+      "C": 1,
+      "D": 0,
+      "A_pct": 50,
+      "B_pct": 0,
+      "C_pct": 50,
+      "D_pct": 0
+    },
+    "top_recurring_themes": [
+      {
+        "theme": "General Studies - Imported PYQ Question",
+        "count": 2,
+        "why_asked": "Appeared persistently across cycles (2024). High probability core focus area.",
+        "sample_question_ids": [
+          "pyq_imp_paper_exam_telangana_police_constable_mtx2a2vl_2024_mtx6ivv6_q01",
+          "pyq_imp_paper_exam_telangana_police_constable_mtx2a2vl_2024_mtx6ivv6_q02"
+        ]
+      }
+    ],
+    "emerging_themes": [
+      {
+        "theme": "Recent State Socio-Economic Survey & Welfare Schemes",
+        "first_appeared_year": 2016,
+        "latest_year": 2023,
+        "count": 0
+      }
+    ],
+    "rotational_topics": [
+      {
+        "topic": "Ancient Dynastic Art & Inscriptions",
+        "cycle_length_years": 2,
+        "last_seen_year": 2023
+      }
+    ],
+    "adjacent_testable_areas": [],
+    "confidence_score": 65,
+    "readiness_status": "LIMITED_DATA"
+  },
+  {
     "profile_id": "intel_exam_custom_state_administrative_exam_mtwx9y3y_mtwxak5m",
     "exam_id": "exam_custom_state_administrative_exam_mtwx9y3y",
     "exam_version_id": "exam_custom_state_administrative_exam_mtwx9y3y_v1",

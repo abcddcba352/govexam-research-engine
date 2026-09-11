@@ -116,10 +116,12 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
   // ── Handlers ──
   const handleStateChange = (newState: string) => {
     setSelectedState(newState);
-    const match = filteredExams[0] ||
-      (newState === 'ALL' ? exams[0] :
-        newState === 'CENTRAL' ? exams.find(isCentralExam) :
-          exams.find(e => getExamState(e) === newState));
+    let match = exams[0];
+    if (newState === 'CENTRAL') {
+      match = exams.find(isCentralExam) || exams[0];
+    } else if (newState !== 'ALL') {
+      match = exams.find(e => !isCentralExam(e) && getExamState(e) === newState) || exams[0];
+    }
     if (match) onSelectExam(match.exam_id);
   };
 

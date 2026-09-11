@@ -432,23 +432,28 @@ export async function parseAndIngestQuestionPaper(payload: IngestPaperPayload): 
     }
   }
 
-  // 2c. Heuristic Regex Parser for text
+  // 2c. Robust Regex Parser for text
   if (rawQuestions.length === 0 && payload.raw_text && payload.raw_text.trim()) {
     const text = payload.raw_text.trim();
     const chunks = text.split(/(?:^|\n)(?=(?:Q(?:\.|\s*|uestion\s*)|(?:\d+)[\.\:\)]))\s*/i).filter(c => c.trim().length > 10);
 
     for (let i = 0; i < chunks.length; i++) {
-      const chunk = chunks[i];
-      const optMatch = chunk.match(/(?:\(?([A-Da-d1-4])\)?[\.\:\)]|\bOption\s*([A-D]))/);
+      const chunk = chunks[i].trim();
+      const questionNumberMatch = chunk.match(/^(?:Q(?:uestion)?\s*(\d+)[\.\:\)]?|(\d+)[\.\:\)])/i);
+      const qNum = questionNumberMatch ? parseInt(questionNumberMatch[1] || questionNumberMatch[2], 10) : i + 1;
+      const withoutQNum = chunk.replace(/^(?:Q(?:uestion)?\s*\d+[\.\:\)]?|\(?\d+\)?[\.\:\)])\s*/i, '').trim();
+
+      // Find start of options (A, B, C, D or Option A)
+      const optMatch = withoutQNum.match(/(?:(?:\r?\n|^)\s*(?:\(?([A-Da-d])\)?[\.\:\)]|\bOption\s*([A-D]))|(?:\(?([A-Da-d])\)?[\.\:\)]|\bOption\s*([A-D]))\s*)/);
       const optIndex = optMatch && optMatch.index !== undefined ? optMatch.index : -1;
-      const stem = (optIndex > 0 ? chunk.substring(0, optIndex) : chunk).replace(/^(?:Q(?:\.|\s*|uestion\s*)|\d+[\.\:\)])\s*/i, '').trim();
+      const stem = (optIndex > 0 ? withoutQNum.substring(0, optIndex) : withoutQNum.split(/\r?\n/)[0]).trim();
 
-      const optA = (chunk.match(/(?:\(?A\)?[\.\:\)]|\bOption\s*A\b)\s*([\s\S]*?)(?=(?:\(?B\)?[\.\:\)]|\bOption\s*B\b)|Answer|Key|Ans|$)/i)?.[1] || '').trim();
-      const optB = (chunk.match(/(?:\(?B\)?[\.\:\)]|\bOption\s*B\b)\s*([\s\S]*?)(?=(?:\(?C\)?[\.\:\)]|\bOption\s*C\b)|Answer|Key|Ans|$)/i)?.[1] || '').trim();
-      const optC = (chunk.match(/(?:\(?C\)?[\.\:\)]|\bOption\s*C\b)\s*([\s\S]*?)(?=(?:\(?D\)?[\.\:\)]|\bOption\s*D\b)|Answer|Key|Ans|$)/i)?.[1] || '').trim();
-      const optD = (chunk.match(/(?:\(?D\)?[\.\:\)]|\bOption\s*D\b)\s*([\s\S]*?)(?=(?:Answer|Key|Ans|Explanation|Ref|$))/i)?.[1] || '').trim();
+      const optA = (chunk.match(/(?:(?:\(?A\)?[\.\:\)]|\bOption\s*A\b))\s*([\s\S]*?)(?=(?:\(?B\)?[\.\:\)]|\bOption\s*B\b)|Answer|Key|Ans|$)/i)?.[1] || '').trim();
+      const optB = (chunk.match(/(?:(?:\(?B\)?[\.\:\)]|\bOption\s*B\b))\s*([\s\S]*?)(?=(?:\(?C\)?[\.\:\)]|\bOption\s*C\b)|Answer|Key|Ans|$)/i)?.[1] || '').trim();
+      const optC = (chunk.match(/(?:(?:\(?C\)?[\.\:\)]|\bOption\s*C\b))\s*([\s\S]*?)(?=(?:\(?D\)?[\.\:\)]|\bOption\s*D\b)|Answer|Key|Ans|$)/i)?.[1] || '').trim();
+      const optD = (chunk.match(/(?:(?:\(?D\)?[\.\:\)]|\bOption\s*D\b))\s*([\s\S]*?)(?=(?:Answer|Key|Ans|Explanation|Ref|$))/i)?.[1] || '').trim();
 
-      const keyMatch = chunk.match(/(?:Answer|Ans|Key|Correct(?:\s*Option)?)\s*[:\-\=]?\s*\(?([A-D1-4])/i);
+      const keyMatch = chunk.match(/(?:Answer|Ans|Key|Correct(?:\s*Option)?)\s*[:\-\=]?\s*(?:Option\s*)?\(?([A-D1-4])/i);
       let key = 'A';
       if (keyMatch) {
         const rawKey = keyMatch[1].toUpperCase();
@@ -464,7 +469,7 @@ export async function parseAndIngestQuestionPaper(payload: IngestPaperPayload): 
 
       if (stem && (optA || optB)) {
         rawQuestions.push({
-          question_number: i + 1,
+          question_number: qNum,
           question_en: stem,
           option_a_en: optA || 'Option A',
           option_b_en: optB || 'Option B',
