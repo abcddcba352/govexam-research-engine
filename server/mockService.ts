@@ -43,6 +43,8 @@ import {
 import { getExamIntelligence, getPreviousPapers, getPYQQuestions } from './pyqService.ts';
 import { detectAndGenerateDiagram } from './autonomousDiagramService.ts';
 import { currentArticlePool } from './evidencePool.ts';
+import { buildMockTestTitle, getStateCode } from '../src/utils/stateExamCatalog.ts';
+import { getCleanExamTitle } from '../src/utils/examJurisdiction.ts';
 
 const MAX_ATTEMPTS = 3;
 const BATCH_SIZE = 5;
@@ -918,16 +920,25 @@ Rules:
   const hardCount = generatedQuestions.filter(q => q.difficulty === 'HARD').length;
   const mediumCount = generatedQuestions.length - easyCount - hardCount;
 
+  const stateCode = getStateCode(exam.state_or_central) || 'IN';
+  const cleanExam = getCleanExamTitle(exam);
+  const formattedMockTitle = buildMockTestTitle({
+    stateCode,
+    examName: cleanExam,
+    paperName: exam.paper,
+    seriesNumber: blueprint?.mock_number || nextMockNumber
+  });
+
   const newMockRecord: MockTestRecord = {
     mock_id,
     exam_id: exam.exam_id,
     exam_title: exam.title,
     mock_number: nextMockNumber,
     title: prepMode === 'CUSTOM_PRACTICE'
-      ? `[Custom Practice] Mock 0${nextMockNumber}: ${exam.paper}`
+      ? `[Custom Practice] ${formattedMockTitle}`
       : blueprint
-      ? `[${prepMode === 'PRE_NOTIFICATION_PREPARATION' ? 'Pre-Notification' : prepMode === 'ACTIVE_NOTIFICATION' ? 'Active Notification' : 'Historical'}] Mock #${blueprint.mock_number}: ${exam.paper} (Blueprint v${blueprint.blueprint_version})`
-      : `[${prepMode === 'PRE_NOTIFICATION_PREPARATION' ? 'Pre-Notification' : prepMode === 'ACTIVE_NOTIFICATION' ? 'Active Notification' : 'Historical'}] Mock 0${nextMockNumber}: ${exam.paper}`,
+      ? `${formattedMockTitle} (Blueprint v${blueprint.blueprint_version})`
+      : formattedMockTitle,
     blueprint_id: blueprint?.blueprint_id,
     blueprint_version: blueprint?.blueprint_version,
     test_mode: blueprint?.test_mode,

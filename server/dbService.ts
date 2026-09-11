@@ -31,6 +31,7 @@ import {
   ensureExamPatternVersions,
   generatePatternChangeReport,
 } from './verificationService.ts';
+import { deriveStateExamCatalogMetadata } from '../src/utils/stateExamCatalog.ts';
 import {
   getExecutionEnvironment,
   validatePersistenceConfiguration
@@ -434,6 +435,11 @@ export function createExamFromIntake(input: ExamIntakeInput): ExamRecord {
   const intake_id = `intake_${Date.now().toString(36)}`;
 
   const primaryCycle = input.recruitment_cycle || 'Current Notification';
+  const catalogMeta = deriveStateExamCatalogMetadata({
+    title: input.title,
+    state_or_central: input.state_or_central,
+    paper: input.paper
+  });
 
   const newRecord: ExamRecord = {
     exam_id,
@@ -446,6 +452,11 @@ export function createExamFromIntake(input: ExamIntakeInput): ExamRecord {
     paper: input.paper,
     recruitment_cycle: primaryCycle,
     active_cycle: primaryCycle,
+    catalog_slug: input.catalog_slug || catalogMeta.catalogSlug,
+    exam_kind: input.exam_kind || catalogMeta.examKind,
+    heading: input.heading || catalogMeta.heading,
+    fallback_title: input.fallback_title || catalogMeta.fallbackTitle,
+    fallback_description: input.fallback_description || catalogMeta.fallbackDescription,
     pattern: {
       total_questions: input.total_questions ?? 0,
       duration_minutes: input.duration_minutes ?? 0,

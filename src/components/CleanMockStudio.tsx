@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import type { ExamRecord, MockTestRecord, MockQuestion } from '../types.ts';
 import { getCleanExamTitle } from '../utils/examJurisdiction.ts';
+import { mockTestLabel } from '../utils/stateExamCatalog.ts';
 
 interface CleanMockStudioProps {
   exams: ExamRecord[];
@@ -683,7 +684,7 @@ export const CleanMockStudio: React.FC<CleanMockStudioProps> = ({
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-slate-900">Mock #{m.mock_number}</span>
+                  <span className="font-bold text-slate-900">{mockTestLabel(m.mock_number)}</span>
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-white border border-slate-200 text-slate-600 font-mono">
                     {m.total_questions} Qs
                   </span>

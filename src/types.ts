@@ -394,6 +394,11 @@ export interface ExamRecord {
   structure_scheme?: ExamStructureScheme;
   study_materials?: StudyMaterialItem[];
   specializations?: string[];
+  catalog_slug?: string;
+  exam_kind?: 'police' | 'education' | 'engineering' | 'administration' | 'general';
+  heading?: string;
+  fallback_title?: string;
+  fallback_description?: string;
 }
 
 export interface StudyMaterialItem {
@@ -435,6 +440,11 @@ export interface ExamIntakeInput {
   stages?: ExamStage[];
   structure_scheme?: ExamStructureScheme;
   specializations?: string[];
+  catalog_slug?: string;
+  exam_kind?: 'police' | 'education' | 'engineering' | 'administration' | 'general';
+  heading?: string;
+  fallback_title?: string;
+  fallback_description?: string;
 }
 
 // ==========================================

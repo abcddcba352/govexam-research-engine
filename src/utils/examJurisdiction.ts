@@ -1078,3 +1078,17 @@ export function getCleanExamTitle(
   return clean || title;
 }
 
+export {
+  formatMockNumber,
+  mockTestLabel,
+  buildMockTestTitle,
+  toCatalogSlug,
+  studentFacingMockTestTitle,
+  inferExamKind,
+  hasMockTestSuffixOrMention,
+  formatExamHeading,
+  formatExamFallbackTitle,
+  formatExamFallbackDescription,
+  getStateCode,
+  deriveStateExamCatalogMetadata
+} from './stateExamCatalog.ts';
