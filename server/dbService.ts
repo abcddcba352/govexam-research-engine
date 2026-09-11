@@ -22,6 +22,7 @@ import {
   PreparationBasis,
   ExamStage,
   ExamStructureScheme,
+  StudyMaterialItem,
   STANDARDIZED_DUPLICATE_LAYERS
 } from '../src/types.ts';
 import {
@@ -514,9 +515,138 @@ export function updateExamStages(
   if (structure_scheme) {
     exam.structure_scheme = structure_scheme;
   }
+  // Sync syllabus topics and pattern sections from papers
+  const allSections: string[] = [];
+  stages.forEach(stg => {
+    stg.papers?.forEach(p => {
+      p.sections?.forEach(sec => {
+        if (sec && !allSections.includes(sec)) allSections.push(sec);
+      });
+    });
+  });
+  if (allSections.length > 0) {
+    exam.syllabus_topics = allSections;
+    if (exam.pattern) {
+      exam.pattern.sections = allSections;
+    }
+  }
+  // If first stage has a paper with positive questions, sync pattern
+  const firstPaper = stages.find(s => s.papers && s.papers.length > 0)?.papers?.[0];
+  if (firstPaper && firstPaper.total_questions && firstPaper.total_questions > 0) {
+    if (!exam.pattern) {
+      exam.pattern = {
+        total_questions: firstPaper.total_questions,
+        duration_minutes: firstPaper.duration_minutes || 180,
+        total_marks: firstPaper.total_marks || firstPaper.total_questions,
+        marks_per_question: firstPaper.total_questions > 0 ? (firstPaper.total_marks || firstPaper.total_questions) / firstPaper.total_questions : 1,
+        negative_marking_rate: firstPaper.negative_marking_rate ?? 0,
+        sections: allSections,
+        mediums: firstPaper.language_mediums || ['English', 'Telugu']
+      };
+    } else {
+      exam.pattern.total_questions = firstPaper.total_questions;
+      if (firstPaper.duration_minutes) exam.pattern.duration_minutes = firstPaper.duration_minutes;
+      if (firstPaper.total_marks) exam.pattern.total_marks = firstPaper.total_marks;
+      if (firstPaper.negative_marking_rate !== undefined) exam.pattern.negative_marking_rate = firstPaper.negative_marking_rate;
+      if (firstPaper.language_mediums && firstPaper.language_mediums.length > 0) exam.pattern.mediums = firstPaper.language_mediums;
+    }
+  }
   exam.updated_at = new Date().toISOString();
   saveExams(exams);
   return exam;
+}
+
+export function updateExamRecord(
+  exam_id: string,
+  updates: Partial<ExamRecord>
+): ExamRecord | null {
+  const exams = getExams();
+  const exam = exams.find(e => e.exam_id === exam_id);
+  if (!exam) return null;
+  if (updates.title) exam.title = updates.title;
+  if (updates.commission) exam.commission = updates.commission;
+  if (updates.post) exam.post = updates.post;
+  if (updates.stage) exam.stage = updates.stage;
+  if (updates.paper) exam.paper = updates.paper;
+  if (updates.recruitment_cycle) exam.recruitment_cycle = updates.recruitment_cycle;
+  if (updates.active_cycle) exam.active_cycle = updates.active_cycle;
+  if (updates.syllabus_topics) exam.syllabus_topics = updates.syllabus_topics;
+  if (updates.pattern) {
+    exam.pattern = { ...exam.pattern, ...updates.pattern };
+  }
+  if (updates.stages) {
+    exam.stages = updates.stages;
+  }
+  if (updates.study_materials) {
+    exam.study_materials = updates.study_materials;
+  }
+  exam.updated_at = new Date().toISOString();
+  saveExams(exams);
+  return exam;
+}
+
+export function addExamStudyMaterial(exam_id: string, material: StudyMaterialItem): ExamRecord | null {
+  const exams = getExams();
+  const exam = exams.find(e => e.exam_id === exam_id);
+  if (!exam) return null;
+  if (!Array.isArray(exam.study_materials)) {
+    exam.study_materials = [];
+  }
+  const existingIdx = exam.study_materials.findIndex(m => m.material_id === material.material_id || m.source_url === material.source_url);
+  if (existingIdx !== -1) {
+    exam.study_materials[existingIdx] = material;
+  } else {
+    exam.study_materials.unshift(material);
+  }
+  // If material has extracted topics, merge any new topics into syllabus
+  if (Array.isArray(material.extracted_topics) && material.extracted_topics.length > 0) {
+    const existingSet = new Set(exam.syllabus_topics || []);
+    for (const t of material.extracted_topics) {
+      if (t && !existingSet.has(t)) {
+        exam.syllabus_topics.push(t);
+        if (exam.pattern && Array.isArray(exam.pattern.sections) && !exam.pattern.sections.includes(t)) {
+          exam.pattern.sections.push(t);
+        }
+      }
+    }
+  }
+  if (Array.isArray(exam.pattern_versions)) {
+    for (const v of exam.pattern_versions) {
+      if (v.is_active || v.recruitment_cycle === (exam.active_cycle || exam.recruitment_cycle)) {
+        v.study_materials = exam.study_materials;
+        v.syllabus_topics = exam.syllabus_topics;
+      }
+    }
+  }
+  exam.updated_at = new Date().toISOString();
+  saveExams(exams);
+  return exam;
+}
+
+export function deleteExamStudyMaterial(exam_id: string, material_id: string): ExamRecord | null {
+  const exams = getExams();
+  const exam = exams.find(e => e.exam_id === exam_id);
+  if (!exam || !Array.isArray(exam.study_materials)) return exam;
+  exam.study_materials = exam.study_materials.filter(m => m.material_id !== material_id);
+  if (Array.isArray(exam.pattern_versions)) {
+    for (const v of exam.pattern_versions) {
+      if (v.is_active || v.recruitment_cycle === (exam.active_cycle || exam.recruitment_cycle)) {
+        v.study_materials = exam.study_materials;
+      }
+    }
+  }
+  exam.updated_at = new Date().toISOString();
+  saveExams(exams);
+  return exam;
+}
+
+export function deleteExamRecord(exam_id: string): boolean {
+  const exams = getExams();
+  const idx = exams.findIndex(e => e.exam_id === exam_id);
+  if (idx === -1) return false;
+  exams.splice(idx, 1);
+  saveExams(exams);
+  return true;
 }
 
 export interface AuditorFactSignoffPayload {

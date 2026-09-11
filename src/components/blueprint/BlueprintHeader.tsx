@@ -2,9 +2,12 @@ import React from 'react';
 import {
   MockBlueprintRecord,
   ExamRecord,
-  TestMode
+  TestMode,
+  ExamStage,
+  ExamStagePaper
 } from '../../types.ts';
 import { groupExamsByJurisdiction } from '../../utils/examJurisdiction.ts';
+import { BlueprintHierarchyFilter } from './BlueprintHierarchyFilter.tsx';
 import {
   ShieldCheck,
   Lock,
@@ -35,6 +38,7 @@ interface BlueprintHeaderProps {
   isValidating: boolean;
   isLocking: boolean;
   isGeneratingMock?: boolean;
+  onPaperChange?: (stage: ExamStage | null, paper: ExamStagePaper | null) => void;
 }
 
 export function BlueprintHeader({
@@ -49,7 +53,8 @@ export function BlueprintHeader({
   onGenerateMock,
   isValidating,
   isLocking,
-  isGeneratingMock = false
+  isGeneratingMock = false,
+  onPaperChange
 }: BlueprintHeaderProps) {
   const currentExam = exams.find(e => e.exam_id === selectedExamId);
 
@@ -120,44 +125,20 @@ export function BlueprintHeader({
               <Layers className="w-4 h-4" />
             </div>
             <div className="flex items-center gap-2">
-              {(() => {
-                const { central, states, stateNames } = groupExamsByJurisdiction(exams);
-                return (
-                  <select
-                    value={selectedExamId}
-                    onChange={(e) => onSelectExam(e.target.value)}
-                    className="font-bold text-base sm:text-lg text-slate-900 bg-transparent border-b border-dashed border-slate-300 hover:border-slate-500 focus:outline-none focus:border-indigo-600 cursor-pointer pr-4"
-                  >
-                    {central.length > 0 && (
-                      <optgroup label="🏛️ Central / National (All-India)">
-                        {central.map(ex => (
-                          <option key={ex.exam_id} value={ex.exam_id}>
-                            {ex.title} • {ex.paper}
-                          </option>
-                        ))}
-                      </optgroup>
-                    )}
-                    {stateNames.map(stateName => (
-                      <optgroup key={stateName} label={`🗺️ State: ${stateName}`}>
-                        {states[stateName].map(ex => (
-                          <option key={ex.exam_id} value={ex.exam_id}>
-                            {ex.title} • {ex.paper}
-                          </option>
-                        ))}
-                      </optgroup>
-                    ))}
-                  </select>
-                );
-              })()}
+              <h2 className="font-bold text-base sm:text-lg text-slate-900">
+                {currentExam?.title || 'Examination Blueprint'}
+              </h2>
               {blueprint && getStatusBadge(blueprint.status)}
             </div>
           </div>
           <p className="text-xs text-slate-500 flex items-center gap-2 flex-wrap mt-0.5">
-            <span>Cycle: <strong className="text-slate-700">{currentExam?.active_cycle || 'Current'}</strong></span>
+            <span>Cycle: <strong className="text-slate-700">{currentExam?.active_cycle || currentExam?.recruitment_cycle || 'Current'}</strong></span>
             <span>•</span>
             <span>Category: <strong className="text-slate-700">{currentExam?.state_or_central}</strong></span>
             <span>•</span>
-            <span>Official Pattern: <strong className="text-slate-700">{currentExam?.pattern?.total_questions || 150} Questions ({currentExam?.pattern?.total_marks || 150} Marks)</strong></span>
+            <span>Stage: <strong className="text-purple-700">{currentExam?.stage}</strong></span>
+            <span>•</span>
+            <span>Paper: <strong className="text-slate-800">{currentExam?.paper}</strong></span>
           </p>
         </div>
 
@@ -244,6 +225,14 @@ export function BlueprintHeader({
           )}
         </div>
       </div>
+
+      {/* 5-Level Cascading Hierarchy Filter: State -> Board -> Exam -> Stage -> Paper */}
+      <BlueprintHierarchyFilter
+        exams={exams}
+        selectedExamId={selectedExamId}
+        onSelectExam={onSelectExam}
+        onPaperChange={onPaperChange}
+      />
 
       {/* Blueprint Metadata strip */}
       {blueprint && (

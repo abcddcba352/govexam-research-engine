@@ -51,6 +51,86 @@ test('inclined manometer retains stated length and angle, with no computed rise 
   const v=renderQuestionDiagram({kind:'INCLINED_MANOMETER',length:20,angle:30,unit:'cm'},'An inclined manometer has L = 20 cm at 30 degrees. Find h.');
   assert.ok(v.svg_content!.includes('L = 20 cm'));assert.ok(v.svg_content!.includes('30°'));
   assert.ok(!/10 cm|sin\(/.test(v.svg_content!));assert.ok(v.svg_content!.includes('hᵥ'));
+  for(const degrees of [15,30,55]) {
+    const svg=renderQuestionDiagram({kind:'INCLINED_MANOMETER',length:20,angle:degrees,unit:'cm'}).svg_content!;
+    const endpoint=svg.match(/Q305 315 315 280 L([\d.]+) ([\d.]+) H570/)!;
+    const drawn=Math.atan2(280-Number(endpoint[2]),Number(endpoint[1])-315)*180/Math.PI;
+    assert.ok(Math.abs(drawn-degrees)<1e-8);
+  }
+});
+test('biology cell diagrams use valid structures and hide marker answers',()=>{
+  const spec:QuestionDiagram={kind:'BIOLOGY_CELL',cell_type:'PLANT',markers:[{label:'A',structure:'NUCLEUS'},{label:'B',structure:'CHLOROPLAST'}]};
+  const visual=renderQuestionDiagram(spec,'In the plant cell diagram, identify structures A and B.');
+  assert.equal(visual.visual_type,'SCIENCE_DIAGRAM');
+  assert.ok(visual.svg_content!.includes('>A<')&&visual.svg_content!.includes('>B<'));
+  assert.ok(!/NUCLEUS|CHLOROPLAST/.test(visual.svg_content!));
+  assert.ok(diagramIssues({...spec,cell_type:'ANIMAL'}).length);
+});
+test('beam, fraction and timeline templates preserve their structured data',()=>{
+  const beam=renderQuestionDiagram({kind:'SIMPLY_SUPPORTED_BEAM',span:8,point_load:12,load_position:3,length_unit:'m',force_unit:'kN'},'A simply supported beam of span 8 m carries a 12 kN point load 3 m from the left support.');
+  assert.equal(beam.visual_type,'SCIENCE_DIAGRAM');assert.ok(beam.svg_content!.includes('x1="245" y1="62"'));
+  const fraction=renderQuestionDiagram({kind:'FRACTION_BAR',numerator:3,denominator:8},'The fraction bar has 3 shaded parts among 8 equal parts.');
+  assert.equal((fraction.svg_content!.match(/fill="url\(#hatch\)"/g)||[]).length,3);
+  const timeline:QuestionDiagram={kind:'TIMELINE',title:'Reform sequence',events:[{year:1829,label:'Event A'},{year:1856,label:'Event B'}]};
+  assert.equal(diagramIssues(timeline,'Use the Reform sequence timeline to place Event A (1829) and Event B (1856) in chronological order.').length,0);
+  assert.ok(diagramIssues({...timeline,events:[timeline.events[1],timeline.events[0]]}).length);
+});
+test('coordinate plots preserve axes, point coordinates and declared segments',()=>{
+  const spec:QuestionDiagram={kind:'COORDINATE_PLOT',x_range:[-5,5],y_range:[-5,5],points:[{label:'A',x:1,y:2},{label:'B',x:4,y:-1}],segments:[['A','B']]};
+  const stem='On the coordinate graph, point A is (1, 2) and point B is (4, -1). Join A and B.';
+  const visual=renderQuestionDiagram(spec,stem);
+  assert.equal(visual.visual_type,'GEOMETRY');
+  assert.ok(visual.svg_content!.includes('A (1, 2)')&&visual.svg_content!.includes('B (4, -1)'));
+  assert.ok(diagramIssues({...spec,segments:[['A','C']]},stem).length);
+  assert.ok(diagramIssues({...spec,points:[{label:'A',x:8,y:2}]},stem).length);
+});
+test('free-body diagrams retain force magnitude, direction and units',()=>{
+  const spec:QuestionDiagram={kind:'FREE_BODY_DIAGRAM',body_label:'Block',unit:'N',forces:[{label:'Pull',magnitude:30,angle:0},{label:'Normal',magnitude:50,angle:90},{label:'Weight',magnitude:50,angle:270}]};
+  const stem='The free-body diagram of a Block shows Pull 30 N at 0 degrees, Normal 50 N at 90 degrees and Weight 50 N at 270 degrees.';
+  const visual=renderQuestionDiagram(spec,stem);
+  assert.ok(visual.svg_content!.includes('Pull: 30 N, 0\u00b0'));
+  assert.ok(visual.svg_content!.includes('Weight: 50 N, 270\u00b0'));
+  assert.ok(diagramIssues({...spec,forces:[...spec.forces,{label:'Bad',magnitude:-1,angle:45}]},stem).length);
+});
+test('electric circuit templates distinguish layout and switch state',()=>{
+  const series:QuestionDiagram={kind:'ELECTRIC_CIRCUIT',layout:'SERIES',source_label:'Cell',resistors:['R1','R2'],switch_state:'CLOSED'};
+  const parallel:QuestionDiagram={...series,layout:'PARALLEL',switch_state:'OPEN'};
+  assert.equal(diagramIssues(series,'The closed switch in this series circuit connects Cell, R1 and R2.' ).length,0);
+  assert.equal(diagramIssues(parallel,'The open switch in this parallel circuit connects Cell, R1 and R2.' ).length,0);
+  assert.notEqual(renderQuestionDiagram(series).svg_content,renderQuestionDiagram(parallel).svg_content);
+  assert.ok(renderQuestionDiagram(parallel).alt_text.includes('open switch'));
+  assert.ok(diagramIssues({...series,resistors:['R1','R1']}).length);
+});
+test('convex-lens and wave templates keep supplied measurements and omit solved values',()=>{
+  const lens=renderQuestionDiagram({kind:'CONVEX_LENS_RAY',focal_length:10,object_distance:30,unit:'cm'},'A convex lens has focal length 10 cm and object distance 30 cm. Study the ray diagram.');
+  assert.ok(lens.svg_content!.includes('f = 10 cm; u = 30 cm'));
+  assert.ok(!/v\s*=\s*15/.test(lens.svg_content!));
+  const wave=renderQuestionDiagram({kind:'TRANSVERSE_WAVE',amplitude:2,wavelength:4,cycles:2,unit:'cm'},'A transverse wave diagram shows amplitude 2 cm, wavelength 4 cm and 2 cycles.');
+  assert.ok(wave.svg_content!.includes('A = 2 cm')&&wave.svg_content!.includes('\u03bb = 4 cm'));
+  assert.ok(diagramIssues({kind:'TRANSVERSE_WAVE',amplitude:2,wavelength:4,cycles:2.5,unit:'cm'}).length);
+});
+test('general technical scenes accept only bounded grayscale primitives and escape labels',()=>{
+  const spec:QuestionDiagram={kind:'TECHNICAL_SCENE',domain:'PHYSICS',title:'Lever & support',scale:'NOT_TO_SCALE',primitives:[{kind:'LINE',from:[100,180],to:[500,180]},{kind:'POLYLINE',points:[[280,250],[320,250],[300,180]],closed:true,fill:'LIGHT'},{kind:'TEXT',x:300,y:275,text:'Fulcrum'}]};
+  const visual=renderQuestionDiagram(spec,'The Lever & support schematic diagram identifies the Fulcrum.');
+  assert.ok(visual.svg_content!.includes('Lever &amp; support'));
+  assert.ok(visual.svg_content!.includes('Schematic; not to scale'));
+  assert.ok(diagramIssues({...spec,primitives:[{kind:'TEXT',x:10,y:10,text:'<script>'}]}).length);
+  assert.ok(diagramIssues({...spec,primitives:[{kind:'LINE',from:[-1,0],to:[5,5]}]}).length);
+});
+test('all new template renderers emit self-contained neutral grayscale SVG',()=>{
+  const specs:QuestionDiagram[]=[
+    {kind:'COORDINATE_PLOT',x_range:[-5,5],y_range:[-5,5],points:[{label:'A',x:1,y:2}],segments:[]},
+    {kind:'FREE_BODY_DIAGRAM',body_label:'Block',unit:'N',forces:[{label:'Force',magnitude:20,angle:45}]},
+    {kind:'ELECTRIC_CIRCUIT',layout:'PARALLEL',source_label:'Cell',resistors:['R1','R2'],switch_state:'OPEN'},
+    {kind:'CONVEX_LENS_RAY',focal_length:10,object_distance:30,unit:'cm'},
+    {kind:'TRANSVERSE_WAVE',amplitude:2,wavelength:4,cycles:2,unit:'cm'},
+    {kind:'TECHNICAL_SCENE',domain:'SOCIAL',title:'Flow',scale:'NOT_TO_SCALE',primitives:[{kind:'ARROW',from:[100,180],to:[500,180]}]},
+  ];
+  for(const spec of specs) {
+    const svg=renderQuestionDiagram(spec).svg_content!;
+    for(const color of svg.match(/#[0-9a-f]{3,6}\b/gi)||[])assert.equal(new Set(color.slice(1).toLowerCase()).size,1);
+    assert.ok(!/<script|foreignObject|onload|href=/i.test(svg));
+  }
 });
 test('visual slot selection rejects missing or wrong figure types',()=>{
   const template=templateQuestion('Bar chart',1)!;

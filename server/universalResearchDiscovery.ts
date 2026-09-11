@@ -53,7 +53,6 @@ export async function executeUniversalDiscovery(id:ExamIdentification, mode = 'H
     ...(domains[0] ? [`${query} notification syllabus site:${domains[0]}`] : []),
     `${query} official notification scheme syllabus filetype:pdf`,
     `${query} notification examination scheme pdf download`,
-    `${query} previous question paper answer key solved paper pdf`,
     `${query} syllabus analysis site:youtube.com`,
   ];
   const searches = await Promise.all(jobs.map(async q => {
@@ -62,40 +61,6 @@ export async function executeUniversalDiscovery(id:ExamIdentification, mode = 'H
   }));
   searches.forEach(s => result.diagnostics.push(...s.diagnostics));
   const hints = searches.flatMap(s => s.results);
-
-  // Extract previous year question papers (PYQs) from search results
-  const pyqMatches = hints.filter(h =>
-    /question\s*paper|previous\s*(?:year\s*)?paper|answer\s*key|solved\s*paper|pyq/i.test(h.title + ' ' + h.snippet) ||
-    /\.pdf$/i.test(h.url)
-  );
-  for (const hint of pyqMatches) {
-    const yearMatch = (hint.title + ' ' + hint.snippet).match(/\b(201\d|202\d)\b/);
-    const year = yearMatch ? Number(yearMatch[1]) : (new Date().getFullYear() - 1);
-    const hasKey = /answer\s*key|solved|key/i.test(hint.title + ' ' + hint.snippet);
-    if (!result.previousPapers.some(p => p.source_id === hint.url || p.notes === hint.url)) {
-      result.previousPapers.push({
-        paper_id: `pyq_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-        paper_name: hint.title || `${id.exam} Previous Year Question Paper (${year})`,
-        exam_id: id.exam.toLowerCase().replace(/[^a-z0-9]+/g, '_'),
-        recruitment_cycle: id.recruitment_cycle,
-        year,
-        stage: id.stage || 'Written Examination',
-        paper_number: 1,
-        language: 'English',
-        source_id: hint.url,
-        notes: hint.url,
-        question_count: 150,
-        marks: 150,
-        duration_minutes: 150,
-        official_status: discoveryTrust(hint.url) === 'LEVEL_5_OFFICIAL' ? 'OFFICIAL' : 'SECONDARY_COPY',
-        content_hash: 'discovered_pyq',
-        extraction_status: 'PENDING',
-        analysis_status: 'PENDING',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      });
-    }
-  }
 
   const supplied = [...(directVideo ? [id.exam] : []),...(options.urls || [])];
   const videoUrls = [...new Set([...supplied,...hints.map(r => r.url)].filter(u => youtubeId(u)))].slice(0,3);

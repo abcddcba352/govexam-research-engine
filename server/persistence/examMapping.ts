@@ -14,6 +14,7 @@ export function mapPattern(row: any): ExamPatternVersion {
       sections: row.section_structure?.sections || [], mediums: row.language_rules?.languages || [],
     },
     syllabus_topics: row.section_structure?.syllabus_topics || [],
+    study_materials: row.section_structure?.study_materials || [],
   };
 }
 
@@ -30,6 +31,9 @@ export function mapExam(row: any, versions: any[], facts: any[], sources: any[] 
     : (row.syllabus_topics && row.syllabus_topics.length > 0)
       ? row.syllabus_topics
       : (scheme?.stages?.[0]?.papers?.[0]?.sections || []);
+  const materials = active?.section_structure?.study_materials ||
+    row.study_materials ||
+    (rows.find(r => r.section_structure?.study_materials?.length > 0)?.section_structure?.study_materials) || [];
 
   const record: ExamRecord = {
     exam_id: row.exam_id, intake_id: `intake_${row.exam_id}`, title: row.title,
@@ -40,6 +44,7 @@ export function mapExam(row: any, versions: any[], facts: any[], sources: any[] 
     syllabus_topics: topics,
     stages: row.stages || scheme?.stages,
     structure_scheme: scheme || undefined,
+    study_materials: materials,
     preparation_mode: active?.section_structure?.preparation_mode || 'PRE_NOTIFICATION_PREPARATION',
     status: 'INTAKE_SUBMITTED', exam_profile_status: 'RESEARCH_REQUIRED', pattern_status: 'UNVERIFIED',
     source_confidence_score: 0, created_at: row.created_at, updated_at: row.updated_at,

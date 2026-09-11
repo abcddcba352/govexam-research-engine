@@ -3,7 +3,9 @@ import {
   ExamRecord,
   MockBlueprintRecord,
   CreateBlueprintInput,
-  BlueprintQuestionSlot
+  BlueprintQuestionSlot,
+  ExamStage,
+  ExamStagePaper
 } from '../types.ts';
 import { BlueprintHeader } from './blueprint/BlueprintHeader.tsx';
 import { BlueprintCreateModal } from './blueprint/BlueprintCreateModal.tsx';
@@ -29,17 +31,21 @@ interface BlueprintStudioScreenProps {
   selectedExamId: string;
   onSelectExam: (examId: string) => void;
   onNavigateToMocks?: (blueprintId: string) => void;
+  onNavigateToCoverage?: () => void;
 }
 
 export function BlueprintStudioScreen({
   exams,
   selectedExamId,
   onSelectExam,
-  onNavigateToMocks
+  onNavigateToMocks,
+  onNavigateToCoverage
 }: BlueprintStudioScreenProps) {
   const [blueprints, setBlueprints] = useState<MockBlueprintRecord[]>([]);
   const [selectedBlueprintId, setSelectedBlueprintId] = useState<string>('');
   const [activeBlueprint, setActiveBlueprint] = useState<MockBlueprintRecord | null>(null);
+  const [activeStage, setActiveStage] = useState<ExamStage | null>(null);
+  const [activePaper, setActivePaper] = useState<ExamStagePaper | null>(null);
 
   // Sub-tabs
   const [activeSubTab, setActiveSubTab] = useState<
@@ -255,17 +261,28 @@ export function BlueprintStudioScreen({
       {/* Feedback message banner */}
       {feedbackMsg && (
         <div
-          className={`p-3.5 rounded-xl border text-xs font-semibold flex items-center justify-between transition-all ${
+          className={`p-3.5 rounded-xl border text-xs font-semibold flex items-center justify-between gap-3 transition-all ${
             feedbackMsg.type === 'success'
               ? 'bg-emerald-50 text-emerald-900 border-emerald-200'
               : 'bg-rose-50 text-rose-900 border-rose-200'
           }`}
         >
-          <span>{feedbackMsg.text}</span>
+          <div className="flex flex-wrap items-center gap-2 flex-1">
+            <span>{feedbackMsg.text}</span>
+            {feedbackMsg.text.includes('Syllabus Coverage') && onNavigateToCoverage && (
+              <button
+                type="button"
+                onClick={onNavigateToCoverage}
+                className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer shadow-2xs"
+              >
+                Go to Syllabus Coverage →
+              </button>
+            )}
+          </div>
           <button
             type="button"
             onClick={() => setFeedbackMsg(null)}
-            className="text-slate-400 hover:text-slate-700 cursor-pointer"
+            className="text-slate-400 hover:text-slate-700 cursor-pointer shrink-0"
           >
             ✕
           </button>
@@ -286,6 +303,10 @@ export function BlueprintStudioScreen({
         isValidating={isValidating}
         isLocking={isLocking}
         isGeneratingMock={isGeneratingMock}
+        onPaperChange={(stage, paper) => {
+          setActiveStage(stage);
+          setActivePaper(paper);
+        }}
       />
 
       {/* Blueprint Selector Strip (if multiple blueprints exist for exam) */}
@@ -463,6 +484,8 @@ export function BlueprintStudioScreen({
           isOpen={isCreateModalOpen}
           onClose={() => setIsCreateModalOpen(false)}
           exam={currentExam}
+          selectedStage={activeStage}
+          selectedPaper={activePaper}
           onCreate={handleCreateBlueprint}
           isSubmitting={isGenerating}
         />

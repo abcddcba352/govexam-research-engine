@@ -1,5 +1,8 @@
 import { GoogleGenAI, ThinkingLevel } from '@google/genai';
 import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
 
 dotenv.config();
 
@@ -195,23 +198,250 @@ export function getThinkingConfig(level: ThinkingLevelSetting) {
 /**
  * Initializes GoogleGenAI client with standard user agent header
  */
-let cachedGenAI: GoogleGenAI | null = null;
+// ---------------------------------------------------------------------------
+// ADMIN GEMINI API KEY POOL & ROTATION SYSTEM
+// ---------------------------------------------------------------------------
 
-export function getGenAI(): GoogleGenAI {
-  if(process.env.AI_PROVIDER==='cloudflare')throw new Error('Cloudflare free mode is active. Gemini calls and paid fallback are disabled; use Direct Web research and the cloud question bank.');
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error('GEMINI_API_KEY environment variable is required.');
+export interface AdminGeminiKeyRecord {
+  id: string;
+  key: string;
+  label?: string;
+  masked_key: string;
+  status: 'ACTIVE' | 'RATE_LIMITED' | 'INVALID' | 'DISABLED';
+  added_at: string;
+  last_used_at?: string;
+  success_count: number;
+  failure_count: number;
+  last_error?: string;
+}
+
+const DATA_DIR = path.resolve(process.cwd(), 'server', 'data');
+const ADMIN_KEYS_FILE = path.join(DATA_DIR, 'gemini_api_keys.json');
+
+export function maskApiKey(key: string): string {
+  if (!key || key.length < 8) return '****';
+  const prefix = key.slice(0, 6);
+  const suffix = key.slice(-4);
+  return `${prefix}...${suffix}`;
+}
+
+export function getAdminGeminiKeys(): AdminGeminiKeyRecord[] {
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    if (fs.existsSync(ADMIN_KEYS_FILE)) {
+      const raw = fs.readFileSync(ADMIN_KEYS_FILE, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        return parsed;
+      }
+    }
+  } catch (err) {
+    console.warn('[GeminiConfig] Failed to read admin Gemini keys:', err);
   }
-  if (!cachedGenAI) {
-    cachedGenAI = new GoogleGenAI({
-      apiKey,
+  return [];
+}
+
+export function saveAdminGeminiKeys(keys: AdminGeminiKeyRecord[]): void {
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    fs.writeFileSync(ADMIN_KEYS_FILE, JSON.stringify(keys, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('[GeminiConfig] Failed to persist admin Gemini keys:', err);
+  }
+}
+
+export function addAdminGeminiKey(rawKey: string, label?: string): AdminGeminiKeyRecord {
+  const cleanKey = (rawKey || '').trim();
+  if (!cleanKey || cleanKey.length < 15) {
+    throw new Error('Invalid Gemini API Key format. Google API keys typically start with "AIzaSy" and are at least 30 characters long.');
+  }
+
+  const existing = getAdminGeminiKeys();
+  const foundIndex = existing.findIndex(k => k.key === cleanKey);
+
+  const newRecord: AdminGeminiKeyRecord = {
+    id: foundIndex >= 0 ? existing[foundIndex].id : `gkey_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`,
+    key: cleanKey,
+    label: label?.trim() || (foundIndex >= 0 ? existing[foundIndex].label : `Key ${existing.length + 1}`),
+    masked_key: maskApiKey(cleanKey),
+    status: 'ACTIVE',
+    added_at: foundIndex >= 0 ? existing[foundIndex].added_at : new Date().toISOString(),
+    last_used_at: undefined,
+    success_count: foundIndex >= 0 ? existing[foundIndex].success_count : 0,
+    failure_count: 0
+  };
+
+  if (foundIndex >= 0) {
+    existing[foundIndex] = newRecord;
+  } else {
+    existing.unshift(newRecord);
+  }
+
+  saveAdminGeminiKeys(existing);
+  return newRecord;
+}
+
+export function deleteAdminGeminiKey(idOrKey: string): boolean {
+  const existing = getAdminGeminiKeys();
+  const filtered = existing.filter(k => k.id !== idOrKey && k.key !== idOrKey);
+  if (filtered.length !== existing.length) {
+    saveAdminGeminiKeys(filtered);
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Merges all configured keys from admin storage and environment variables
+ */
+export function getAllGeminiApiKeys(): string[] {
+  const adminKeys = getAdminGeminiKeys().filter(k => k.status !== 'DISABLED').map(k => k.key);
+  const rawEnvKeys = [
+    process.env.GEMINI_API_KEY,
+    process.env.GEMINI_EXTRA_KEYS ? process.env.GEMINI_EXTRA_KEYS.split(',') : [],
+    process.env.GEMINI_BACKUP_API_KEY
+  ].flat().filter((k): k is string => Boolean(k && typeof k === 'string' && k.trim().length > 10)).map(k => k.trim());
+
+  // Priority order: Admin keys first, then environment keys
+  return [...new Set([...adminKeys, ...rawEnvKeys])];
+}
+
+/**
+ * Client cache by API key
+ */
+const clientCache = new Map<string, GoogleGenAI>();
+
+export function createGenAIClient(apiKey: string): GoogleGenAI {
+  const clean = apiKey.trim();
+  let client = clientCache.get(clean);
+  if (!client) {
+    client = new GoogleGenAI({
+      apiKey: clean,
       httpOptions: {
         headers: {
           'User-Agent': 'aistudio-build',
         },
       },
     });
+    clientCache.set(clean, client);
   }
-  return cachedGenAI;
+  return client;
+}
+
+let activeKeyIndex = 0;
+
+/**
+ * Initializes GoogleGenAI client with standard user agent header
+ */
+export function getGenAI(overrideKey?: string): GoogleGenAI {
+  if (overrideKey && overrideKey.trim()) {
+    return createGenAIClient(overrideKey.trim());
+  }
+
+  const allKeys = getAllGeminiApiKeys();
+  if (allKeys.length === 0) {
+    if (process.env.AI_PROVIDER === 'cloudflare') {
+      throw new Error('Cloudflare free mode is active. Gemini calls and paid fallback are disabled; configure an API key in Admin Settings to enable Gemini.');
+    }
+    throw new Error('No Google Gemini API keys configured. Please add an API key in Admin Settings or set GEMINI_API_KEY.');
+  }
+
+  const selectedKey = allKeys[activeKeyIndex % allKeys.length];
+  return createGenAIClient(selectedKey);
+}
+
+/**
+ * Executes an AI operation with automatic failover rotation across all available API keys.
+ * If one key encounters a 429 / Quota / Rate Limit error, it rotates to the next available key.
+ */
+export async function executeWithGeminiFailover<T>(
+  operation: (ai: GoogleGenAI, apiKey: string) => Promise<T>
+): Promise<T> {
+  const allKeys = getAllGeminiApiKeys();
+  if (allKeys.length === 0) {
+    throw new Error('No Google Gemini API keys available. Please add a key in the Admin API Keys settings.');
+  }
+
+  const totalKeys = allKeys.length;
+  let lastError: any = null;
+
+  for (let attempt = 0; attempt < totalKeys; attempt++) {
+    const keyIdx = (activeKeyIndex + attempt) % totalKeys;
+    const currentKey = allKeys[keyIdx];
+    const client = createGenAIClient(currentKey);
+
+    try {
+      const result = await operation(client, currentKey);
+      
+      // Update success metrics
+      activeKeyIndex = keyIdx; // Stick with working key
+      const adminKeys = getAdminGeminiKeys();
+      const match = adminKeys.find(k => k.key === currentKey);
+      if (match) {
+        match.status = 'ACTIVE';
+        match.last_used_at = new Date().toISOString();
+        match.success_count = (match.success_count || 0) + 1;
+        saveAdminGeminiKeys(adminKeys);
+      }
+
+      return result;
+    } catch (err: any) {
+      lastError = err;
+      const errMsg = String(err?.message || err);
+      const isRateLimit = errMsg.includes('429') || 
+                          errMsg.includes('RESOURCE_EXHAUSTED') || 
+                          errMsg.toLowerCase().includes('quota') ||
+                          errMsg.includes('503') ||
+                          errMsg.toLowerCase().includes('overloaded');
+
+      console.warn(`[GeminiFailover] Key (${maskApiKey(currentKey)}) attempt failed: ${errMsg.slice(0, 120)}.`);
+
+      const adminKeys = getAdminGeminiKeys();
+      const match = adminKeys.find(k => k.key === currentKey);
+      if (match) {
+        if (isRateLimit) {
+          match.status = 'RATE_LIMITED';
+        } else if (errMsg.includes('API_KEY_INVALID') || errMsg.includes('400')) {
+          match.status = 'INVALID';
+        }
+        match.last_error = errMsg.slice(0, 200);
+        match.failure_count = (match.failure_count || 0) + 1;
+        saveAdminGeminiKeys(adminKeys);
+      }
+
+      // If more keys exist, continue to next key
+      if (attempt < totalKeys - 1) {
+        console.log(`[GeminiFailover] Rotating to next API key (${attempt + 2}/${totalKeys})...`);
+        continue;
+      }
+    }
+  }
+
+  throw new Error(`All ${totalKeys} configured Gemini API keys exhausted or rate-limited. Last error: ${lastError?.message || String(lastError)}`);
+}
+
+/**
+ * Tests whether a Gemini API key is valid and has available quota
+ */
+export async function testGeminiApiKey(apiKey: string): Promise<{ valid: boolean; error?: string; model?: string }> {
+  try {
+    const client = createGenAIClient(apiKey.trim());
+    const model = 'gemini-3.1-flash-lite';
+    const res = await client.models.generateContent({
+      model,
+      contents: 'Hello, verify API connection.'
+    });
+
+    if (res.text) {
+      return { valid: true, model };
+    }
+    return { valid: false, error: 'Empty response received from Gemini' };
+  } catch (err: any) {
+    const msg = err?.message || String(err);
+    return { valid: false, error: msg };
+  }
 }

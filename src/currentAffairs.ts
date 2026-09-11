@@ -26,6 +26,13 @@ export function validDate(value: unknown): value is string {
     Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value;
 }
 
+/** Validates that a cutoff date is a valid ISO date within calendar bounds (2000-2099), timezone-safe. */
+export function isValidCutoffDate(value: unknown): value is string {
+  if (!validDate(value)) return false;
+  return value >= '2000-01-01' && value <= '2099-12-31';
+}
+
+
 /** Preserve the publisher's calendar date; local timezone conversion can shift it backwards. */
 export function parsePublicationDate(raw:string|undefined):string|undefined {
   if(!raw) return undefined;

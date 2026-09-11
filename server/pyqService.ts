@@ -16,7 +16,9 @@ import {
   PYQCognitiveLevel,
   PYQDifficultyLevel,
   AuditType,
-  DataProvenance
+  DataProvenance,
+  SubjectWeightageItem,
+  PaperWeightageAnalysis
 } from '../src/types.ts';
 import {
   INITIAL_PREVIOUS_PAPERS,
@@ -24,8 +26,9 @@ import {
   INITIAL_INTELLIGENCE_PROFILES,
   INITIAL_PYQ_CLUSTERS
 } from './pyqSeedData.ts';
-import { getExamById, saveGenerationAuditLog } from './dbService.ts';
-import { getGenAI, getPrimaryModel, getThinkingConfig, getThinkingLevelForTask } from './geminiConfig.ts';
+import { getExamById, saveGenerationAuditLog, getExams, createExamFromIntake, saveExams } from './dbService.ts';
+import { mapQuestionToSubject, resolveCanonicalSubjectsForExam, autoMapAllQuestions } from './subjectMapper.ts';
+import { getGenAI, getPrimaryModel, getThinkingConfig, getThinkingLevelForTask, executeWithGeminiFailover } from './geminiConfig.ts';
 
 const DATA_DIR = path.join(process.cwd(), 'server', 'data');
 const PAPERS_FILE = path.join(DATA_DIR, 'previous_papers.json');
@@ -65,28 +68,66 @@ if (process.env.PERSISTENCE_BACKEND !== 'DATABASE') {
   }
 }
 
+// In-memory state caches to ensure dynamic ingestion persists across runtime requests
+let inMemoryPapers: PreviousPaperRecord[] = [...INITIAL_PREVIOUS_PAPERS];
+let inMemoryQuestions: PYQQuestionRecord[] = [...INITIAL_PYQ_QUESTIONS];
+let memoryPapersLoaded = false;
+let memoryQuestionsLoaded = false;
+let kvSynced = false;
+
+export async function syncPYQFromKV(kv: any, force = false): Promise<void> {
+  if (!kv) return;
+  (globalThis as any).__CF_KV__ = kv;
+  if (kvSynced && !force) return;
+  try {
+    const remotePapers = await kv.get('pyq_papers_v1', 'json');
+    if (Array.isArray(remotePapers) && remotePapers.length > 0) {
+      const paperMap = new Map<string, PreviousPaperRecord>();
+      for (const p of inMemoryPapers) paperMap.set(p.paper_id, p);
+      for (const p of remotePapers) paperMap.set(p.paper_id, p);
+      inMemoryPapers = Array.from(paperMap.values());
+      memoryPapersLoaded = true;
+    }
+    const remoteQuestions = await kv.get('pyq_questions_v1', 'json');
+    if (Array.isArray(remoteQuestions) && remoteQuestions.length > 0) {
+      const qMap = new Map<string, PYQQuestionRecord>();
+      for (const q of inMemoryQuestions) qMap.set(q.pyq_question_id, q);
+      for (const q of remoteQuestions) qMap.set(q.pyq_question_id, q);
+      inMemoryQuestions = Array.from(qMap.values());
+      memoryQuestionsLoaded = true;
+    }
+    kvSynced = true;
+  } catch (err) {
+    console.warn('[PYQ_KV_SYNC_WARN]', err);
+  }
+}
+
 // ==========================================
 // 1. PAPERS REPOSITORY & REGISTRATION
 // ==========================================
 
 export function getPreviousPapers(examId?: string): PreviousPaperRecord[] {
-  try {
-    const raw = fs.readFileSync(PAPERS_FILE, 'utf-8');
-    let papers: PreviousPaperRecord[] = JSON.parse(raw);
-    papers = papers.map(p => ({
-      ...p,
-      data_provenance: p.data_provenance || 'RETRIEVED_OFFICIAL'
-    }));
-    if (examId) {
-      return papers.filter(p => p.exam_id === examId);
+  if (!memoryPapersLoaded) {
+    try {
+      const raw = fs.readFileSync(PAPERS_FILE, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        inMemoryPapers = parsed;
+      }
+    } catch (e) {
+      // Retain inMemoryPapers in memory-only or worker environments
     }
-    return papers;
-  } catch (e) {
-    return INITIAL_PREVIOUS_PAPERS.map(p => ({
-      ...p,
-      data_provenance: p.data_provenance || 'RETRIEVED_OFFICIAL'
-    }));
+    memoryPapersLoaded = true;
   }
+  let papers = inMemoryPapers;
+  papers = papers.map(p => ({
+    ...p,
+    data_provenance: p.data_provenance || 'RETRIEVED_OFFICIAL'
+  }));
+  if (examId) {
+    return papers.filter(p => p.exam_id === examId);
+  }
+  return papers;
 }
 
 export function getPaperById(paperId: string): PreviousPaperRecord | undefined {
@@ -95,9 +136,17 @@ export function getPaperById(paperId: string): PreviousPaperRecord | undefined {
 }
 
 export function savePreviousPapers(papers: PreviousPaperRecord[]): void {
+  inMemoryPapers = papers;
+  memoryPapersLoaded = true;
   try {
     fs.writeFileSync(PAPERS_FILE, JSON.stringify(papers, null, 2));
   } catch (e) {}
+  const kv = (globalThis as any).__CF_KV__;
+  if (kv) {
+    try {
+      kv.put('pyq_papers_v1', JSON.stringify(papers)).catch((e: any) => console.warn('[KV_PUT_PAPERS_ERR]', e));
+    } catch (e) {}
+  }
 }
 
 export function registerPreviousPaper(input: Partial<PreviousPaperRecord>): PreviousPaperRecord {
@@ -106,14 +155,15 @@ export function registerPreviousPaper(input: Partial<PreviousPaperRecord>): Prev
   const year = input.year || new Date().getFullYear();
   const shift = input.shift || 'Default Shift';
   const booklet = input.booklet_code || 'Series-A';
+  const paperName = input.paper_name || 'Paper-I';
 
   // Compute content hash to prevent duplicate ingestion
-  const rawSignature = `${examId}_${year}_${shift}_${booklet}_${input.paper_name || ''}`;
+  const rawSignature = `${examId}_${year}_${shift}_${booklet}_${paperName}`;
   const contentHash = input.content_hash || crypto.createHash('sha256').update(rawSignature).digest('hex').substring(0, 32);
 
-  // Check for duplicate paper
+  // Check for duplicate paper matching exam, year, shift, booklet AND paper name
   const existing = papers.find(
-    p => p.exam_id === examId && p.year === year && p.shift === shift && p.booklet_code === booklet
+    p => p.exam_id === examId && p.year === year && p.shift === shift && p.booklet_code === booklet && p.paper_name === paperName
   );
   if (existing) {
     return existing;
@@ -169,56 +219,60 @@ export function getPYQQuestions(filter?: {
   search?: string;
   data_provenance?: DataProvenance;
 }): PYQQuestionRecord[] {
-  try {
-    const raw = fs.readFileSync(QUESTIONS_FILE, 'utf-8');
-    let questions: PYQQuestionRecord[] = JSON.parse(raw);
-    questions = questions.map(q => ({
-      ...q,
-      data_provenance: q.data_provenance || 'RETRIEVED_OFFICIAL'
-    }));
-
-    if (filter?.data_provenance) {
-      questions = questions.filter(q => q.data_provenance === filter.data_provenance);
+  if (!memoryQuestionsLoaded) {
+    try {
+      const raw = fs.readFileSync(QUESTIONS_FILE, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        inMemoryQuestions = parsed;
+      }
+    } catch (e) {
+      // Retain inMemoryQuestions
     }
-    if (filter?.exam_id) {
-      questions = questions.filter(q => q.exam_id === filter.exam_id);
-    }
-    if (filter?.paper_id) {
-      questions = questions.filter(q => q.paper_id === filter.paper_id);
-    }
-    if (filter?.subject) {
-      questions = questions.filter(q => q.primary_subject.toLowerCase().includes(filter.subject!.toLowerCase()));
-    }
-    if (filter?.topic) {
-      questions = questions.filter(q => q.primary_topic.toLowerCase().includes(filter.topic!.toLowerCase()));
-    }
-    if (filter?.question_type) {
-      questions = questions.filter(q => q.question_type === filter.question_type);
-    }
-    if (filter?.difficulty) {
-      questions = questions.filter(q => q.difficulty === filter.difficulty);
-    }
-    if (filter?.static_or_current) {
-      questions = questions.filter(q => q.static_or_current === filter.static_or_current);
-    }
-    if (filter?.search) {
-      const s = filter.search.toLowerCase();
-      questions = questions.filter(
-        q =>
-          q.question_en.toLowerCase().includes(s) ||
-          q.primary_subject.toLowerCase().includes(s) ||
-          q.primary_topic.toLowerCase().includes(s) ||
-          q.core_concept.toLowerCase().includes(s)
-      );
-    }
-
-    return questions;
-  } catch (e) {
-    return INITIAL_PYQ_QUESTIONS.map(q => ({
-      ...q,
-      data_provenance: q.data_provenance || 'RETRIEVED_OFFICIAL'
-    }));
+    memoryQuestionsLoaded = true;
   }
+  let questions = inMemoryQuestions;
+  questions = questions.map(q => ({
+    ...q,
+    data_provenance: q.data_provenance || 'RETRIEVED_OFFICIAL'
+  }));
+
+  if (filter?.data_provenance) {
+    questions = questions.filter(q => q.data_provenance === filter.data_provenance);
+  }
+  if (filter?.exam_id) {
+    questions = questions.filter(q => q.exam_id === filter.exam_id);
+  }
+  if (filter?.paper_id) {
+    questions = questions.filter(q => q.paper_id === filter.paper_id);
+  }
+  if (filter?.subject) {
+    questions = questions.filter(q => q.primary_subject.toLowerCase().includes(filter.subject!.toLowerCase()));
+  }
+  if (filter?.topic) {
+    questions = questions.filter(q => q.primary_topic.toLowerCase().includes(filter.topic!.toLowerCase()));
+  }
+  if (filter?.question_type) {
+    questions = questions.filter(q => q.question_type === filter.question_type);
+  }
+  if (filter?.difficulty) {
+    questions = questions.filter(q => q.difficulty === filter.difficulty);
+  }
+  if (filter?.static_or_current) {
+    questions = questions.filter(q => q.static_or_current === filter.static_or_current);
+  }
+  if (filter?.search) {
+    const s = filter.search.toLowerCase();
+    questions = questions.filter(
+      q =>
+        q.question_en.toLowerCase().includes(s) ||
+        q.primary_subject.toLowerCase().includes(s) ||
+        q.primary_topic.toLowerCase().includes(s) ||
+        q.core_concept.toLowerCase().includes(s)
+    );
+  }
+
+  return questions;
 }
 
 export function getPYQQuestionById(id: string): PYQQuestionRecord | undefined {
@@ -227,9 +281,533 @@ export function getPYQQuestionById(id: string): PYQQuestionRecord | undefined {
 }
 
 export function savePYQQuestions(questions: PYQQuestionRecord[]): void {
+  inMemoryQuestions = questions;
+  memoryQuestionsLoaded = true;
   try {
     fs.writeFileSync(QUESTIONS_FILE, JSON.stringify(questions, null, 2));
   } catch (e) {}
+  const kv = (globalThis as any).__CF_KV__;
+  if (kv) {
+    try {
+      kv.put('pyq_questions_v1', JSON.stringify(questions)).catch((e: any) => console.warn('[KV_PUT_QUESTIONS_ERR]', e));
+    } catch (e) {}
+  }
+}
+
+
+
+// ==========================================
+// 2C. DIRECT QUESTION PAPER INGESTION & PARSER (WITH GEMINI AI MATCHING)
+// ==========================================
+
+export interface IngestPaperPayload {
+  exam_id?: string;
+  exam_title?: string;
+  exam_board?: string;
+  exam_stage?: string;
+  paper_name?: string;
+  exam_date?: string;
+  year?: number;
+  shift?: string;
+  booklet_code?: string;
+  raw_text?: string;
+  format?: 'RAW_TEXT' | 'STRUCTURED_JSON' | 'QNA_LIST';
+  questions_override?: any[];
+  custom_subjects?: string[];
+  ai_match_subjects?: boolean;
+}
+
+export async function parseAndIngestQuestionPaper(payload: IngestPaperPayload): Promise<{
+  success: boolean;
+  paper: PreviousPaperRecord;
+  count: number;
+  questions: PYQQuestionRecord[];
+  weightage_analysis?: PaperWeightageAnalysis;
+}> {
+  const year = payload.year || (payload.exam_date ? parseInt(payload.exam_date.substring(0, 4), 10) : new Date().getFullYear());
+  const examDate = payload.exam_date || `${year}-06-01`;
+  const paperName = payload.paper_name?.trim() || `Previous Examination Paper (${year})`;
+  const shift = payload.shift?.trim() || 'General Session';
+  const bookletCode = payload.booklet_code?.trim() || 'Series-A';
+
+  // 1. Resolve or Create Exam Record
+  let examId = (payload.exam_id || '').trim();
+  const rawSubjects = (payload.custom_subjects || [])
+    .map(s => typeof s === 'string' ? s.trim() : '')
+    .filter((s): s is string => Boolean(s && s.length > 0));
+
+  if (!examId || examId === 'general' || examId === 'new') {
+    if (payload.exam_title && payload.exam_title.trim()) {
+      const allExams = getExams();
+      const existingExam = allExams.find(e => 
+        e.title.toLowerCase() === payload.exam_title!.trim().toLowerCase()
+      );
+      if (existingExam) {
+        examId = existingExam.exam_id;
+        // Merge any new subjects into exam syllabus
+        if (rawSubjects.length > 0) {
+          const combined = [...new Set([...(existingExam.syllabus_topics || []), ...rawSubjects])];
+          existingExam.syllabus_topics = combined;
+          existingExam.pattern.sections = [...new Set([...(existingExam.pattern.sections || []), ...rawSubjects])];
+          saveExams(allExams);
+        }
+      } else {
+        const createdExam = createExamFromIntake({
+          title: payload.exam_title.trim(),
+          commission: payload.exam_board?.trim() || 'Official Commission / Examination Board',
+          state_or_central: 'STATE',
+          post: 'Official Examination Service',
+          stage: payload.exam_stage?.trim() || 'Preliminary / Objective Examination',
+          paper: paperName,
+          recruitment_cycle: `${year} Notification Cycle`,
+          total_questions: 150,
+          duration_minutes: 150,
+          marks_per_question: 1,
+          negative_marking_rate: 0.25,
+          sections: rawSubjects.length > 0 ? rawSubjects : ['General Studies'],
+          syllabus_topics: rawSubjects.length > 0 ? rawSubjects : ['General Studies'],
+          mediums: ['English']
+        });
+        examId = createdExam.exam_id;
+      }
+    } else {
+      const allExams = getExams();
+      examId = allExams[0]?.exam_id || 'general';
+    }
+  }
+
+  // 2. Extract Questions from structured override, JSON text, or heuristic regex
+  let rawQuestions: Array<{
+    question_number?: number;
+    question_en: string;
+    option_a_en: string;
+    option_b_en: string;
+    option_c_en: string;
+    option_d_en: string;
+    correct_answer?: string;
+    reason_summary?: string;
+    primary_subject?: string;
+    primary_topic?: string;
+    difficulty?: 'EASY' | 'MODERATE' | 'DIFFICULT';
+    matching_rationale?: string;
+  }> = [];
+
+  // 2a. Direct structured questions
+  if (Array.isArray(payload.questions_override) && payload.questions_override.length > 0) {
+    rawQuestions = payload.questions_override.map((item, idx) => ({
+      question_number: item.question_number || idx + 1,
+      question_en: item.question_en || item.question || item.text || `Question ${idx + 1}`,
+      option_a_en: item.option_a_en || item.option_a || (Array.isArray(item.options) ? item.options[0] : 'Option A'),
+      option_b_en: item.option_b_en || item.option_b || (Array.isArray(item.options) ? item.options[1] : 'Option B'),
+      option_c_en: item.option_c_en || item.option_c || (Array.isArray(item.options) ? item.options[2] : 'Option C'),
+      option_d_en: item.option_d_en || item.option_d || (Array.isArray(item.options) ? item.options[3] : 'Option D'),
+      correct_answer: (item.correct_answer || item.answer || item.key || 'A').toUpperCase().replace(/[^ABCD]/g, '').charAt(0) || 'A',
+      reason_summary: item.reason_summary || item.explanation || 'Verified from previous examination official answer key.',
+      primary_subject: item.primary_subject || item.subject || 'General Studies',
+      primary_topic: item.primary_topic || item.topic || 'Official Question Item',
+      difficulty: item.difficulty || 'MODERATE'
+    }));
+  }
+  // 2b. JSON in raw_text
+  else if (payload.raw_text && payload.raw_text.trim().startsWith('[')) {
+    try {
+      const parsed = JSON.parse(payload.raw_text.trim());
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        rawQuestions = parsed.map((item, idx) => ({
+          question_number: item.question_number || idx + 1,
+          question_en: item.question_en || item.question || item.text || `Question ${idx + 1}`,
+          option_a_en: item.option_a_en || item.option_a || (Array.isArray(item.options) ? item.options[0] : 'Option A'),
+          option_b_en: item.option_b_en || item.option_b || (Array.isArray(item.options) ? item.options[1] : 'Option B'),
+          option_c_en: item.option_c_en || item.option_c || (Array.isArray(item.options) ? item.options[2] : 'Option C'),
+          option_d_en: item.option_d_en || item.option_d || (Array.isArray(item.options) ? item.options[3] : 'Option D'),
+          correct_answer: (item.correct_answer || item.answer || item.key || 'A').toUpperCase().replace(/[^ABCD]/g, '').charAt(0) || 'A',
+          reason_summary: item.reason_summary || item.explanation || 'Verified from previous examination official answer key.',
+          primary_subject: item.primary_subject || item.subject || 'General Studies',
+          primary_topic: item.primary_topic || item.topic || 'Official Question Item',
+          difficulty: item.difficulty || 'MODERATE'
+        }));
+      }
+    } catch (e) {
+      // Fall through to regex parser
+    }
+  }
+
+  // 2c. Heuristic Regex Parser for text
+  if (rawQuestions.length === 0 && payload.raw_text && payload.raw_text.trim()) {
+    const text = payload.raw_text.trim();
+    const chunks = text.split(/(?:^|\n)(?=(?:Q(?:\.|\s*|uestion\s*)|(?:\d+)[\.\:\)]))\s*/i).filter(c => c.trim().length > 10);
+
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
+      const optMatch = chunk.match(/(?:\(?([A-Da-d1-4])\)?[\.\:\)]|\bOption\s*([A-D]))/);
+      const optIndex = optMatch && optMatch.index !== undefined ? optMatch.index : -1;
+      const stem = (optIndex > 0 ? chunk.substring(0, optIndex) : chunk).replace(/^(?:Q(?:\.|\s*|uestion\s*)|\d+[\.\:\)])\s*/i, '').trim();
+
+      const optA = (chunk.match(/(?:\(?A\)?[\.\:\)]|\bOption\s*A\b)\s*([\s\S]*?)(?=(?:\(?B\)?[\.\:\)]|\bOption\s*B\b)|Answer|Key|Ans|$)/i)?.[1] || '').trim();
+      const optB = (chunk.match(/(?:\(?B\)?[\.\:\)]|\bOption\s*B\b)\s*([\s\S]*?)(?=(?:\(?C\)?[\.\:\)]|\bOption\s*C\b)|Answer|Key|Ans|$)/i)?.[1] || '').trim();
+      const optC = (chunk.match(/(?:\(?C\)?[\.\:\)]|\bOption\s*C\b)\s*([\s\S]*?)(?=(?:\(?D\)?[\.\:\)]|\bOption\s*D\b)|Answer|Key|Ans|$)/i)?.[1] || '').trim();
+      const optD = (chunk.match(/(?:\(?D\)?[\.\:\)]|\bOption\s*D\b)\s*([\s\S]*?)(?=(?:Answer|Key|Ans|Explanation|Ref|$))/i)?.[1] || '').trim();
+
+      const keyMatch = chunk.match(/(?:Answer|Ans|Key|Correct(?:\s*Option)?)\s*[:\-\=]?\s*\(?([A-D1-4])/i);
+      let key = 'A';
+      if (keyMatch) {
+        const rawKey = keyMatch[1].toUpperCase();
+        if (rawKey === '1') key = 'A';
+        else if (rawKey === '2') key = 'B';
+        else if (rawKey === '3') key = 'C';
+        else if (rawKey === '4') key = 'D';
+        else if (['A', 'B', 'C', 'D'].includes(rawKey)) key = rawKey;
+      }
+
+      const expMatch = chunk.match(/(?:Explanation|Solution|Rationale|Ref|Citation)\s*[:\-\=]?\s*([\s\S]*?)$/i);
+      const explanation = expMatch ? expMatch[1].trim() : 'Official commission previous year question with verified answer key.';
+
+      if (stem && (optA || optB)) {
+        rawQuestions.push({
+          question_number: i + 1,
+          question_en: stem,
+          option_a_en: optA || 'Option A',
+          option_b_en: optB || 'Option B',
+          option_c_en: optC || 'Option C',
+          option_d_en: optD || 'Option D',
+          correct_answer: key,
+          reason_summary: explanation,
+          primary_subject: 'General Studies',
+          primary_topic: 'Imported PYQ Question',
+          difficulty: 'MODERATE'
+        });
+      }
+    }
+  }
+
+  // 2d. Gemini AI Parsing Fallback for complex unstructured dumps
+  if (rawQuestions.length === 0 && payload.raw_text && payload.raw_text.trim()) {
+    try {
+      await executeWithGeminiFailover(async (ai) => {
+        const prompt = `You are a government exam paper ingestion expert.
+Parse the following pasted raw examination text and return a pure JSON array of extracted multiple-choice questions.
+Each question must strictly have this JSON format:
+[
+  {
+    "question_number": 1,
+    "question_en": "Question text here",
+    "option_a_en": "Text of option A",
+    "option_b_en": "Text of option B",
+    "option_c_en": "Text of option C",
+    "option_d_en": "Text of option D",
+    "correct_answer": "A" | "B" | "C" | "D",
+    "reason_summary": "Explanation or why this answer is correct",
+    "primary_subject": "General Studies",
+    "primary_topic": "Official Question Item",
+    "difficulty": "MODERATE"
+  }
+]
+Only return valid parseable JSON array, no extra commentary.
+
+RAW TEXT:
+${payload.raw_text!.substring(0, 15000)}
+`;
+        const res = await ai.models.generateContent({
+          model: getPrimaryModel(),
+          contents: prompt
+        });
+        const textOut = res.text || '';
+        const jsonMatch = textOut.match(/\[\s*\{[\s\S]*\}\s*\]/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          if (Array.isArray(parsed)) {
+            rawQuestions = parsed;
+          }
+        }
+      });
+    } catch (e) {
+      console.warn("[PYQ Ingestion] Gemini question parsing fallback notice:", e);
+    }
+  }
+
+  if (rawQuestions.length === 0) {
+    throw new Error("Could not parse any valid questions from the provided text. Please ensure questions include stem, options (A, B, C, D) and answer keys.");
+  }
+
+  // 3. GEMINI QUESTION-TO-SUBJECT MATCHING
+  // If subjects were provided and AI matching is enabled (default true)
+  const candidateSubjects = rawSubjects.length > 0 ? rawSubjects : [];
+  let geminiClassificationSuccess = false;
+  let modelUsedForMatching = 'Heuristic Classification';
+
+  if (candidateSubjects.length > 0 && payload.ai_match_subjects !== false) {
+    try {
+      console.log(`[PYQ AI Matching] Classifying ${rawQuestions.length} questions into ${candidateSubjects.length} subjects: ${candidateSubjects.join(', ')}`);
+
+      // Batch questions in slices of up to 25 to ensure reliable JSON parsing
+      const BATCH_SIZE = 25;
+      const totalBatches = Math.ceil(rawQuestions.length / BATCH_SIZE);
+
+      for (let b = 0; b < totalBatches; b++) {
+        const batch = rawQuestions.slice(b * BATCH_SIZE, (b + 1) * BATCH_SIZE);
+        const batchSummaries = batch.map(q => ({
+          question_number: q.question_number,
+          question: q.question_en.substring(0, 250),
+          options: `A: ${q.option_a_en.substring(0, 60)} | B: ${q.option_b_en.substring(0, 60)} | C: ${q.option_c_en.substring(0, 60)} | D: ${q.option_d_en.substring(0, 60)}`
+        }));
+
+        await executeWithGeminiFailover(async (ai) => {
+          const prompt = `You are an elite government exam curriculum auditor.
+The user uploaded questions from "${paperName}" and specified these CANONICAL SUBJECTS:
+${candidateSubjects.map((s, i) => `${i + 1}. "${s}"`).join('\n')}
+
+For each question below:
+1. Classify the question strictly into one of the canonical subjects listed above. Do not invent new subjects.
+2. Identify the specific primary topic within that subject (e.g., "Fundamental Rights", "Fiscal Policy", "Telangana Movement 1969", "Percentage & Ratios", "Indian Rivers").
+3. Determine difficulty: "EASY", "MODERATE", or "DIFFICULT".
+4. Provide a brief 1-sentence rationale explaining the classification.
+
+Output ONLY a JSON array with this structure:
+[
+  {
+    "question_number": <number>,
+    "matched_subject": "<Exact match from canonical subjects>",
+    "primary_topic": "<Specific syllabus topic>",
+    "difficulty": "EASY" | "MODERATE" | "DIFFICULT",
+    "rationale": "<Brief rationale>"
+  }
+]
+
+QUESTIONS TO CLASSIFY:
+${JSON.stringify(batchSummaries, null, 2)}
+`;
+          const modelId = getPrimaryModel();
+          modelUsedForMatching = modelId;
+          const res = await ai.models.generateContent({
+            model: modelId,
+            contents: prompt
+          });
+
+          const textOut = res.text || '';
+          const jsonMatch = textOut.match(/\[\s*\{[\s\S]*\}\s*\]/);
+          if (jsonMatch) {
+            const classifications: Array<{
+              question_number: number;
+              matched_subject: string;
+              primary_topic: string;
+              difficulty?: 'EASY' | 'MODERATE' | 'DIFFICULT';
+              rationale?: string;
+            }> = JSON.parse(jsonMatch[0]);
+
+            for (const c of classifications) {
+              const target = rawQuestions.find(q => q.question_number === c.question_number);
+              if (target) {
+                // Ensure the matched subject is from candidateSubjects
+                const exactMatch = candidateSubjects.find(cs => cs.toLowerCase() === (c.matched_subject || '').toLowerCase());
+                target.primary_subject = exactMatch || c.matched_subject || candidateSubjects[0];
+                target.primary_topic = c.primary_topic || target.primary_topic || 'Core Concept';
+                if (c.difficulty && ['EASY', 'MODERATE', 'DIFFICULT'].includes(c.difficulty)) {
+                  target.difficulty = c.difficulty;
+                }
+                target.matching_rationale = c.rationale;
+              }
+            }
+          }
+        });
+      }
+
+      geminiClassificationSuccess = true;
+      console.log(`[PYQ AI Matching] Successfully classified questions using Gemini AI.`);
+    } catch (aiErr: any) {
+      console.warn('[PYQ AI Matching] Gemini matching encountered error, applying heuristic fallback:', aiErr?.message || aiErr);
+      // Fallback: match based on keywords
+      for (const q of rawQuestions) {
+        const text = `${q.question_en} ${q.option_a_en} ${q.option_b_en}`.toLowerCase();
+        let matched = candidateSubjects[0];
+        let maxMatches = 0;
+        for (const subj of candidateSubjects) {
+          const words = subj.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+          let matchCount = 0;
+          for (const w of words) {
+            if (text.includes(w)) matchCount++;
+          }
+          if (matchCount > maxMatches) {
+            maxMatches = matchCount;
+            matched = subj;
+          }
+        }
+        q.primary_subject = matched;
+      }
+    }
+  }
+
+  // 4. REGISTER PREVIOUS PAPER RECORD
+  const newPaper = registerPreviousPaper({
+    exam_id: examId,
+    recruitment_cycle: `${year} Examination Cycle`,
+    year: year,
+    exam_date: examDate,
+    stage: 'Previous Year Objective Examination',
+    paper_name: paperName,
+    paper_number: 1,
+    shift: shift,
+    booklet_code: bookletCode,
+    language: 'English',
+    question_count: rawQuestions.length,
+    marks: rawQuestions.length,
+    duration_minutes: Math.max(60, Math.round(rawQuestions.length * 1)),
+    official_status: 'OFFICIAL',
+    extraction_status: 'EXTRACTED',
+    analysis_status: 'COMPLETED',
+    notes: `Paper ingested on ${new Date().toLocaleDateString()}. Subjects configured: ${candidateSubjects.length}. AI matching: ${geminiClassificationSuccess ? 'Gemini AI' : 'Heuristic'}.`
+  });
+
+  // 5. CONVERT TO PYQQuestionRecord AND PERSIST
+  const createdQuestions: PYQQuestionRecord[] = rawQuestions.map((q, idx) => {
+    const qNum = q.question_number || idx + 1;
+    const ans = (['A', 'B', 'C', 'D'].includes(q.correct_answer || '') ? q.correct_answer : 'A') as 'A' | 'B' | 'C' | 'D';
+    const diff = (q.difficulty && ['EASY', 'MODERATE', 'DIFFICULT'].includes(q.difficulty) ? q.difficulty : 'MODERATE') as 'EASY' | 'MODERATE' | 'DIFFICULT';
+
+    return {
+      pyq_question_id: `pyq_imp_${newPaper.paper_id}_q${String(qNum).padStart(2, '0')}`,
+      paper_id: newPaper.paper_id,
+      exam_id: examId,
+      question_number: qNum,
+      question_en: q.question_en,
+      option_a_en: q.option_a_en || 'Option A',
+      option_b_en: q.option_b_en || 'Option B',
+      option_c_en: q.option_c_en || 'Option C',
+      option_d_en: q.option_d_en || 'Option D',
+      correct_answer: ans,
+      provisional_answer: ans,
+      answer_verification_status: 'FINAL_OFFICIAL',
+      answer_source_citation: `${newPaper.paper_name} (${bookletCode}) - Master Answer Key: Option ${ans}`,
+      raw_question_text: `${q.question_en} (A) ${q.option_a_en} (B) ${q.option_b_en} (C) ${q.option_c_en} (D) ${q.option_d_en}`,
+      normalized_question_text: q.question_en,
+      has_image: false,
+      has_table: false,
+      has_chart: false,
+      has_map: false,
+      has_diagram: false,
+      primary_subject: q.primary_subject || 'General Studies',
+      primary_topic: q.primary_topic || 'Official Question Item',
+      subtopic: 'Examination Item',
+      microtopic: 'Syllabus Concept',
+      question_type: 'DIRECT_FACT',
+      question_archetype: 'DIRECT_FACT',
+      difficulty: diff,
+      cognitive_level: 'UNDERSTAND',
+      static_or_current: 'STATIC',
+      state_specificity: 'STATE_SPECIFIC',
+      distractor_style: 'NEAR_FACT',
+      why_asked_reason: 'OFFICIAL_COMMISSION_ITEM',
+      reason_summary: q.reason_summary || q.matching_rationale || 'Verified commission item.',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      data_provenance: 'RETRIEVED_OFFICIAL'
+    } as any as PYQQuestionRecord;
+  });
+
+  const existingQuestions = getPYQQuestions();
+  const combinedQuestions = [...createdQuestions, ...existingQuestions];
+  savePYQQuestions(combinedQuestions);
+
+  // 6. COMPUTE SYLLABUS WEIGHTAGE ANALYSIS
+  const totalQuestions = createdQuestions.length;
+  const subjectMap: Record<string, {
+    count: number;
+    topics: Record<string, number>;
+    difficulty: { EASY: number; MODERATE: number; DIFFICULT: number };
+  }> = {};
+
+  // Initialize with user's candidate subjects so 0-count subjects are visible
+  for (const s of candidateSubjects) {
+    subjectMap[s] = {
+      count: 0,
+      topics: {},
+      difficulty: { EASY: 0, MODERATE: 0, DIFFICULT: 0 }
+    };
+  }
+
+  // Tally from created questions
+  for (const q of createdQuestions) {
+    const subj = q.primary_subject || 'General Studies';
+    if (!subjectMap[subj]) {
+      subjectMap[subj] = {
+        count: 0,
+        topics: {},
+        difficulty: { EASY: 0, MODERATE: 0, DIFFICULT: 0 }
+      };
+    }
+    subjectMap[subj].count++;
+    const t = q.primary_topic || 'General Topic';
+    subjectMap[subj].topics[t] = (subjectMap[subj].topics[t] || 0) + 1;
+    const diff = (q.difficulty as 'EASY' | 'MODERATE' | 'DIFFICULT') || 'MODERATE';
+    subjectMap[subj].difficulty[diff]++;
+  }
+
+  const subjectItems: SubjectWeightageItem[] = Object.entries(subjectMap).map(([subject, data]) => {
+    const topicsArr = Object.entries(data.topics)
+      .map(([topic, count]) => ({ topic, count }))
+      .sort((a, b) => b.count - a.count);
+
+    return {
+      subject,
+      question_count: data.count,
+      percentage: totalQuestions > 0 ? Math.round((data.count / totalQuestions) * 1000) / 10 : 0,
+      topics: topicsArr,
+      difficulty_breakdown: data.difficulty
+    };
+  }).sort((a, b) => b.question_count - a.question_count);
+
+  // High yield topics across all subjects
+  const allTopicCounts: Record<string, { topic: string; subject: string; count: number }> = {};
+  for (const q of createdQuestions) {
+    const key = `${q.primary_subject}:::${q.primary_topic}`;
+    if (!allTopicCounts[key]) {
+      allTopicCounts[key] = {
+        topic: q.primary_topic,
+        subject: q.primary_subject,
+        count: 0
+      };
+    }
+    allTopicCounts[key].count++;
+  }
+  const highYieldTopics = Object.values(allTopicCounts)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 8);
+
+  // Strategic Summary
+  const topSubject = subjectItems[0];
+  const topTwo = subjectItems.slice(0, 2);
+  const combinedTopPct = topTwo.reduce((sum, s) => sum + s.percentage, 0);
+
+  let strategicSummary = `In this examination paper (${paperName}), the highest weightage was observed in "${topSubject?.subject || 'General Studies'}" with ${topSubject?.question_count || 0} questions (${topSubject?.percentage || 0}%).`;
+  if (topTwo.length > 1) {
+    strategicSummary += ` The top two subjects ("${topTwo[0].subject}" and "${topTwo[1].subject}") account for ${combinedTopPct.toFixed(1)}% of all questions, indicating essential core priority areas for test takers.`;
+  }
+
+  const weightageAnalysis: PaperWeightageAnalysis = {
+    paper_name: paperName,
+    year,
+    total_questions: totalQuestions,
+    subjects: subjectItems,
+    high_yield_topics: highYieldTopics,
+    strategic_summary: strategicSummary,
+    analyzed_by_gemini: geminiClassificationSuccess,
+    model_used: geminiClassificationSuccess ? modelUsedForMatching : undefined,
+    custom_subjects_provided: candidateSubjects
+  };
+
+  // 7. RECALCULATE EXAM INTELLIGENCE PROFILE
+  try {
+    buildExamIntelligenceProfile(examId);
+  } catch (e) {
+    console.warn('[PYQ] Intelligence recalculation notice:', e);
+  }
+
+  return {
+    success: true,
+    paper: newPaper,
+    count: createdQuestions.length,
+    questions: createdQuestions,
+    weightage_analysis: weightageAnalysis
+  };
 }
 
 // ==========================================
@@ -317,6 +895,8 @@ export async function analyseQuestionBatch(
 
   const examId = targetQuestions[0].exam_id;
   const exam = getExamById(examId);
+  const canonicalSubjects = resolveCanonicalSubjectsForExam(exam || examId);
+  const canonicalNames = canonicalSubjects.map(cs => cs.name);
 
   // Use Gemini with Thinking level 'PYQ_ANALYSIS' if API key available
   let genAI: any = null;
@@ -340,6 +920,16 @@ Analyze the following Previous-Year Question (PYQ):
 
 EXAM: ${exam?.title || 'State/Central Public Service Commission'}
 SUBJECT CONTEXT: ${q.primary_subject || 'General Studies'}
+${canonicalNames.length > 0 ? `
+CRITICAL CONSTRAINT - OFFICIAL SYLLABUS SUBJECTS:
+You MUST classify "primary_subject" into EXACTLY ONE of the following official syllabus subjects:
+${canonicalNames.map(name => `- "${name}"`).join('\n')}
+Do NOT invent new subject names outside this list.
+` : ''}
+${exam?.syllabus_topics && exam.syllabus_topics.length > 0 ? `
+SYLLABUS TOPICS CONTEXT:
+${exam.syllabus_topics.slice(0, 15).map(topic => `- ${topic}`).join('\n')}
+` : ''}
 QUESTION:
 ${q.question_en}
 
@@ -401,7 +991,16 @@ Never present speculative 'why asked' reasoning as established fact. Return ONLY
         const cleaned = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         const parsed = JSON.parse(cleaned);
 
-        q.primary_subject = parsed.primary_subject || q.primary_subject;
+        const rawSubject = parsed.primary_subject || q.primary_subject;
+        const mapped = mapQuestionToSubject({
+          exam_id: examId,
+          primary_subject: rawSubject,
+          primary_topic: parsed.primary_topic || q.primary_topic,
+          question_number: q.question_number,
+          question_en: q.question_en
+        }, exam);
+
+        q.primary_subject = mapped.canonical_subject || rawSubject;
         q.primary_topic = parsed.primary_topic || q.primary_topic;
         q.subtopic = parsed.subtopic || q.subtopic;
         q.microtopic = parsed.microtopic || q.microtopic;
@@ -433,10 +1032,10 @@ Never present speculative 'why asked' reasoning as established fact. Return ONLY
           modelUnavailable = true;
           console.warn("AI quota/concurrency reached; fast-failing remaining batch questions to deterministic expert analysis.");
         }
-        applyFallbackIntelligence(q);
+        applyFallbackIntelligence(q, exam);
       }
     } else {
-      applyFallbackIntelligence(q);
+      applyFallbackIntelligence(q, exam);
     }
 
     // Refresh canonical fact fingerprint
@@ -453,8 +1052,9 @@ Never present speculative 'why asked' reasoning as established fact. Return ONLY
   return targetQuestions;
 }
 
-function applyFallbackIntelligence(q: PYQQuestionRecord) {
-  if (!q.primary_subject) q.primary_subject = 'General Studies';
+function applyFallbackIntelligence(q: PYQQuestionRecord, exam?: any) {
+  const mapped = mapQuestionToSubject(q, exam);
+  q.primary_subject = mapped.canonical_subject || q.primary_subject || 'General Studies';
   if (!q.primary_topic) q.primary_topic = 'Core Concept';
   if (!q.subtopic) q.subtopic = 'Foundation';
   if (!q.microtopic) q.microtopic = 'Specific Provision';
@@ -520,17 +1120,50 @@ export function buildExamIntelligenceProfile(examId: string): ExamIntelligencePr
   );
 
   // 1. Subject Breakdown & Comparison with Official Blueprint
+  const canonicalSubjects = resolveCanonicalSubjectsForExam(exam || examId);
+  let questionsModified = false;
   const subjectCounts: Record<string, number> = {};
+
   for (const q of questions) {
+    if (canonicalSubjects.length > 0) {
+      const mapped = mapQuestionToSubject(q, exam);
+      if (mapped.canonical_subject && mapped.canonical_subject !== q.primary_subject) {
+        q.primary_subject = mapped.canonical_subject;
+        questionsModified = true;
+      }
+    }
     const s = q.primary_subject || 'General Studies';
     subjectCounts[s] = (subjectCounts[s] || 0) + 1;
   }
 
+  // Persist updated subjects back to disk if modified
+  if (questionsModified) {
+    try {
+      const allQuestions = getPYQQuestions();
+      for (const q of questions) {
+        const idx = allQuestions.findIndex(item => item.pyq_question_id === q.pyq_question_id);
+        if (idx !== -1) allQuestions[idx].primary_subject = q.primary_subject;
+      }
+      savePYQQuestions(allQuestions);
+    } catch (e) {
+      console.warn("Failed to persist remapped question subjects:", e);
+    }
+  }
+
   const totalQuestions = questions.length || 1;
   const subjectDistribution = Object.entries(subjectCounts).map(([subject, count]) => {
-    // Official weightage from syllabus if defined
+    // Official weightage from canonical subjects or syllabus
     let officialWeight: number | undefined = undefined;
-    if (exam?.pattern?.sections && exam.pattern.sections.length > 0) {
+    if (canonicalSubjects.length > 0) {
+      const match = canonicalSubjects.find(cs => 
+        cs.name.toLowerCase() === subject.toLowerCase() ||
+        cs.aliases.some(a => a.toLowerCase() === subject.toLowerCase() || subject.toLowerCase().includes(a.toLowerCase()))
+      );
+      if (match) {
+        officialWeight = match.weight_pct;
+      }
+    }
+    if (officialWeight === undefined && exam?.pattern?.sections && exam.pattern.sections.length > 0) {
       const match = exam.pattern.sections.find(sec => sec.toLowerCase().includes(subject.toLowerCase()) || subject.toLowerCase().includes(sec.toLowerCase()));
       if (match) {
         officialWeight = Math.round((100 / exam.pattern.sections.length) * 10) / 10;

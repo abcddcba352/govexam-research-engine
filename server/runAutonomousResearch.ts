@@ -4,7 +4,7 @@ import { withExamWorkflow } from './persistence/examWorkflow.ts';
 import { getExams, getExamById, getSources } from './dbService.ts';
 import { discoverCurrentAffairs } from './autonomousResearch.ts';
 import { saveAutonomousArticles } from './autonomousPersistence.ts';
-import { validDate } from '../src/currentAffairs.ts';
+import { validDate, isValidCutoffDate } from '../src/currentAffairs.ts';
 
 process.env.PERSISTENCE_BACKEND ||= 'DATABASE';
 const once=process.argv.includes('--once');
@@ -16,7 +16,8 @@ const stop=new AbortController();
 process.on('SIGINT',()=>stop.abort()); process.on('SIGTERM',()=>stop.abort());
 async function cycle() {
   const cutoff=cutoffArg||new Date().toISOString().slice(0,10);
-  if(!validDate(cutoff)||cutoff>new Date().toISOString().slice(0,10)) throw Error('Invalid cutoff date.');
+  if(!isValidCutoffDate(cutoff)) throw Error('Invalid cutoff date.');
+
   const ids=await withExamWorkflow(()=>getExams().filter(e=>!filter||e.exam_id===filter).map(e=>e.exam_id));
   if(!ids.length) throw Error('No matching registered examinations.');
   let failures=0;

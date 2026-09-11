@@ -1,6 +1,7 @@
 import { httpServerHandler } from 'cloudflare:node';
 import { createApp } from './serverApp.ts';
 import { runCloudResearch, readCloudResearchState } from './cloudResearch.ts';
+import { syncPYQFromKV } from './pyqService.ts';
 export { FreeEngineObject } from './freeCloudEngine.ts';
 
 function applyEnvironment(env:any) {
@@ -41,7 +42,7 @@ export default {
       if(path.startsWith('/api/free-engine/')) {
         if(!env.FREE_ENGINE)return Response.json({error:'Free cloud engine is not configured.'},{status:503});
         const endpoint=path.slice('/api/free-engine'.length);
-        if(!['/overview','/check-ai','/jobs','/facts/review','/questions/review','/assemble'].includes(endpoint))return Response.json({error:'Not found.'},{status:404});
+        if(!['/overview','/check-ai','/jobs','/facts/review','/questions/review','/assemble','/tick'].includes(endpoint))return Response.json({error:'Not found.'},{status:404});
         if(request.method!=='GET'&&(!request.headers.get('content-type')?.includes('application/json') || (request.headers.get('origin')&&request.headers.get('origin')!==new URL(request.url).origin)))return Response.json({error:'Use the admin site to submit this request.'},{status:403});
         if(Number(request.headers.get('content-length')||0)>18000)return Response.json({error:'Request too large.'},{status:413});
         const engine=env.FREE_ENGINE.get(env.FREE_ENGINE.idFromName('govexam-free-engine-v1'));
@@ -54,6 +55,9 @@ export default {
         const state=await readCloudResearchState(env?.GOVEXAM_RESEARCH_STATE);
         return Response.json({configured:Boolean(env?.GOVEXAM_RESEARCH_STATE),interval_minutes:10,state},{headers:{'Cache-Control':'no-store'}});
       }
+      // Static assets are bound explicitly. Send every non-API route through the
+      // asset service so `/` and client-side routes receive the SPA entry point.
+      if(!path.startsWith('/api/')&&env?.ASSETS) return env.ASSETS.fetch(request);
       if (env) {
         for (const [key, value] of Object.entries(env)) {
           if (typeof value === 'string') {
@@ -72,6 +76,11 @@ export default {
         const app = createApp();
         const server = app.listen(3000);
         handler = httpServerHandler(server);
+      }
+
+      if (env?.GOVEXAM_RESEARCH_STATE) {
+        (globalThis as any).__CF_KV__ = env.GOVEXAM_RESEARCH_STATE;
+        await syncPYQFromKV(env.GOVEXAM_RESEARCH_STATE);
       }
 
       return await handler.fetch(request, env, ctx);

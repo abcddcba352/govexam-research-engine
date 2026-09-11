@@ -14,17 +14,24 @@ export interface ExamIdentification {
 
 export interface ExamStagePaper {
   paper_id: string;
-  paper_number: string;
+  paper_number?: string;
   title: string;
-  type: 'OBJECTIVE' | 'DESCRIPTIVE' | 'SKILL_TEST' | 'PHYSICAL_TEST' | 'INTERVIEW';
+  type?: 'OBJECTIVE' | 'DESCRIPTIVE' | 'SKILL_TEST' | 'PHYSICAL_TEST' | 'INTERVIEW';
   total_questions?: number;
   total_marks: number;
   duration_minutes?: number;
   negative_marking_rate?: number;
   is_qualifying?: boolean;
+  branch_or_specialization?: string; // e.g. 'Civil Engineering', 'Electrical Engineering', 'Common'
+  applicable_branch?: string;
+  is_common_paper?: boolean;
   language_mediums?: string[];
+  language_i_options?: string[];
+  language_ii?: string;
+  syllabus_reference?: string;
   sections?: string[];
   syllabus_highlights?: string[];
+  syllabus_topics?: string[];
 }
 
 export interface ExamStage {
@@ -49,7 +56,8 @@ export interface ExamStructureScheme {
   selection_summary: string;
   stages: ExamStage[];
   official_reference?: string;
-  source_status: 'VERIFIED_OFFICIAL_CATALOG' | 'LIVE_AI_RETRIEVED' | 'HYBRID_VERIFIED';
+  source_status: 'VERIFIED_OFFICIAL_CATALOG' | 'LIVE_AI_RETRIEVED' | 'HYBRID_VERIFIED' | 'REVIEW_REQUIRED' | 'RESEARCH_INCOMPLETE';
+  discovery_notes?: string[];
 }
 
 export type AuthorityType = 
@@ -318,6 +326,15 @@ export interface ExamFactVerification {
   verified_by?: string;
 }
 
+export interface CanonicalSubjectInfo {
+  name: string;
+  marks: number;
+  questions: number;
+  weight_pct: number;
+  question_range?: [number, number];
+  aliases: string[];
+}
+
 export interface ExamPattern {
   total_questions: number;
   duration_minutes: number;
@@ -326,6 +343,7 @@ export interface ExamPattern {
   negative_marking_rate: number; // e.g. 0.25 (1/4) or 0.33 (1/3) or 0
   sections: string[];
   mediums: string[];
+  canonical_subjects?: CanonicalSubjectInfo[];
 }
 
 export interface ExamPatternVersion {
@@ -337,6 +355,7 @@ export interface ExamPatternVersion {
   pattern: ExamPattern;
   syllabus_topics: string[];
   fact_verifications?: Record<CriticalFactName, ExamFactVerification>;
+  study_materials?: StudyMaterialItem[];
   is_active: boolean;
   notes?: string;
 }
@@ -373,6 +392,24 @@ export interface ExamRecord {
   data_provenance?: DataProvenance;
   stages?: ExamStage[];
   structure_scheme?: ExamStructureScheme;
+  study_materials?: StudyMaterialItem[];
+  specializations?: string[];
+}
+
+export interface StudyMaterialItem {
+  material_id: string;
+  exam_id?: string;
+  type: 'YOUTUBE_VIDEO' | 'DOCUMENT_PDF' | 'STUDY_NOTES';
+  title: string;
+  source_url: string;
+  author_or_channel: string;
+  thumbnail_url?: string;
+  duration_seconds?: number;
+  extracted_topics: string[];
+  notes_markdown: string;
+  material_links: string[];
+  transcript_available?: boolean;
+  created_at: string;
 }
 
 export interface ExamIntakeInput {
@@ -397,6 +434,7 @@ export interface ExamIntakeInput {
   preparation_mode?: PreparationMode;
   stages?: ExamStage[];
   structure_scheme?: ExamStructureScheme;
+  specializations?: string[];
 }
 
 // ==========================================
@@ -1114,6 +1152,7 @@ export type WhyAskedReasonTag =
   | 'ROTATIONAL_TOPIC'
   | 'TEXTBOOK_CORE'
   | 'CONCEPTUAL_APPLICATION'
+  | 'TELANGANA_HEROES'
   | 'UNKNOWN';
 
 export interface AdjacentConceptRecord {
@@ -1283,6 +1322,30 @@ export interface TopicTrend {
   sample_size_caution: string;
 }
 
+export interface SubjectWeightageItem {
+  subject: string;
+  question_count: number;
+  percentage: number;
+  topics: Array<{ topic: string; count: number }>;
+  difficulty_breakdown: {
+    EASY: number;
+    MODERATE: number;
+    DIFFICULT: number;
+  };
+}
+
+export interface PaperWeightageAnalysis {
+  paper_name: string;
+  year?: number;
+  total_questions: number;
+  subjects: SubjectWeightageItem[];
+  high_yield_topics: Array<{ topic: string; subject: string; count: number }>;
+  strategic_summary: string;
+  analyzed_by_gemini: boolean;
+  model_used?: string;
+  custom_subjects_provided: string[];
+}
+
 export interface ExamIntelligenceProfile {
   profile_id: string;
   exam_id: string;
@@ -1437,6 +1500,24 @@ export type ExamIntelligenceReadiness =
   | 'LIMITED_DATA'
   | 'SUFFICIENT'
   | 'HIGH_CONFIDENCE';
+
+export interface OnlinePaperCatalogItem {
+  catalog_id: string;
+  exam_id: string;
+  exam_title: string;
+  recruitment_cycle: string;
+  year: number;
+  exam_date: string;
+  stage: string;
+  paper_name: string;
+  shift: string;
+  booklet_code: string;
+  question_count: number;
+  official_portal_url: string;
+  has_answer_key: boolean;
+  status: 'READY_TO_INGEST' | 'INGESTED';
+  key_status: 'FINAL_OFFICIAL' | 'PROVISIONAL';
+}
 
 // ==========================================
 // 6. EVIDENCE-BASED MOCK BLUEPRINT ENGINE
@@ -1696,6 +1777,9 @@ export interface CreateBlueprintInput {
     target_exam_date?: string | null;
     preparation_as_of_date?: string;
     current_affairs_mode?: 'OFFICIAL_EXAM_CUTOFF' | 'PREPARATION_CURRENT_AFFAIRS' | 'HISTORICAL_PRACTICE';
+    stage_id?: string;
+    paper_id?: string;
+    paper_title?: string;
   };
   allow_cross_mode_reuse?: boolean;
   preparation_mode?: PreparationMode;

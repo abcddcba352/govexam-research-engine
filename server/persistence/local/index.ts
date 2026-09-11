@@ -74,6 +74,12 @@ export class LocalExamRepository implements ExamRepository {
     writeJsonFile('exams.json', exams);
   }
 
+  async deleteExam(examId: string): Promise<void> {
+    const exams = await this.getExams();
+    const filtered = exams.filter(e => e.exam_id !== examId);
+    writeJsonFile('exams.json', filtered);
+  }
+
   async updateExamStatus(examId: string, status: string): Promise<void> {
     const exam = await this.getExamById(examId);
     if (exam) {

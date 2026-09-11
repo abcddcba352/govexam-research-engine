@@ -50,11 +50,11 @@ export function selectBank(slots:(Pick<BlueprintQuestionSlot,'slot_id'|'topic'|'
 }
 
 export const TEMPLATE_TOPICS=[
-  {id:'percentage',matches:/percent|percentage/i,subject:'math'},
-  {id:'simple-interest',matches:/simple interest/i,subject:'math'},
-  {id:'linear-equation',matches:/linear equation|algebra/i,subject:'math'},
-  {id:'right-triangle',matches:/right[ -]angled triangle|right triangle|pythagoras/i,subject:'math'},
-  {id:'bar-chart',matches:/bar chart|bar graph/i,subject:'math'},
+  {id:'percentage',matches:/percent|percentage|arithmetic|numerical|quantitative/i,subject:'math'},
+  {id:'simple-interest',matches:/simple interest|interest/i,subject:'math'},
+  {id:'linear-equation',matches:/linear equation|algebra|mental ability|reasoning/i,subject:'math'},
+  {id:'right-triangle',matches:/right[ -]angled triangle|right triangle|pythagoras|geometry/i,subject:'math'},
+  {id:'bar-chart',matches:/bar chart|bar graph|data interpretation/i,subject:'math'},
 ] as const;
 export function templateQuestion(topic:string,seed:number):{question:MockQuestion;template_id:string;fact_family:string}|undefined {
   const template=TEMPLATE_TOPICS.find(t=>t.matches.test(topic));if(!template)return;

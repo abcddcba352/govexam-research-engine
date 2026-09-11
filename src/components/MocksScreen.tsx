@@ -31,6 +31,8 @@ import {
 } from 'lucide-react';
 import {
   ExamRecord,
+  ExamStage,
+  ExamStagePaper,
   MockTestRecord,
   MockQuestion,
   MockBlueprintRecord,
@@ -39,6 +41,7 @@ import {
   VisualSpecification
 } from '../types.ts';
 import { getBoardForExam, groupExamsByJurisdiction } from '../utils/examJurisdiction.ts';
+import { ExamHierarchyFilter } from './common/ExamHierarchyFilter.tsx';
 
 interface MocksScreenProps {
   exams: ExamRecord[];
@@ -94,6 +97,8 @@ export const MocksScreen: React.FC<MocksScreenProps> = ({
   const [selectedExamId, setSelectedExamId] = useState<string>(
     initialExamId || (exams.length > 0 ? exams[0].exam_id : '')
   );
+  const [activeStage, setActiveStage] = useState<ExamStage | null>(null);
+  const [activePaper, setActivePaper] = useState<ExamStagePaper | null>(null);
   const [mocks, setMocks] = useState<MockTestRecord[]>([]);
   const [activeMock, setActiveMock] = useState<MockTestRecord | null>(null);
   const [isLoadingMocks, setIsLoadingMocks] = useState(false);
@@ -248,7 +253,15 @@ export const MocksScreen: React.FC<MocksScreenProps> = ({
       const data: MockTestRecord[] = await res.json();
       setMocks(data);
       if (data.length > 0) {
-        setActiveMock(data[0]);
+        const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+        const qMockId = params?.get('mock_id');
+        const qMockNum = params?.get('mock_num');
+        const targetMock = qMockId
+          ? data.find(m => m.mock_id === qMockId)
+          : qMockNum
+          ? data.find(m => m.mock_number === parseInt(qMockNum, 10))
+          : data[0];
+        setActiveMock(targetMock || data[0]);
         setActiveQuestionIndex(0);
       } else {
         setActiveMock(null);
@@ -267,8 +280,8 @@ export const MocksScreen: React.FC<MocksScreenProps> = ({
     try {
       const bpId = overrideBlueprintId || selectedBlueprintId || undefined;
       const targetQCount = bpId
-        ? (lockedBlueprints.find(b => b.blueprint_id === bpId)?.question_count || selectedExam?.pattern.total_questions || 150)
-        : (selectedExam?.pattern.total_questions || 150);
+        ? (lockedBlueprints.find(b => b.blueprint_id === bpId)?.question_count || activePaper?.total_questions || selectedExam?.pattern.total_questions || 150)
+        : (activePaper?.total_questions || selectedExam?.pattern.total_questions || 150);
       const res = await fetch('/api/mocks/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -277,7 +290,11 @@ export const MocksScreen: React.FC<MocksScreenProps> = ({
           blueprint_id: bpId,
           question_count: targetQCount,
           difficulty: 'Standard',
-          preparation_mode: selectedPreparationMode
+          preparation_mode: selectedPreparationMode,
+          stage_id: activeStage?.stage_id,
+          paper_id: activePaper?.paper_id,
+          paper_title: activePaper?.title,
+          provider: 'gemini'
         })
       });
 
@@ -536,52 +553,41 @@ export const MocksScreen: React.FC<MocksScreenProps> = ({
           </p>
         </div>
 
-        {/* Exam Picker Selector */}
-        <div className="flex items-center gap-3">
-          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Target Exam:</label>
+        {/* Active Exam & Paper Badges */}
+        <div className="flex flex-wrap items-center gap-2">
           {(() => {
             const b = selectedExam ? getBoardForExam(selectedExam) : null;
             if (!b) return null;
             return (
-              <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-amber-50 text-amber-900 border border-amber-300 text-xs font-bold shrink-0">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 text-amber-900 border border-amber-300 text-xs font-bold shrink-0 shadow-2xs">
                 <span>{b.icon}</span>
                 <span>{b.shortName}</span>
               </span>
             );
           })()}
-          <select
-            value={selectedExamId}
-            onChange={e => setSelectedExamId(e.target.value)}
-            className="px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-          >
-            {groupedExams.central.length > 0 && (
-              <optgroup label="🏛️ Central / National (All-India)">
-                {groupedExams.central.map(exam => {
-                  const b = getBoardForExam(exam);
-                  const prefix = b ? `[${b.shortName}] ` : '';
-                  return (
-                    <option key={exam.exam_id} value={exam.exam_id}>
-                      {prefix}{exam.commission}: {exam.title} ({exam.paper})
-                    </option>
-                  );
-                })}
-              </optgroup>
-            )}
-            {groupedExams.stateNames.map(stateName => (
-              <optgroup key={stateName} label={`🗺️ State: ${stateName}`}>
-                {groupedExams.states[stateName].map(exam => {
-                  const b = getBoardForExam(exam);
-                  const prefix = b ? `[${b.shortName}] ` : '';
-                  return (
-                    <option key={exam.exam_id} value={exam.exam_id}>
-                      {prefix}{exam.commission}: {exam.title} ({exam.paper})
-                    </option>
-                  );
-                })}
-              </optgroup>
-            ))}
-          </select>
+          {activePaper && (
+            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-900 border border-emerald-300 text-xs font-bold shadow-2xs">
+              <FileText className="w-3.5 h-3.5 text-emerald-600" />
+              <span className="max-w-[180px] truncate" title={activePaper.title}>{activePaper.title}</span>
+            </span>
+          )}
         </div>
+      </div>
+
+      {/* 5-Level Cascading Hierarchy Filter */}
+      <div className="print:hidden">
+        <ExamHierarchyFilter
+          exams={exams}
+          selectedExamId={selectedExamId}
+          onSelectExam={setSelectedExamId}
+          onPaperChange={(stage, paper) => {
+            setActiveStage(stage);
+            setActivePaper(paper);
+          }}
+          title="Master Examination & Paper Hierarchy Filter"
+          subtitle="Filter through the official state, board, exam, stage, and paper structure to audit or generate master papers"
+          badgeLabel="Master Audit Hierarchy"
+        />
       </div>
 
       {/* Preparation Mode Selector & Pattern Change Notice */}
@@ -975,6 +981,11 @@ export const MocksScreen: React.FC<MocksScreenProps> = ({
                     onClick={() => {
                       setActiveMock(m);
                       setActiveQuestionIndex(0);
+                      if (typeof window !== 'undefined') {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('mock_num', String(m.mock_number));
+                        window.history.replaceState({}, '', url.toString());
+                      }
                     }}
                     className={`w-full text-left p-3 rounded-lg border text-xs font-medium transition-all cursor-pointer ${
                       activeMock?.mock_id === m.mock_id

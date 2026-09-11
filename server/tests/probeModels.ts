@@ -1,44 +1,58 @@
 import dotenv from 'dotenv';
 dotenv.config();
-import { GoogleGenAI } from '@google/genai';
-
-import { getThinkingConfig } from '../geminiConfig.ts';
+import { getRepositoryRegistry } from '../persistence/index.ts';
+import { generateMockTestForExam } from '../mockService.ts';
 
 async function main() {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    console.error('No GEMINI_API_KEY found');
-    process.exit(1);
-  }
-  const ai = new GoogleGenAI({ apiKey });
+  console.log('=== STARTING LIVE GEMINI MOCK GENERATION ===');
+  console.log('Target Exam: appsc_group_2_screening');
+  console.log('Blueprint: bp_appsc_g2_5q_paper1');
+  console.log('AI Provider:', process.env.AI_PROVIDER || 'gemini');
+  console.log('Gemini API Key:', process.env.GEMINI_API_KEY ? 'Present (AQ...)' : 'MISSING');
 
-  console.log('Testing gemini-3.1-flash-lite with 5-slot batch...');
-  const prompt = `Generate 5 multiple choice questions for Telangana Group-II exam in strict JSON array format:
-[
-  {
-    "question_number": 1,
-    "slot_id": "slot_1",
-    "section_name": "General Studies",
-    "question_text": "Sample stem",
-    "options": ["Option A", "Option B", "Option C", "Option D"],
-    "correct_option_index": 0,
-    "explanation": "Authoritative explanation",
-    "topic": "Indian Polity",
-    "difficulty": "MEDIUM",
-    "source_reference": "Constitution of India"
-  }
-]`;
-  const res = await ai.models.generateContent({
-    model: 'gemini-3.1-flash-lite',
-    contents: prompt,
-    config: {
-      responseMimeType: 'application/json',
-      thinkingConfig: getThinkingConfig('MEDIUM'),
-    }
+  const startTime = Date.now();
+  const mock = await generateMockTestForExam({
+    exam_id: 'appsc_group_2_screening',
+    blueprint_id: 'bp_appsc_g2_5q_paper1',
+    desiredQuestionCount: 5,
+    difficulty: 'Standard',
+    preparation_mode: 'PRE_NOTIFICATION_PREPARATION'
   });
-  console.log('gemini-3.1-flash-lite 5-slot result length:', res.text?.length);
-  const parsed = JSON.parse(res.text || '[]');
-  console.log('Parsed count:', parsed.length, 'Sample Q1 stem:', parsed[0]?.question_text);
+
+  const durationSec = ((Date.now() - startTime) / 1000).toFixed(1);
+  console.log(`\n🎉 Mock Generated in ${durationSec}s!`);
+  console.log(`Mock ID: ${mock.mock_id}`);
+  console.log(`Title: ${mock.title}`);
+  console.log(`Total Questions: ${mock.total_questions}`);
+  console.log(`Total Marks: ${mock.total_marks}`);
+  console.log(`Duration: ${mock.duration_minutes} minutes`);
+
+  const questions = mock.sections.flatMap(s => s.questions);
+  console.log(`\n--- QUESTIONS (${questions.length}) ---`);
+  questions.forEach(q => {
+    console.log(`\nQ${q.question_number} [${q.section_name}] | Topic: ${q.topic} | Difficulty: ${q.difficulty} | Cognitive: ${q.cognitive_level}`);
+    console.log(`Provenance: ${q.generation_provenance} | Model: ${q.generation_model_id}`);
+    console.log(`Stem: ${q.question_text}`);
+    q.options.forEach((opt, idx) => {
+      const isCorrect = idx === q.correct_option_index ? ' [CORRECT]' : '';
+      console.log(`  ${String.fromCharCode(65 + idx)}. ${opt}${isCorrect}`);
+    });
+    console.log(`Explanation: ${q.explanation}`);
+    console.log(`Source Reference: ${q.source_reference}`);
+  });
+
+  console.log('\n--- PERSISTING TO SUPABASE DATABASE ---');
+  const reg = getRepositoryRegistry();
+  await reg.mocks.saveMock(mock);
+  console.log('✅ Mock saved to database successfully!');
+
+  // Verify retrieval from Supabase
+  const retrieved = await reg.mocks.getMockById(mock.mock_id);
+  console.log('✅ Retrieved from Supabase:', retrieved?.mock_id, 'Title:', retrieved?.title, 'Questions count:', retrieved?.sections.flatMap(s => s.questions).length);
 }
 
-main().catch(console.error);
+main().catch(err => {
+  console.error('❌ Generation Error:', err);
+  process.exit(1);
+});
+

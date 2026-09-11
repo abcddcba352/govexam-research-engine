@@ -25,10 +25,11 @@
     "ENVIRONMENT": "staging",
     "APP_ENV": "staging",
     "PERSISTENCE_BACKEND": "DATABASE",
-    "AI_PROVIDER": "cloudflare",
+    "AI_PROVIDER": "gemini",
     "FREE_ENGINE_DAILY_NEURONS": "6000",
-    "GEMINI_PRIMARY_MODEL": "gemini-3.8-flash",
+    "GEMINI_PRIMARY_MODEL": "gemini-3.6-flash",
     "GEMINI_FALLBACK_MODEL": "gemini-3.1-flash-lite",
+    "GEMINI_API_KEY": "",
     "MODEL_TIER_POLICY": "ALLOW_ECONOMY_FALLBACK_WITH_STRICT_AUDIT"
   }
 }

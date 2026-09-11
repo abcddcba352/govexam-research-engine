@@ -4,6 +4,10 @@ import {
   ExamStructureScheme,
 } from '../src/types.ts';
 import { getCandidateModels, getGenAI, getThinkingConfig } from './geminiConfig.ts';
+import { isTelanganaTet, telanganaTetScheme } from './tetScheme.ts';
+import { webSearchFree } from './searchDiscovery.ts';
+import { stealthFetch } from './stealthFetcher.ts';
+import { extractSyllabusFromNotificationText } from './syllabusExtractor.ts';
 function isQuotaExhausted(error: unknown): boolean {
   const message = String((error as any)?.message || error || '').toLowerCase();
   return message.includes('429') || message.includes('resource_exhausted') || message.includes('quota') || message.includes('rate limit');
@@ -952,7 +956,7 @@ export const OFFICIAL_EXAM_SCHEMES: ExamStructureScheme[] = [
           {
             paper_id: 'appsc_eo_scr_p1',
             paper_number: 'Screening Paper',
-            title: 'General Studies and Mental Ability',
+            title: 'Composite Screening Paper: Part-A (General Studies & Mental Ability - 50 Qs) + Part-B (Hindu Philosophy & Temple System - 100 Qs)',
             type: 'OBJECTIVE',
             total_questions: 150,
             total_marks: 150,
@@ -960,14 +964,8 @@ export const OFFICIAL_EXAM_SCHEMES: ExamStructureScheme[] = [
             negative_marking_rate: 0.33,
             is_qualifying: true,
             sections: [
-              'AP Endowments Administration & Governance Structure',
-              'Bifurcation Act 2014 & Schedule IX/X Institutions',
-              'Disaster Management & Remote Sensing in AP Coastal Hazards',
-              'Data Analysis & Summary Statistics (Mean, Median, Mode, Dispersion)',
-              'Indian Constitution, Fundamental Rights & AP e-Governance',
-              'Economic Development of AP & Major Irrigation Projects',
-              'Modern Indian & AP Socio-Political History',
-              'Environmental Protection & UNFCCC Climate Commitments'
+              'Part-A (50 Qs / 50 Marks): General Studies & Mental Ability (Current Affairs, General Science, History, Polity, AP Economy, Geography, Disaster Management, Logical Reasoning, AP Bifurcation Act)',
+              'Part-B (100 Qs / 100 Marks): Hindu Philosophy & Temple System (Ramayana, Mahabharata, Bhagavad Gita, Bhagavata Purana, Major Temples of AP, Agamas, Upanishads & Darshanas, Bhakti Movement, AP Endowments Act 1987)'
             ]
           }
         ]
@@ -1032,6 +1030,7 @@ export const OFFICIAL_EXAM_SCHEMES: ExamStructureScheme[] = [
  */
 export function findOfficialScheme(query: string): ExamStructureScheme | null {
   const q = query.toLowerCase().trim();
+  if (isTelanganaTet(q)) return telanganaTetScheme(query);
 
   // 1. Specific keywords
   if (q.includes('police si') || q.includes('sub inspector') || (q.includes('police') && (q.includes('si') || q.includes('sub-inspector')))) {
@@ -1197,7 +1196,7 @@ Be completely truthful to the gazetted official notification rules for this exam
 /**
  * Primary public method: Resolves stages and papers breakdown for any exam query
  */
-export async function fetchExamStructure(query: string): Promise<ExamStructureScheme> {
+export async function fetchExamStructure(query: string, mode: 'HYBRID'|'GOOGLE_API'|'DIRECT_WEB' = 'HYBRID'): Promise<ExamStructureScheme> {
   const cleaned = (query || '').trim();
   if (!cleaned) {
     throw new Error('Examination query must not be empty.');
@@ -1205,14 +1204,35 @@ export async function fetchExamStructure(query: string): Promise<ExamStructureSc
 
   // 1. Check official verified catalog first for zero latency and 100% verified accuracy
   const official = findOfficialScheme(cleaned);
-  if (official) {
+  if (official && !isTelanganaTet(cleaned)) {
     return {
       ...official,
       query: cleaned
     };
   }
 
-  // 2. Try live AI discovery
+  // Bounded, key-free retrieval. Extracted material remains a review candidate.
+  try {
+    const search=await webSearchFree(`${cleaned} official syllabus examination scheme`,4);
+    const hints=search.results.filter(r=>/syllabus|scheme|bulletin|notification/i.test(r.title+' '+r.url)).slice(0,2);
+    for(const hint of hints) {
+      const page=await stealthFetch(hint.url,{timeoutMs:8000,simulateHuman:false});
+      if(!page.success)continue;
+      const parsed=extractSyllabusFromNotificationText(page.text,cleaned);
+      if(parsed.stages?.length && parsed.syllabus_topics.length>3 && !isTelanganaTet(cleaned))return {
+        query:cleaned,exam_name:parsed.exam_name||cleaned,commission:parsed.authority||'Authority requires review',
+        state_or_central:'Requires review',recruitment_cycle:parsed.recruitment_cycle||'Session requires review',
+        total_stages:parsed.stages.length,selection_summary:'Retrieved syllabus candidate. Confirm paper identity, session, source and extracted rules.',
+        source_status:'REVIEW_REQUIRED',official_reference:page.url,stages:parsed.stages,
+        discovery_notes:['Direct Web uses no AI key. Extraction is not official verification.'],
+      };
+    }
+    if(official)return {...official,discovery_notes:[...(official.discovery_notes||[]),...hints.map(h=>`Discovered source for review: ${h.url}`)]};
+  } catch { /* Keep the reference available when public search is unavailable. */ }
+  if(official)return official;
+
+  // 2. Try AI only when explicitly allowed by the selected mode.
+  if(mode!=='DIRECT_WEB') {
   try {
     const aiResolved = await queryAIForExamStructure(cleaned);
     if (aiResolved) {
@@ -1221,42 +1241,8 @@ export async function fetchExamStructure(query: string): Promise<ExamStructureSc
   } catch (aiErr) {
     console.warn('[AI_EXAM_STRUCTURE_WARN]', aiErr);
   }
+  }
 
-  // 3. Fallback heuristic scheme
-  return {
-    query: cleaned,
-    exam_name: cleaned,
-    commission: 'Public Service Commission / Recruiting Board',
-    state_or_central: 'State / Central',
-    recruitment_cycle: 'Current Notification Cycle',
-    total_stages: 1,
-    selection_summary: `Standard single-stage competitive examination comprising written test and certificate verification.`,
-    source_status: 'HYBRID_VERIFIED',
-    stages: [
-      {
-        stage_id: 'stage_written_1',
-        stage_number: 1,
-        stage_name: 'Written Examination (Objective / Descriptive)',
-        stage_type: 'MAINS',
-        is_qualifying_only: false,
-        total_papers: 1,
-        total_marks: 150,
-        description: 'Official competitive examination paper testing general studies and specialized domain knowledge.',
-        papers: [
-          {
-            paper_id: 'paper_1',
-            paper_number: 'Paper-I',
-            title: `${cleaned}: Paper-I (General Studies & Domain Scope)`,
-            type: 'OBJECTIVE',
-            total_questions: 150,
-            total_marks: 150,
-            duration_minutes: 150,
-            negative_marking_rate: 0.25,
-            is_qualifying: false,
-            sections: ['General Studies', 'General Abilities', 'Domain Subject Knowledge']
-          }
-        ]
-      }
-    ]
-  };
+  return {query:cleaned,exam_name:cleaned,commission:'Authority requires research',state_or_central:'Unknown',total_stages:0,stages:[],source_status:'RESEARCH_INCOMPLETE',selection_summary:'No usable scheme was retrieved. Retry research with a precise exam name and session. No pattern has been invented.'};
+
 }

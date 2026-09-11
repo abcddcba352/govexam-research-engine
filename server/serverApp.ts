@@ -73,7 +73,10 @@ import {
   getPYQClusters,
   getExamIntelligenceReadiness,
   getAnalysisRuns,
+  parseAndIngestQuestionPaper,
 } from "./pyqService.ts";
+import { autoMapAllQuestions, getCanonicalSubjects } from "./subjectMapper.ts";
+import { readPublic } from "./retrievalHttp.ts";
 import {
   getStoredBlueprints,
   getBlueprintById,
@@ -96,6 +99,14 @@ import {
 import { getRepositoryRegistry } from "./persistence/index.ts";
 import { checkProductionPersistence } from "./persistence/healthCheck.ts";
 import { validateSupabaseConfiguration } from "./persistence/supabaseClient.ts";
+import {
+  getAdminGeminiKeys,
+  addAdminGeminiKey,
+  deleteAdminGeminiKey,
+  getAllGeminiApiKeys,
+  testGeminiApiKey,
+  AdminGeminiKeyRecord
+} from "./geminiConfig.ts";
 
 export function createApp(): express.Application {
   const app = express();
@@ -845,6 +856,16 @@ export function createApp(): express.Application {
     }
   });
 
+  // Direct Ingest / Parse Paper (Paste Text or JSON)
+  app.post("/api/pyq/import", async (req, res) => {
+    try {
+      const result = await parseAndIngestQuestionPaper(req.body);
+      res.json(result);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message || "Failed to parse and ingest question paper" });
+    }
+  });
+
   app.post("/api/pyq/papers/:id/link-answers", async (req, res) => {
     try {
       const result = await linkAnswerKeyToPaper(req.params.id, req.body);
@@ -950,6 +971,26 @@ export function createApp(): express.Application {
       res.json(runs);
     } catch (err: any) {
       res.status(500).json({ error: err.message || "Failed to fetch analysis runs" });
+    }
+  });
+
+  // Auto-Map Questions to Canonical Syllabus Subjects
+  app.post("/api/pyq/auto-map-subjects/:examId", (req, res) => {
+    try {
+      const result = autoMapAllQuestions(req.params.examId);
+      const intel = buildExamIntelligenceProfile(req.params.examId);
+      res.json({ success: true, ...result, intelligence: intel });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message || "Failed to auto-map questions to subjects" });
+    }
+  });
+
+  app.get("/api/pyq/canonical-subjects/:examId", (req, res) => {
+    try {
+      const subjects = getCanonicalSubjects(req.params.examId);
+      res.json({ exam_id: req.params.examId, canonical_subjects: subjects });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message || "Failed to fetch canonical subjects" });
     }
   });
 
@@ -1104,5 +1145,134 @@ export function createApp(): express.Application {
   });
 
 
+  // ==========================================
+  // ADMIN GEMINI API KEY POOL ENDPOINTS
+  // ==========================================
+
+  // List all admin keys (masked) and pool status
+  app.get("/api/admin/gemini-keys", (req, res) => {
+    try {
+      const adminKeys = getAdminGeminiKeys();
+      const maskedList = adminKeys.map(k => ({
+        id: k.id,
+        label: k.label,
+        masked_key: k.masked_key,
+        status: k.status,
+        added_at: k.added_at,
+        last_used_at: k.last_used_at,
+        success_count: k.success_count || 0,
+        failure_count: k.failure_count || 0,
+        last_error: k.last_error
+      }));
+      const allKeys = getAllGeminiApiKeys();
+      res.json({
+        success: true,
+        keys: maskedList,
+        total_configured: allKeys.length,
+        total_admin_keys: adminKeys.length,
+        has_env_key: Boolean(process.env.GEMINI_API_KEY)
+      });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message || "Failed to list Gemini API keys" });
+    }
+  });
+
+  // Add one or multiple Gemini API keys
+  app.post("/api/admin/gemini-keys", async (req, res) => {
+    try {
+      const { key, keys, label } = req.body || {};
+      const keyCandidates: string[] = [];
+
+      if (typeof key === 'string' && key.trim()) {
+        const splitKeys = key.split(/[\r\n,]+/).map(s => s.trim()).filter(s => s.length > 10);
+        keyCandidates.push(...splitKeys);
+      }
+      if (Array.isArray(keys)) {
+        keys.forEach(k => {
+          if (typeof k === 'string' && k.trim().length > 10) {
+            keyCandidates.push(k.trim());
+          }
+        });
+      }
+
+      if (keyCandidates.length === 0) {
+        return res.status(400).json({ error: "Please provide at least one valid Gemini API Key." });
+      }
+
+      const addedRecords: any[] = [];
+      const testResults: any[] = [];
+
+      for (let i = 0; i < keyCandidates.length; i++) {
+        const candidate = keyCandidates[i];
+        const keyLabel = keyCandidates.length > 1 ? `${label || 'Admin Key'} #${i + 1}` : label;
+        const testResult = await testGeminiApiKey(candidate);
+        testResults.push({ key_preview: candidate.slice(0, 6) + '...', ...testResult });
+
+        const record = addAdminGeminiKey(candidate, keyLabel);
+        if (!testResult.valid) {
+          record.status = 'INVALID';
+          record.last_error = testResult.error || 'Connection test failed';
+        }
+        addedRecords.push({
+          id: record.id,
+          label: record.label,
+          masked_key: record.masked_key,
+          status: record.status,
+          added_at: record.added_at,
+          last_error: record.last_error
+        });
+      }
+
+      res.status(201).json({
+        success: true,
+        message: `Successfully registered ${addedRecords.length} API key(s) to the rotation pool.`,
+        added: addedRecords,
+        tests: testResults
+      });
+    } catch (err: any) {
+      res.status(400).json({ error: err.message || "Failed to add Gemini API key" });
+    }
+  });
+
+  // Delete a key from admin pool
+  app.delete("/api/admin/gemini-keys/:id", (req, res) => {
+    try {
+      const removed = deleteAdminGeminiKey(req.params.id);
+      if (!removed) {
+        return res.status(404).json({ error: "API key record not found." });
+      }
+      res.json({ success: true, message: "API key removed from rotation pool." });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message || "Failed to remove API key" });
+    }
+  });
+
+  // Test an API key (by ID or raw key)
+  app.post("/api/admin/gemini-keys/test", async (req, res) => {
+    try {
+      const { id, key } = req.body || {};
+      let targetKey = key;
+      if (!targetKey && id) {
+        const adminKeys = getAdminGeminiKeys();
+        const found = adminKeys.find(k => k.id === id);
+        if (found) targetKey = found.key;
+      }
+      if (!targetKey) {
+        return res.status(400).json({ error: "API key or Key ID is required to run test." });
+      }
+
+      const result = await testGeminiApiKey(targetKey);
+      res.json({
+        success: result.valid,
+        valid: result.valid,
+        model: result.model,
+        error: result.error
+      });
+    } catch (err: any) {
+      res.status(500).json({ valid: false, error: err.message || "Test execution failed" });
+    }
+  });
+
   return app;
+
 }

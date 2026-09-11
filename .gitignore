@@ -16,3 +16,4 @@ staging-*.json
 work/
 supabase/.temp/
 .wrangler/
+server/data/gemini_api_keys.json

@@ -202,7 +202,10 @@ const RAW_EXAMS: ExamRecord[] = [
         'Logical Reasoning, Analytical Ability and Data Interpretation',
         'Basic English (10th Standard)'
       ],
-      mediums: ['English', 'Telugu', 'Urdu']
+      mediums: ['English', 'Telugu', 'Urdu'],
+      canonical_subjects: [
+        { name: 'General Studies & General Abilities', marks: 150, questions: 150, weight_pct: 100, aliases: ['General Studies', 'GS', 'General Abilities', 'Paper-I', 'General Studies & General Abilities'] }
+      ]
     },
     syllabus_topics: [
       'Telangana Socio-Economic Outlook & Budget Highlights',
@@ -328,7 +331,14 @@ const RAW_EXAMS: ExamRecord[] = [
         'Current Affairs (Major Events, Science, Sports)',
         'Mental Ability (Logical, Data Interpretation)'
       ],
-      mediums: ['English', 'Telugu']
+      mediums: ['English', 'Telugu'],
+      canonical_subjects: [
+        { name: 'Indian History', marks: 30, questions: 30, weight_pct: 20, question_range: [1, 30] as [number, number], aliases: ['History', 'Ancient History', 'Medieval History', 'Modern History', 'Indian History (Ancient, Medieval, Modern)'] },
+        { name: 'Geography', marks: 30, questions: 30, weight_pct: 20, question_range: [31, 60] as [number, number], aliases: ['General Geography', 'Physical Geography', 'AP Geography', 'Indian Geography', 'Geography (General, Physical, India, AP)'] },
+        { name: 'Indian Society', marks: 30, questions: 30, weight_pct: 20, question_range: [61, 90] as [number, number], aliases: ['Society', 'Social Issues', 'Welfare Mechanisms', 'Indian Society (Structure, Social Issues, Welfare)'] },
+        { name: 'Current Affairs', marks: 30, questions: 30, weight_pct: 20, question_range: [91, 120] as [number, number], aliases: ['Current Events', 'Science & Technology Current Affairs', 'Sports', 'Current Affairs (Major Events, Science, Sports)'] },
+        { name: 'Mental Ability', marks: 30, questions: 30, weight_pct: 20, question_range: [121, 150] as [number, number], aliases: ['Reasoning', 'Logical Reasoning', 'Data Interpretation', 'Mental Ability (Logical, Data Interpretation)'] }
+      ]
     },
     syllabus_topics: [
       'Bifurcation Act 2014 & Schedule IX/X Institutions',
@@ -403,7 +413,13 @@ const RAW_EXAMS: ExamRecord[] = [
         'Quantitative Aptitude (25 Qs / 50 Marks)',
         'English Comprehension (25 Qs / 50 Marks)'
       ],
-      mediums: ['English', 'Hindi']
+      mediums: ['English', 'Hindi'],
+      canonical_subjects: [
+        { name: 'General Intelligence and Reasoning', marks: 50, questions: 25, weight_pct: 25, question_range: [1, 25] as [number, number], aliases: ['Reasoning', 'General Intelligence', 'Logical Reasoning', 'General Intelligence and Reasoning'] },
+        { name: 'General Awareness', marks: 50, questions: 25, weight_pct: 25, question_range: [26, 50] as [number, number], aliases: ['General Knowledge', 'GK', 'GA', 'Static GK', 'Current Affairs', 'General Awareness'] },
+        { name: 'Quantitative Aptitude', marks: 50, questions: 25, weight_pct: 25, question_range: [51, 75] as [number, number], aliases: ['Maths', 'Mathematics', 'Quant', 'QA', 'Quantitative Aptitude'] },
+        { name: 'English Comprehension', marks: 50, questions: 25, weight_pct: 25, question_range: [76, 100] as [number, number], aliases: ['English', 'English Language', 'Verbal Ability', 'English Comprehension'] }
+      ]
     },
     syllabus_topics: [
       'Static GK: Classical Dances, Census, National Parks',
@@ -513,7 +529,10 @@ const RAW_EXAMS: ExamRecord[] = [
         'Data Analysis: Tabulation, Visual Representation, Summary Statistics (Mean, Median, Mode, Variance)',
         'Bifurcation of Andhra Pradesh and its Administrative, Economic, Social & Legal Implications'
       ],
-      mediums: ['English', 'Telugu']
+      mediums: ['English', 'Telugu'],
+      canonical_subjects: [
+        { name: 'General Studies & Mental Ability', marks: 150, questions: 150, weight_pct: 100, aliases: ['General Studies', 'GS & MA', 'GA&MA', 'General Studies and Mental Ability', 'General Studies & Mental Ability', 'Paper-I'] }
+      ]
     },
     syllabus_topics: [
       'AP Endowments Administration & Governance Structure',
@@ -581,15 +600,15 @@ const RAW_EXAMS: ExamRecord[] = [
     ]
   },
   {
-    exam_id: 'appsc_endowment_officer_screening_paper_1',
-    intake_id: 'intake_appsc_eo_scr_2021',
+    exam_id: 'appsc_endowment_officer_mains_paper_2',
+    intake_id: 'intake_appsc_eo_2021',
     data_provenance: 'RETRIEVED_OFFICIAL',
-    title: 'APPSC Executive Officer (Grade-III) Screening Test: Paper-I (General Studies & Mental Ability)',
+    title: 'APPSC Executive Officer (Grade-III) Mains: Paper-II (Hindu Philosophy & Temple System)',
     commission: 'Andhra Pradesh Public Service Commission (APPSC)',
     state_or_central: 'Andhra Pradesh',
     post: 'Executive Officer (Grade-III) in A.P. Charitable and Hindu Religious Institutions and Endowments Subordinate Service',
-    stage: 'Screening Test (Objective Type)',
-    paper: 'Paper-I: General Studies and Mental Ability',
+    stage: 'Mains Examination (Objective Type)',
+    paper: 'Paper-II: Hindu Philosophy and Temple System',
     recruitment_cycle: 'Notification 24/2021 Cycle',
     active_cycle: 'Notification 24/2021 Cycle',
     pattern: {
@@ -599,30 +618,132 @@ const RAW_EXAMS: ExamRecord[] = [
       marks_per_question: 1,
       negative_marking_rate: 0.33,
       sections: [
-        'Events of National and International Importance',
-        'Current Affairs (International, National & Regional)',
-        'General Science, Contemporary Developments in S&T, IT',
-        'Social, Economic and Political History of Modern India & Andhra Pradesh',
-        'Indian Polity and Governance: Constitutional Issues, Public Policy & AP e-Governance',
-        'Economic Development in India & Andhra Pradesh since Independence',
-        'Physical Geography of Indian Subcontinent and Andhra Pradesh',
-        'Disaster Management: Vulnerability, Mitigation, Remote Sensing & GIS',
-        'Sustainable Development and Environmental Protection',
-        'Logical Reasoning, Analytical Ability and Data Interpretation',
-        'Data Analysis: Tabulation, Visual Representation, Summary Statistics (Mean, Median, Mode, Variance)',
-        'Bifurcation of Andhra Pradesh and its Administrative, Economic, Social & Legal Implications'
+        'Ramayana: Balakanda to Uttarakanda, Characters, Ethical Values & Teachings',
+        'Mahabharata: 18 Parvas, Yaksha Prashna, Vidura Niti & Philosophical Teachings',
+        'Bhagavad Gita: Karma Yoga, Jnana Yoga, Bhakti Yoga, Viswaroopa Darshanam & Sthitaprajna',
+        'Bhagavata Purana: Dashavataras, Dhruva, Prahlada, Gajendra Moksham & Krishna Leela',
+        'Major Hindu Temples of Andhra Pradesh: Tirumala, Srisailam, Simhachalam, Lepakshi, Srikalahasti, Ahobilam',
+        'Agamas & Temple Rituals: Vaikhanasa, Pancharatra, Saiva & Sakta Agamas, Temple Architecture & Layout',
+        'Vedic Literature, Upanishads & Shad-Darshanas (Advaita, Visishtadvaita, Dvaita)',
+        'Bhakti Movement in South India: Alvars, Nayanars, Annamacharya, Tyagaraja, Ramadasu, Vemana',
+        'Hindu Festivals, Customs and Traditional Vratas of Andhra Pradesh',
+        'Andhra Pradesh Charitable and Hindu Religious Institutions and Endowments Act, 1987 (Act 30 of 1987)'
       ],
-      mediums: ['English', 'Telugu']
+      mediums: ['English', 'Telugu'],
+      canonical_subjects: [
+        { name: 'Hindu Philosophy & Temple System', marks: 150, questions: 150, weight_pct: 100, aliases: ['Hindu Philosophy', 'HP & TS', 'Hindu Philosophy and Temple System', 'Temple System', 'Paper-II', 'Hindu Philosophy & Temple System'] }
+      ]
     },
     syllabus_topics: [
-      'AP Endowments Administration & Governance Structure',
-      'Bifurcation Act 2014 & Schedule IX/X Institutions',
-      'Disaster Management & Remote Sensing in AP Coastal Hazards',
-      'Data Analysis & Summary Statistics (Mean, Median, Mode, Dispersion)',
-      'Indian Constitution, Fundamental Rights & AP e-Governance',
-      'Economic Development of AP & Major Irrigation Projects',
-      'Modern Indian & AP Socio-Political History',
-      'Environmental Protection & UNFCCC Climate Commitments'
+      'Ramayana: Parvas, Ethical Dilemmas, Dharma Sookshmas and Character Analysis',
+      'Mahabharata: 18 Parvas, Yaksha Prashna, Vidura Niti and Sanatsujatiya',
+      'Bhagavad Gita: Core Philosophies of Karma, Jnana and Bhakti Marga',
+      'Major Temples of AP: Historical Sthala Puranas, Architecture and Endowments',
+      'Agama Shastras: Vaikhanasa, Pancharatra, Saivagama Temple Rituals and Protocols',
+      'Vedic Corpus: Samhitas, Brahmanas, Aranyakas and Principal Upanishads',
+      'Vedanta Darshanas: Advaita (Sankara), Visishtadvaita (Ramanuja), Dvaita (Madhva)',
+      'AP Endowments Act 1987 (Act 30/1987): Governance, Commissioner & EO Statutory Duties'
+    ],
+    status: 'MOCK_READY',
+    exam_profile_status: 'VERIFIED',
+    pattern_status: 'VERIFIED',
+    last_researched_at: '2026-09-08T00:00:00.000Z',
+    pattern_verified_at: '2026-09-08T00:00:00.000Z',
+    syllabus_verified_at: '2026-09-08T00:00:00.000Z',
+    current_affairs_updated_at: '2026-09-08T00:00:00.000Z',
+    source_confidence_score: 98,
+    target_date: '2025-11-20',
+    created_at: '2026-09-08T00:00:00.000Z',
+    updated_at: '2026-09-08T00:00:00.000Z',
+    research_run_id: 'run_init_appsc_eo_p2',
+    pattern_versions: [
+      {
+        version_id: 'appsc_eo_v2021_p2',
+        exam_id: 'appsc_endowment_officer_mains_paper_2',
+        recruitment_cycle: 'Notification 24/2021 Cycle',
+        notification_number: '24/2021',
+        effective_date: '2021-12-28',
+        is_active: true,
+        pattern: {
+          total_questions: 150,
+          duration_minutes: 150,
+          total_marks: 150,
+          marks_per_question: 1,
+          negative_marking_rate: 0.33,
+          sections: [
+            'Ramayana: Balakanda to Uttarakanda, Characters, Ethical Values & Teachings',
+            'Mahabharata: 18 Parvas, Yaksha Prashna, Vidura Niti & Philosophical Teachings',
+            'Bhagavad Gita: Karma Yoga, Jnana Yoga, Bhakti Yoga, Viswaroopa Darshanam & Sthitaprajna',
+            'Bhagavata Purana: Dashavataras, Dhruva, Prahlada, Gajendra Moksham & Krishna Leela',
+            'Major Hindu Temples of Andhra Pradesh: Tirumala, Srisailam, Simhachalam, Lepakshi, Srikalahasti, Ahobilam',
+            'Agamas & Temple Rituals: Vaikhanasa, Pancharatra, Saiva & Sakta Agamas, Temple Architecture & Layout',
+            'Vedic Literature, Upanishads & Shad-Darshanas (Advaita, Visishtadvaita, Dvaita)',
+            'Bhakti Movement in South India: Alvars, Nayanars, Annamacharya, Tyagaraja, Ramadasu, Vemana',
+            'Hindu Festivals, Customs and Traditional Vratas of Andhra Pradesh',
+            'Andhra Pradesh Charitable and Hindu Religious Institutions and Endowments Act, 1987 (Act 30 of 1987)'
+          ],
+          mediums: ['English', 'Telugu']
+        },
+        syllabus_topics: [
+          'Ramayana: Parvas, Ethical Dilemmas, Dharma Sookshmas and Character Analysis',
+          'Mahabharata: 18 Parvas, Yaksha Prashna, Vidura Niti and Sanatsujatiya',
+          'Bhagavad Gita: Core Philosophies of Karma, Jnana and Bhakti Marga',
+          'Major Temples of AP: Historical Sthala Puranas, Architecture and Endowments',
+          'Agama Shastras: Vaikhanasa, Pancharatra, Saivagama Temple Rituals and Protocols',
+          'Vedic Corpus: Samhitas, Brahmanas, Aranyakas and Principal Upanishads',
+          'Vedanta Darshanas: Advaita (Sankara), Visishtadvaita (Ramanuja), Dvaita (Madhva)',
+          'AP Endowments Act 1987 (Act 30/1987): Governance, Commissioner & EO Statutory Duties'
+        ]
+      }
+    ]
+  },
+  {
+    exam_id: 'appsc_endowment_officer_screening_paper_1',
+    intake_id: 'intake_appsc_eo_scr_2021',
+    data_provenance: 'RETRIEVED_OFFICIAL',
+    title: 'APPSC Executive Officer (Grade-III) Screening Test: Composite Paper (Part-A: GA&MA 50 Qs + Part-B: Hindu Philosophy 100 Qs)',
+    commission: 'Andhra Pradesh Public Service Commission (APPSC)',
+    state_or_central: 'Andhra Pradesh',
+    post: 'Executive Officer (Grade-III) in A.P. Charitable and Hindu Religious Institutions and Endowments Subordinate Service',
+    stage: 'Screening Test (Objective Type)',
+    paper: 'Composite Paper: Part-A General Studies & Mental Ability (50 Qs) + Part-B Hindu Philosophy & Temple System (100 Qs)',
+    recruitment_cycle: 'Notification 24/2021 Cycle',
+    active_cycle: 'Notification 24/2021 Cycle',
+    pattern: {
+      total_questions: 150,
+      duration_minutes: 150,
+      total_marks: 150,
+      marks_per_question: 1,
+      negative_marking_rate: 0.33,
+      sections: [
+        'Part-A (50 Qs / 50 Marks): General Studies & Mental Ability (Current Affairs, Science & Tech, History, Polity, AP Economy, Geography, Disaster Management, Logical Reasoning, AP Bifurcation Act)',
+        'Part-B (100 Qs / 100 Marks): Hindu Philosophy & Temple System (Ramayana, Mahabharata, Bhagavad Gita, Bhagavata Purana, Major AP Temples, Agamas, Upanishads & Darshanas, Bhakti Movement, AP Endowments Act 1987)'
+      ],
+      mediums: ['English', 'Telugu'],
+      canonical_subjects: [
+        { name: 'Part-A: General Studies & Mental Ability', marks: 50, questions: 50, weight_pct: 33.33, question_range: [1, 50] as [number, number], aliases: ['General Studies', 'GS & MA', 'GA&MA', 'General Studies and Mental Ability', 'General Studies & Mental Ability', 'Part-A', 'Part-A: General Studies & Mental Ability'] },
+        { name: 'Part-B: Hindu Philosophy & Temple System', marks: 100, questions: 100, weight_pct: 66.67, question_range: [51, 150] as [number, number], aliases: ['Hindu Philosophy', 'HP & TS', 'Hindu Philosophy and Temple System', 'Hindu Philosophy & Temple System', 'Temple System', 'Part-B', 'Part-B: Hindu Philosophy & Temple System'] }
+      ]
+    },
+    syllabus_topics: [
+      'Part-A: Events of National & International Importance & Current Affairs',
+      'Part-A: General Science, S&T Developments and Information Technology',
+      'Part-A: Social, Economic and Political History of Modern India & Andhra Pradesh',
+      'Part-A: Indian Polity and Governance, Constitutional Issues & AP e-Governance',
+      'Part-A: Economic Development in India & Andhra Pradesh Since Independence',
+      'Part-A: Physical Geography of Indian Subcontinent and Andhra Pradesh',
+      'Part-A: Disaster Management, Remote Sensing & Environmental Protection',
+      'Part-A: Logical Reasoning, Analytical Ability, Data Interpretation & Statistics',
+      'Part-A: Bifurcation of Andhra Pradesh & Administrative / Legal Implications',
+      'Part-B: Ramayana: 7 Kandas, Ethical Values, Dharmic Principles and Teachings',
+      'Part-B: Mahabharata: 18 Parvas, Yaksha Prashna, Vidura Niti & Moral Teachings',
+      'Part-B: Bhagavad Gita: Karma, Jnana and Bhakti Yoga, Sthitaprajna Doctrine',
+      'Part-B: Bhagavata Purana: Dashavataras, Dhruva, Prahlada & Sacred Stories',
+      'Part-B: Historic Temples of AP: Tirumala, Srisailam, Simhachalam, Lepakshi, Srikalahasti',
+      'Part-B: Agamas: Vaikhanasa, Pancharatra, Saiva Agamas, Layout & Temple Rituals',
+      'Part-B: Vedic Corpus, Upanishads & Vedanta Darshanas (Advaita, Visishtadvaita, Dvaita)',
+      'Part-B: Bhakti Movement: Alvars, Nayanars, Annamayya, Tyagaraja, Ramadasu, Vemana',
+      'Part-B: AP Endowments Act 1987 (Act 30/1987): Administration & EO Statutory Roles'
     ],
     status: 'MOCK_READY',
     exam_profile_status: 'VERIFIED',
@@ -651,30 +772,34 @@ const RAW_EXAMS: ExamRecord[] = [
           marks_per_question: 1,
           negative_marking_rate: 0.33,
           sections: [
-            'Events of National and International Importance',
-            'Current Affairs (International, National & Regional)',
-            'General Science, Contemporary Developments in S&T, IT',
-            'Social, Economic and Political History of Modern India & Andhra Pradesh',
-            'Indian Polity and Governance: Constitutional Issues, Public Policy & AP e-Governance',
-            'Economic Development in India & Andhra Pradesh since Independence',
-            'Physical Geography of Indian Subcontinent and Andhra Pradesh',
-            'Disaster Management: Vulnerability, Mitigation, Remote Sensing & GIS',
-            'Sustainable Development and Environmental Protection',
-            'Logical Reasoning, Analytical Ability and Data Interpretation',
-            'Data Analysis: Tabulation, Visual Representation, Summary Statistics (Mean, Median, Mode, Variance)',
-            'Bifurcation of Andhra Pradesh and its Administrative, Economic, Social & Legal Implications'
+            'Part-A (50 Qs / 50 Marks): General Studies & Mental Ability (Current Affairs, Science & Tech, History, Polity, AP Economy, Geography, Disaster Management, Logical Reasoning, AP Bifurcation Act)',
+            'Part-B (100 Qs / 100 Marks): Hindu Philosophy & Temple System (Ramayana, Mahabharata, Bhagavad Gita, Bhagavata Purana, Major AP Temples, Agamas, Upanishads & Darshanas, Bhakti Movement, AP Endowments Act 1987)'
           ],
-          mediums: ['English', 'Telugu']
+          mediums: ['English', 'Telugu'],
+          canonical_subjects: [
+            { name: 'Part-A: General Studies & Mental Ability', marks: 50, questions: 50, weight_pct: 33.33, question_range: [1, 50] as [number, number], aliases: ['General Studies', 'GS & MA', 'GA&MA', 'General Studies and Mental Ability', 'General Studies & Mental Ability', 'Part-A', 'Part-A: General Studies & Mental Ability'] },
+            { name: 'Part-B: Hindu Philosophy & Temple System', marks: 100, questions: 100, weight_pct: 66.67, question_range: [51, 150] as [number, number], aliases: ['Hindu Philosophy', 'HP & TS', 'Hindu Philosophy and Temple System', 'Hindu Philosophy & Temple System', 'Temple System', 'Part-B', 'Part-B: Hindu Philosophy & Temple System'] }
+          ]
         },
         syllabus_topics: [
-          'AP Endowments Administration & Governance Structure',
-          'Bifurcation Act 2014 & Schedule IX/X Institutions',
-          'Disaster Management & Remote Sensing in AP Coastal Hazards',
-          'Data Analysis & Summary Statistics (Mean, Median, Mode, Dispersion)',
-          'Indian Constitution, Fundamental Rights & AP e-Governance',
-          'Economic Development of AP & Major Irrigation Projects',
-          'Modern Indian & AP Socio-Political History',
-          'Environmental Protection & UNFCCC Climate Commitments'
+          'Part-A: Events of National & International Importance & Current Affairs',
+          'Part-A: General Science, S&T Developments and Information Technology',
+          'Part-A: Social, Economic and Political History of Modern India & Andhra Pradesh',
+          'Part-A: Indian Polity and Governance, Constitutional Issues & AP e-Governance',
+          'Part-A: Economic Development in India & Andhra Pradesh Since Independence',
+          'Part-A: Physical Geography of Indian Subcontinent and Andhra Pradesh',
+          'Part-A: Disaster Management, Remote Sensing & Environmental Protection',
+          'Part-A: Logical Reasoning, Analytical Ability, Data Interpretation & Statistics',
+          'Part-A: Bifurcation of Andhra Pradesh & Administrative / Legal Implications',
+          'Part-B: Ramayana: 7 Kandas, Ethical Values, Dharmic Principles and Teachings',
+          'Part-B: Mahabharata: 18 Parvas, Yaksha Prashna, Vidura Niti & Moral Teachings',
+          'Part-B: Bhagavad Gita: Karma, Jnana and Bhakti Yoga, Sthitaprajna Doctrine',
+          'Part-B: Bhagavata Purana: Dashavataras, Dhruva, Prahlada & Sacred Stories',
+          'Part-B: Historic Temples of AP: Tirumala, Srisailam, Simhachalam, Lepakshi, Srikalahasti',
+          'Part-B: Agamas: Vaikhanasa, Pancharatra, Saiva Agamas, Layout & Temple Rituals',
+          'Part-B: Vedic Corpus, Upanishads & Vedanta Darshanas (Advaita, Visishtadvaita, Dvaita)',
+          'Part-B: Bhakti Movement: Alvars, Nayanars, Annamayya, Tyagaraja, Ramadasu, Vemana',
+          'Part-B: AP Endowments Act 1987 (Act 30/1987): Administration & EO Statutory Roles'
         ]
       }
     ]
@@ -713,7 +838,10 @@ const RAW_EXAMS: ExamRecord[] = [
         'Logical Reasoning, Analytical Ability and Data Interpretation',
         'Basic English (10th Standard)'
       ],
-      mediums: ['English', 'Telugu']
+      mediums: ['English', 'Telugu'],
+      canonical_subjects: [
+        { name: 'General Studies & General Abilities', marks: 150, questions: 150, weight_pct: 100, aliases: ['General Studies', 'GS', 'Paper-I', 'General Studies & General Abilities', 'General Abilities'] }
+      ]
     },
     syllabus_topics: [
       'Current Affairs (Regional, National & International)',
@@ -822,7 +950,14 @@ const RAW_EXAMS: ExamRecord[] = [
         'Test of Reasoning / Mental Ability',
         'Contents pertaining to the State of Telangana'
       ],
-      mediums: ['English', 'Telugu', 'Urdu']
+      mediums: ['English', 'Telugu', 'Urdu'],
+      canonical_subjects: [
+        { name: 'Arithmetic & Reasoning', marks: 50, questions: 50, weight_pct: 25, question_range: [1, 50] as [number, number], aliases: ['Arithmetic', 'Test of Reasoning / Mental Ability', 'Mental Ability', 'Maths', 'Quantitative Aptitude', 'Arithmetic & Reasoning'] },
+        { name: 'General Science', marks: 30, questions: 30, weight_pct: 15, question_range: [51, 80] as [number, number], aliases: ['Science', 'General Science', 'Physics', 'Chemistry', 'Biology'] },
+        { name: 'History of India & National Movement', marks: 40, questions: 40, weight_pct: 20, question_range: [81, 120] as [number, number], aliases: ['History', 'Indian History', 'History of India, Indian culture, Indian National Movement', 'Indian Culture'] },
+        { name: 'Geography, Polity & Economy', marks: 30, questions: 30, weight_pct: 15, question_range: [121, 150] as [number, number], aliases: ['Geography', 'Polity', 'Economy', 'Indian Geography, Polity and Economy'] },
+        { name: 'Telangana & Current Affairs', marks: 50, questions: 50, weight_pct: 25, question_range: [151, 200] as [number, number], aliases: ['Current Affairs', 'Current events of national and international importance', 'Contents pertaining to the State of Telangana', 'Telangana State', 'English'] }
+      ]
     },
     syllabus_topics: [
       'English',
@@ -914,7 +1049,14 @@ const RAW_EXAMS: ExamRecord[] = [
         'Test of Reasoning / Mental Ability',
         'Contents pertaining to the State of Telangana'
       ],
-      mediums: ['English', 'Telugu', 'Urdu']
+      mediums: ['English', 'Telugu', 'Urdu'],
+      canonical_subjects: [
+        { name: 'Arithmetic & Reasoning', marks: 50, questions: 50, weight_pct: 25, question_range: [1, 50] as [number, number], aliases: ['Arithmetic', 'Test of Reasoning / Mental Ability', 'Mental Ability', 'Maths', 'Quantitative Aptitude', 'Arithmetic & Reasoning'] },
+        { name: 'General Science', marks: 30, questions: 30, weight_pct: 15, question_range: [51, 80] as [number, number], aliases: ['Science', 'General Science', 'Physics', 'Chemistry', 'Biology'] },
+        { name: 'History of India & National Movement', marks: 40, questions: 40, weight_pct: 20, question_range: [81, 120] as [number, number], aliases: ['History', 'Indian History', 'History of India, Indian culture, Indian National Movement', 'Indian Culture'] },
+        { name: 'Geography, Polity & Economy', marks: 30, questions: 30, weight_pct: 15, question_range: [121, 150] as [number, number], aliases: ['Geography', 'Polity', 'Economy', 'Indian Geography, Polity and Economy'] },
+        { name: 'Telangana & Current Affairs', marks: 50, questions: 50, weight_pct: 25, question_range: [151, 200] as [number, number], aliases: ['Current Affairs', 'Current events of national and international importance', 'Contents pertaining to the State of Telangana', 'Telangana State', 'English'] }
+      ]
     },
     syllabus_topics: [
       'English',

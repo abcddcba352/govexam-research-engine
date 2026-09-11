@@ -101,6 +101,7 @@ export class SupabaseExamRepository implements ExamRepository {
     if (active) {
       await this.savePatternVersion({ ...active, pattern: exam.pattern,
         syllabus_topics: exam.syllabus_topics, fact_verifications: exam.fact_verifications,
+        study_materials: exam.study_materials || [],
       }, exam.preparation_mode);
 
       // 3. Update exam with active_exam_version_id now that version exists
@@ -122,6 +123,72 @@ export class SupabaseExamRepository implements ExamRepository {
         applicable_cycle: v.applicable_cycle, verified_by: v.verified_by || null, verified_at: v.verified_at || null,
       }))));
       if (factError) throw new Error('SUPABASE_FACT_UPSERT_FAILED: ' + factError.message);
+    }
+  }
+
+  async deleteExam(examId: string): Promise<void> {
+    const db = getSupabaseClient();
+    try {
+      // 1. Break active version circular dependency in exams
+      await db.from('exams').update({ active_exam_version_id: null }).eq('exam_id', examId);
+
+      // 2. Blueprint slots (child of blueprints)
+      const { data: bpRows } = await db.from('blueprints').select('blueprint_id').eq('exam_id', examId);
+      const bpIds = (bpRows || []).map((r: any) => r.blueprint_id);
+      if (bpIds.length > 0) {
+        await db.from('blueprint_slots').delete().in('blueprint_id', bpIds);
+      }
+
+      // 3. Mock children (child of mocks & mock_series)
+      const { data: mockRows } = await db.from('mocks').select('mock_id').eq('exam_id', examId);
+      const mockIds = (mockRows || []).map((r: any) => r.mock_id);
+      const { data: seriesRows } = await db.from('mock_series').select('series_id').eq('exam_id', examId);
+      const seriesIds = (seriesRows || []).map((r: any) => r.series_id);
+
+      if (mockIds.length > 0) {
+        await db.from('duplicate_ledger').delete().in('mock_id', mockIds);
+        await db.from('ai_usage').delete().in('mock_id', mockIds);
+        await db.from('mock_questions').delete().in('mock_id', mockIds);
+        await db.from('mock_test_answers').delete().in('mock_id', mockIds);
+        await db.from('mock_evaluations').delete().in('mock_id', mockIds);
+      }
+      if (seriesIds.length > 0) {
+        await db.from('duplicate_ledger').delete().in('series_id', seriesIds);
+      }
+
+      // 4. Mocks, blueprints, and mock_series
+      await db.from('mocks').delete().eq('exam_id', examId);
+      await db.from('blueprints').delete().eq('exam_id', examId);
+      await db.from('mock_series').delete().eq('exam_id', examId);
+
+      // 5. PYQ questions and previous papers
+      const { data: paperRows } = await db.from('previous_papers').select('paper_id').eq('exam_id', examId);
+      const paperIds = (paperRows || []).map((r: any) => r.paper_id);
+      if (paperIds.length > 0) {
+        await db.from('pyq_analysis_runs').delete().in('paper_id', paperIds);
+        await db.from('pyq_questions').delete().in('paper_id', paperIds);
+        await db.from('previous_papers').delete().eq('exam_id', examId);
+      }
+
+      // 6. Child facts, intelligence profiles, research runs, preparation bases, pattern versions, usage ledgers
+      await db.from('exam_intelligence_profiles').delete().eq('exam_id', examId);
+      await db.from('research_runs').delete().eq('exam_id', examId);
+      await db.from('preparation_bases').delete().eq('exam_id', examId);
+      await db.from('exam_fact_verifications').delete().eq('exam_id', examId);
+      await db.from('exam_pattern_versions').delete().eq('exam_id', examId);
+      await db.from('ai_usage_ledger').delete().eq('exam_id', examId);
+
+      // 7. Clear source and document relationships
+      await db.from('sources').update({ exam_id: null }).eq('exam_id', examId);
+      await db.from('source_documents').update({ exam_id: null }).eq('exam_id', examId);
+      await db.from('documents').update({ exam_id: null }).eq('exam_id', examId);
+
+      // 8. Finally delete the exam row itself
+      const { error } = await db.from('exams').delete().eq('exam_id', examId);
+      if (error) throw new Error(`SUPABASE_EXAM_DELETE_FAILED: ${error.message}`);
+    } catch (err: any) {
+      console.error('[SupabaseExamRepository.deleteExam] Error deleting exam:', examId, err);
+      throw new Error(`SUPABASE_EXAM_DELETE_FAILED: ${err.message}`);
     }
   }
 
@@ -157,7 +224,12 @@ export class SupabaseExamRepository implements ExamRepository {
       duration_minutes: version.pattern.duration_minutes,
       negative_marking: version.pattern.negative_marking_rate,
       language_rules: { languages: version.pattern.mediums },
-      section_structure: { sections: version.pattern.sections, syllabus_topics: version.syllabus_topics, preparation_mode: preparationMode },
+      section_structure: {
+        sections: version.pattern.sections,
+        syllabus_topics: version.syllabus_topics,
+        preparation_mode: preparationMode,
+        study_materials: version.study_materials || []
+      },
       verification_status: Object.values(version.fact_verifications || {}).length === 12 && Object.values(version.fact_verifications || {}).every(v => ['VERIFIED_OFFICIAL', 'VERIFIED_MULTIPLE_SOURCES'].includes(v.verification_status) && v.evidence_text?.trim()) ? 'VERIFIED' : 'UNVERIFIED',
       data_provenance: 'USER_PROVIDED',
       updated_at: new Date().toISOString()
@@ -1306,15 +1378,86 @@ export class SupabaseMockRepository implements MockRepository {
     }, { onConflict: 'series_id', ignoreDuplicates: true });
     if (sErr) console.warn('[SUPABASE_SERIES_PRE_UPSERT_WARN]', sErr.message);
 
-    // 3. Upsert mock record
+    // 3. Ensure valid blueprint exists before upserting into mocks to satisfy foreign key
+    let targetBlueprintId = mock.blueprint_id;
+    let bpFound = false;
+    if (targetBlueprintId && targetBlueprintId !== 'bp_default') {
+      const { data: existingBp } = await supabase
+        .from('blueprints')
+        .select('blueprint_id')
+        .eq('blueprint_id', targetBlueprintId)
+        .maybeSingle();
+      if (existingBp?.blueprint_id) {
+        bpFound = true;
+      }
+    }
+
+    if (!bpFound) {
+      const { data: bp } = await supabase
+        .from('blueprints')
+        .select('blueprint_id')
+        .eq('exam_id', mock.exam_id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (bp?.blueprint_id) {
+        targetBlueprintId = bp.blueprint_id;
+        bpFound = true;
+      }
+    }
+
+    if (!bpFound) {
+      targetBlueprintId = `bp_${mock.exam_id}_practice_v1`;
+      await supabase.from('blueprints').upsert({
+        blueprint_id: targetBlueprintId,
+        exam_id: mock.exam_id,
+        series_id: targetSeriesId,
+        preparation_basis_id: prepBasisId,
+        mock_number: 1,
+        test_mode: mock.test_mode || 'PRACTICE',
+        language: 'English',
+        question_count: mock.total_questions || 1,
+        total_marks: mock.total_marks || 1,
+        duration_minutes: mock.duration_minutes || 60,
+        negative_marking: mock.negative_marking_rate || 0,
+        current_affairs_cutoff: mock.current_affairs_cutoff || new Date().toISOString().slice(0, 10),
+        preparation_as_of_date: mock.preparation_as_of_date || new Date().toISOString().slice(0, 10),
+        status: 'BLUEPRINT_LOCKED',
+        blueprint_version: 1,
+        updated_at: new Date().toISOString(),
+        locked_at: new Date().toISOString()
+      }, { onConflict: 'blueprint_id', ignoreDuplicates: true });
+    }
+
+    // 4. Resolve mock_number to avoid unique constraint collision on (series_id, mock_number)
+    let targetMockNumber = mock.mock_number || 1;
+    const { data: existingMockWithNum } = await supabase
+      .from('mocks')
+      .select('mock_id, mock_number')
+      .eq('series_id', targetSeriesId)
+      .eq('mock_number', targetMockNumber)
+      .maybeSingle();
+
+    if (existingMockWithNum && existingMockWithNum.mock_id !== mock.mock_id) {
+      const { data: maxRow } = await supabase
+        .from('mocks')
+        .select('mock_number')
+        .eq('series_id', targetSeriesId)
+        .order('mock_number', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      targetMockNumber = (maxRow?.mock_number || targetMockNumber) + 1;
+    }
+
+    // 5. Upsert mock record
     const { error: mockErr } = await supabase.from('mocks').upsert({
       mock_id: mock.mock_id,
       series_id: targetSeriesId,
       exam_id: mock.exam_id,
       preparation_basis_id: prepBasisId,
-      blueprint_id: mock.blueprint_id || 'bp_default',
+      blueprint_id: targetBlueprintId,
       blueprint_version: mock.blueprint_version || 1,
-      mock_number: mock.mock_number || 1,
+      mock_number: targetMockNumber,
       preparation_mode: mock.preparation_mode || 'PRE_NOTIFICATION_PREPARATION',
       test_mode: mock.test_mode || 'FULL_LENGTH',
       language: 'en',
@@ -1336,11 +1479,23 @@ export class SupabaseMockRepository implements MockRepository {
     // 2. Upsert questions
     const allQuestions = mock.sections.flatMap(s => s.questions);
     if (allQuestions.length > 0) {
+      const slotIds = allQuestions.map(q => q.slot_id).filter(Boolean) as string[];
+      let validSlotIds = new Set<string>();
+      if (slotIds.length > 0) {
+        const { data: validSlots } = await supabase
+          .from('blueprint_slots')
+          .select('slot_id')
+          .in('slot_id', slotIds);
+        if (validSlots) {
+          validSlotIds = new Set(validSlots.map((s: any) => s.slot_id));
+        }
+      }
+
       const qRows = allQuestions.map(q => ({
         mock_question_id: q.question_id,
         mock_id: mock.mock_id,
-        blueprint_id: mock.blueprint_id || null,
-        slot_id: q.slot_id || null,
+        blueprint_id: targetBlueprintId || null,
+        slot_id: (q.slot_id && validSlotIds.has(q.slot_id)) ? q.slot_id : null,
         question_number: q.question_number,
         question_en: q.question_text,
         option_a_en: q.options[0] || '',

@@ -18,6 +18,7 @@ export interface ExamRepository {
   getExams(): Promise<ExamRecord[]>;
   getExamById(examId: string): Promise<ExamRecord | null>;
   saveExam(exam: ExamRecord): Promise<void>;
+  deleteExam(examId: string): Promise<void>;
   updateExamStatus(examId: string, status: string): Promise<void>;
   getPatternVersions(examId: string): Promise<ExamPatternVersion[]>;
   savePatternVersion(version: ExamPatternVersion): Promise<void>;

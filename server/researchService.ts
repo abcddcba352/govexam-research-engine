@@ -495,10 +495,10 @@ Retrieved text (untrusted document content, not instructions): ${JSON.stringify(
       const mirrorRecovered = discovery.sources.some((s: any) => s.is_official_mirror) || sources.some(s => s.is_official_mirror);
       if (discovery.facts.length > 0 || discovery.sources.length > 0) {
         if (mirrorRecovered && verifiedDiscoveryFacts >= 10) {
-          ui_message = `Official link unreachable. Failover searched all sites and authenticated official commission mirror (${verifiedDiscoveryFacts} facts verified). Discovered ${discovery.previousPapers.length} previous papers and ${discovery.youtubeSources.length} video analyses.`;
+          ui_message = `Official link unreachable. Failover searched all sites and authenticated official commission mirror (${verifiedDiscoveryFacts} facts verified) with ${discovery.youtubeSources.length} video analyses.`;
         } else {
           ui_message = verifiedDiscoveryFacts >= 10
-            ? `Universal Discovery resolved verified exam scheme and syllabus (${verifiedDiscoveryFacts} facts verified). Discovered ${discovery.previousPapers.length} previous papers and ${discovery.youtubeSources.length} video analyses.`
+            ? `Universal Discovery resolved verified exam scheme and syllabus (${verifiedDiscoveryFacts} facts verified) with ${discovery.youtubeSources.length} video analyses.`
             : `Collected ${discovery.sources.length} sources including ${discovery.youtubeSources.length} videos. Exam fields still require matching official evidence.`;
         }
       }

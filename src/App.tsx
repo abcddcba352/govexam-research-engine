@@ -27,6 +27,7 @@ import {
   BarChart3,
   History,
   ShieldCheck,
+  Key,
   Zap,
   ArrowRight,
   BookOpen,
@@ -36,8 +37,10 @@ import {
   Award,
   FileCheck2,
   HelpCircle,
-  Brain
+  Brain,
+  ChevronDown
 } from 'lucide-react';
+import { CleanMockStudio } from './components/CleanMockStudio.tsx';
 
 // These audit workspaces are only needed after the user changes tabs. Loading
 // them on demand keeps the research/intake screen responsive on slower devices.
@@ -70,9 +73,48 @@ const COMMON_EXAM_PRESETS = [
 ];
 
 export default function App() {
+  const getInitialTab = (): 'COVERAGE' | 'CURRENT_AFFAIRS' | 'INTAKE' | 'STUDIO' | 'COMPARE' | 'PYQ' | 'BLUEPRINT' | 'MOCKS' | 'LEDGER' | 'SOURCES' | 'LOGS' => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const qTab = params.get('tab')?.toUpperCase();
+      const validTabs = ['COVERAGE', 'CURRENT_AFFAIRS', 'INTAKE', 'STUDIO', 'COMPARE', 'PYQ', 'BLUEPRINT', 'MOCKS', 'LEDGER', 'SOURCES', 'LOGS'];
+      if (qTab && validTabs.includes(qTab)) return qTab as any;
+      const hash = window.location.hash.replace('#', '').toUpperCase();
+      if (hash && validTabs.includes(hash)) return hash as any;
+    }
+    return 'STUDIO';
+  };
+
   const [activeTab, setActiveTab] = useState<
     'COVERAGE' | 'CURRENT_AFFAIRS' | 'INTAKE' | 'STUDIO' | 'COMPARE' | 'PYQ' | 'BLUEPRINT' | 'MOCKS' | 'LEDGER' | 'SOURCES' | 'LOGS'
-  >('INTAKE');
+  >(getInitialTab);
+  const [showAdvancedTools, setShowAdvancedTools] = useState(false);
+  const [isGeminiKeysModalOpen, setIsGeminiKeysModalOpen] = useState(false);
+  const [geminiKeyCount, setGeminiKeyCount] = useState<number>(0);
+
+  const fetchGeminiKeyCount = async () => {
+    try {
+      const res = await fetch('/api/admin/gemini-keys');
+      if (res.ok) {
+        const data = await res.json();
+        setGeminiKeyCount(data.total_configured || 0);
+      }
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    fetchGeminiKeyCount();
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (url.searchParams.get('tab')?.toUpperCase() !== activeTab) {
+        url.searchParams.set('tab', activeTab);
+        window.history.replaceState({}, '', url.toString());
+      }
+    }
+  }, [activeTab]);
   const [examQuery, setExamQuery] = useState('');
   const [researchExamId, setResearchExamId] = useState<string | undefined>();
   const [selectedMode, setSelectedMode] = useState<ResearchMode>('HYBRID');
@@ -97,9 +139,16 @@ export default function App() {
 
   // Persistent server data
   const [exams, setExams] = useState<ExamRecord[]>([]);
-  const [selectedMockExamId, setSelectedMockExamId] = useState<string>('');
-  const [selectedPYQExamId, setSelectedPYQExamId] = useState<string>('');
-  const [selectedBlueprintExamId, setSelectedBlueprintExamId] = useState<string>('');
+  const getInitialExamId = () => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('exam_id') || params.get('exam') || '';
+    }
+    return '';
+  };
+  const [selectedMockExamId, setSelectedMockExamId] = useState<string>(getInitialExamId);
+  const [selectedPYQExamId, setSelectedPYQExamId] = useState<string>(getInitialExamId);
+  const [selectedBlueprintExamId, setSelectedBlueprintExamId] = useState<string>(getInitialExamId);
   const [registry, setRegistry] = useState<OfficialSourceRegistryRecord[]>([]);
   const [runs, setRuns] = useState<ResearchRunLog[]>([]);
 
@@ -142,15 +191,28 @@ export default function App() {
     fetchRuns();
   }, []);
 
+  // Automatically clear transient global errors when switching navigation tabs
+  useEffect(() => {
+    setErrorMsg(null);
+  }, [activeTab]);
+
   const fetchExams = async () => {
     try {
       const res = await fetch('/api/exams');
       if (res.ok) {
         const data = await res.json();
         setExams(data);
-        if (data.length > 0 && !selectedMockExamId) {
-          const target = data.find((e: any) => e.exam_id.includes('endowment')) || data[0];
-          setSelectedMockExamId(target.exam_id);
+        if (data.length > 0) {
+          const target = data.find((e: any) => e.exam_id === 'appsc_group_2_screening') || data.find((e: any) => e.exam_id.includes('group_2')) || data[0];
+          if (!selectedMockExamId) {
+            setSelectedMockExamId(target.exam_id);
+          }
+          if (!selectedPYQExamId) {
+            setSelectedPYQExamId(target.exam_id);
+          }
+          if (!selectedBlueprintExamId) {
+            setSelectedBlueprintExamId(target.exam_id);
+          }
         }
       }
     } catch (e) {
@@ -354,20 +416,36 @@ export default function App() {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
-                  GovExam Curriculum & Exam Engine
+                  Varadhi Exam Studio
                 </h1>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
-                  Admin Studio
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  Admin Engine
                 </span>
               </div>
               <p className="text-[11px] text-slate-500 hidden sm:block">
-                Curriculum Research • Blueprint Verification • Non-Repeat Duplicate Ledger
+                High-Fidelity Mock Test Generation & PYQ Question Bank for Varadhi
               </p>
             </div>
           </div>
 
-          {/* Navigation Screens */}
+          {/* Clean Navigation Bar */}
           <nav className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-semibold overflow-x-auto">
+            {/* 1. MOCK GENERATOR (DEFAULT & PRIMARY) */}
+            <button
+              type="button"
+              id="nav-studio-btn"
+              onClick={() => setActiveTab('STUDIO')}
+              className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+                activeTab === 'STUDIO'
+                  ? 'bg-emerald-600 text-white shadow-xs font-bold'
+                  : 'text-slate-700 hover:text-slate-900'
+              }`}
+            >
+              <Zap className="w-3.5 h-3.5" />
+              <span>⚡ Mock Generator</span>
+            </button>
+
+            {/* 2. EXAM INTAKE */}
             <button
               type="button"
               id="nav-intake-btn"
@@ -382,34 +460,7 @@ export default function App() {
               <span>Exam Intake</span>
             </button>
 
-            <button
-              type="button"
-              id="nav-studio-btn"
-              onClick={() => setActiveTab('STUDIO')}
-              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
-                activeTab === 'STUDIO'
-                  ? 'bg-white text-blue-700 shadow-2xs font-bold'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Search className="w-3.5 h-3.5" />
-              <span>Research Studio</span>
-            </button>
-
-            <button
-              type="button"
-              id="nav-compare-btn"
-              onClick={() => setActiveTab('COMPARE')}
-              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
-                activeTab === 'COMPARE'
-                  ? 'bg-white text-blue-700 shadow-2xs font-bold'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <BarChart3 className="w-3.5 h-3.5" />
-              <span>Compare Modes</span>
-            </button>
-
+            {/* 3. PAST PAPERS & PYQ */}
             <button
               type="button"
               id="nav-pyq-btn"
@@ -421,91 +472,94 @@ export default function App() {
               }`}
             >
               <Brain className="w-3.5 h-3.5" />
-              <span>PYQ Intelligence</span>
+              <span>Past Papers (PYQ)</span>
             </button>
 
+            {/* 4. ADVANCED AUDIT TOOLS TOGGLE */}
             <button
               type="button"
-              id="nav-blueprint-btn"
-              onClick={() => {
-                if (!selectedBlueprintExamId && exams.length > 0) {
-                  setSelectedBlueprintExamId(exams[0].exam_id);
-                }
-                setActiveTab('BLUEPRINT');
-              }}
-              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
-                activeTab === 'BLUEPRINT'
-                  ? 'bg-white text-indigo-700 shadow-2xs font-bold'
-                  : 'text-slate-600 hover:text-slate-900'
+              id="nav-advanced-toggle-btn"
+              onClick={() => setShowAdvancedTools(!showAdvancedTools)}
+              className={`px-2.5 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1 whitespace-nowrap border ${
+                showAdvancedTools || ['BLUEPRINT', 'MOCKS', 'COVERAGE', 'CURRENT_AFFAIRS', 'COMPARE', 'LEDGER', 'SOURCES', 'LOGS'].includes(activeTab)
+                  ? 'border-indigo-300 bg-indigo-50 text-indigo-800 font-bold'
+                  : 'border-transparent text-slate-500 hover:text-slate-800'
               }`}
             >
-              <Layers className="w-3.5 h-3.5" />
-              <span>Blueprint Engine</span>
-            </button>
-
-            <button
-              type="button"
-              id="nav-mocks-btn"
-              onClick={() => setActiveTab('MOCKS')}
-              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
-                activeTab === 'MOCKS'
-                  ? 'bg-white text-indigo-700 shadow-2xs font-bold'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>Master Papers & Audit</span>
-            </button>
-
-            <button type="button" id="nav-coverage-btn" onClick={() => setActiveTab('COVERAGE')} className={`px-3 py-1.5 rounded-lg whitespace-nowrap ${activeTab==='COVERAGE'?'bg-white text-indigo-700 font-bold shadow-sm':'text-slate-600'}`}>Syllabus Coverage</button>
-            <button type="button" id="nav-current-affairs-btn" onClick={() => setActiveTab('CURRENT_AFFAIRS')}
-              className={`px-3 py-1.5 rounded-lg whitespace-nowrap ${activeTab === 'CURRENT_AFFAIRS' ? 'bg-white text-indigo-700 font-bold shadow-sm' : 'text-slate-600'}`}>
-              Current Affairs Desk
-            </button>
-
-            <button
-              type="button"
-              id="nav-ledger-btn"
-              onClick={() => setActiveTab('LEDGER')}
-              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
-                activeTab === 'LEDGER'
-                  ? 'bg-white text-amber-700 shadow-2xs font-bold'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Duplicate Ledger</span>
-            </button>
-
-            <button
-              type="button"
-              id="nav-sources-btn"
-              onClick={() => setActiveTab('SOURCES')}
-              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
-                activeTab === 'SOURCES'
-                  ? 'bg-white text-blue-700 shadow-2xs font-bold'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Database className="w-3.5 h-3.5" />
-              <span>Sources & Registry</span>
-            </button>
-
-            <button
-              type="button"
-              id="nav-logs-btn"
-              onClick={() => setActiveTab('LOGS')}
-              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
-                activeTab === 'LOGS'
-                  ? 'bg-white text-blue-700 shadow-2xs font-bold'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <History className="w-3.5 h-3.5" />
-              <span>Logs ({runs.length})</span>
+              <Layers className="w-3 h-3" />
+              <span>Advanced Tools</span>
+              <ChevronDown className={`w-3 h-3 transition-transform ${showAdvancedTools ? 'rotate-180' : ''}`} />
             </button>
           </nav>
         </div>
+
+        {/* Optional Secondary Ribbon for Advanced Curriculum Tools */}
+        {(showAdvancedTools || ['BLUEPRINT', 'MOCKS', 'COVERAGE', 'CURRENT_AFFAIRS', 'COMPARE', 'LEDGER', 'SOURCES', 'LOGS'].includes(activeTab)) && (
+          <div className="bg-slate-50 border-t border-slate-200/80 px-4 sm:px-6 py-2 overflow-x-auto animate-in fade-in">
+            <div className="max-w-7xl mx-auto flex items-center gap-1 text-[11px] font-medium text-slate-600">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">Audit Suite:</span>
+              <button
+                type="button"
+                onClick={() => setActiveTab('MOCKS')}
+                className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${activeTab === 'MOCKS' ? 'bg-indigo-600 text-white font-bold' : 'hover:bg-slate-200'}`}
+              >
+                Master Papers & Audit
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!selectedBlueprintExamId && exams.length > 0) setSelectedBlueprintExamId(exams[0].exam_id);
+                  setActiveTab('BLUEPRINT');
+                }}
+                className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${activeTab === 'BLUEPRINT' ? 'bg-indigo-600 text-white font-bold' : 'hover:bg-slate-200'}`}
+              >
+                Blueprint Engine
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('COVERAGE')}
+                className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${activeTab === 'COVERAGE' ? 'bg-indigo-600 text-white font-bold' : 'hover:bg-slate-200'}`}
+              >
+                Syllabus Coverage
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('CURRENT_AFFAIRS')}
+                className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${activeTab === 'CURRENT_AFFAIRS' ? 'bg-indigo-600 text-white font-bold' : 'hover:bg-slate-200'}`}
+              >
+                Current Affairs Desk
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('LEDGER')}
+                className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${activeTab === 'LEDGER' ? 'bg-amber-600 text-white font-bold' : 'hover:bg-slate-200'}`}
+              >
+                Duplicate Ledger
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('SOURCES')}
+                className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${activeTab === 'SOURCES' ? 'bg-indigo-600 text-white font-bold' : 'hover:bg-slate-200'}`}
+              >
+                Sources & Registry
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('LOGS')}
+                className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${activeTab === 'LOGS' ? 'bg-indigo-600 text-white font-bold' : 'hover:bg-slate-200'}`}
+              >
+                Logs ({runs.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('COMPARE')}
+                className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${activeTab === 'COMPARE' ? 'bg-indigo-600 text-white font-bold' : 'hover:bg-slate-200'}`}
+              >
+                Compare Modes
+              </button>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Main Content Area */}
@@ -535,238 +589,16 @@ export default function App() {
           />
         )}
 
-        {/* SCREEN 2: RESEARCH STUDIO */}
+        {/* SCREEN: CLEAN ADMIN MOCK GENERATOR STUDIO (FOR VARADHI) */}
         {activeTab === 'STUDIO' && (
-          <div className="space-y-6">
-            {/* Hierarchical Conducting Board Explorer */}
-            <ConductingBoardExplorer
-              exams={exams}
-              jurisdictionTier={jurisdictionTier}
-              onJurisdictionChange={(tier) => {
-                setJurisdictionTier(tier);
-                setSelectedState('');
-                setSelectedBoardId('');
-                setExamQuery('');
-                setResearchExamId(undefined);
-                setStructureScheme(null);
-                setShowStructureExplorer(false);
-              }}
-              selectedState={selectedState}
-              onStateChange={(st) => {
-                setSelectedState(st);
-                setSelectedBoardId('');
-                setExamQuery('');
-                setResearchExamId(undefined);
-                setStructureScheme(null);
-                setShowStructureExplorer(false);
-              }}
-              selectedBoardId={selectedBoardId}
-              onSelectBoard={(boardId) => {
-                setSelectedBoardId(boardId === selectedBoardId ? '' : boardId);
-                setExamQuery('');
-                setResearchExamId(undefined);
-                setStructureScheme(null);
-                setShowStructureExplorer(false);
-              }}
-              onSelectExam={(examTitle, matchedDbExam) => {
-                setExamQuery(examTitle);
-                setResearchExamId(matchedDbExam?.exam_id);
-                void handleFetchStructure(examTitle);
-              }}
-              onLaunchResearch={(query, examId) => {
-                setExamQuery(query);
-                setResearchExamId(examId);
-                void handleStartResearch(undefined, query, examId);
-              }}
-              onOpenMocks={(examId) => handleNavigateToMocksFromIntake(examId)}
-            />
-
-            {/* Input & Mode Selector Card */}
-            <div className="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-2xs space-y-5">
-              {/* Active Search Query Section */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label htmlFor="exam-query-input" className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                    <Search className="w-3.5 h-3.5 text-indigo-600" />
-                    <span>Active Research Query / Custom Notification</span>
-                  </label>
-                  <span className="text-[11px] text-slate-500">
-                    Selected from board branch above, or enter custom query
-                  </span>
-                </div>
-
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-                    <input
-                      id="exam-query-input"
-                      type="text"
-                      placeholder='e.g. "TGPSC Group 2 Paper 1", "TSLPRB Police SI", "SSC CGL Tier 1"'
-                      value={examQuery}
-                      onChange={(e) => { setExamQuery(e.target.value); setResearchExamId(undefined); }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !isResearching) handleStartResearch();
-                      }}
-                      className="w-full text-sm pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                    />
-                  </div>
-
-                  <button
-                    type="button"
-                    id="fetch-stages-btn"
-                    disabled={isLoadingStructure || !examQuery.trim()}
-                    onClick={() => handleFetchStructure(examQuery)}
-                    className="px-4 py-2.5 rounded-xl bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 text-indigo-700 font-bold text-xs shadow-xs transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer shrink-0"
-                    title="Fetch selection stages and all papers breakdown for this exam"
-                  >
-                    {isLoadingStructure ? (
-                      <>
-                        <div className="w-3.5 h-3.5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-                        <span>Fetching Stages...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Layers className="w-3.5 h-3.5 text-indigo-600" />
-                        <span>Stages & Papers</span>
-                      </>
-                    )}
-                  </button>
-
-                  <button
-                    type="button"
-                    id="execute-research-btn"
-                    disabled={isResearching || !examQuery.trim()}
-                    onClick={() => handleStartResearch()}
-                    className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer shrink-0"
-                  >
-                    {isResearching ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Researching...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Research Examination</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Research Mode Selector */}
-              <div className="pt-3 border-t border-slate-100">
-                <ModeSelector
-                  mode={selectedMode}
-                  onChange={setSelectedMode}
-                  disabled={isResearching}
-                />
-              </div>
-
-              {/* Optional Direct Web Attachment Panel */}
-              <DirectWebPanel
-                userUrls={userUrls}
-                onChangeUrls={setUserUrls}
-                documentText={documentText}
-                onChangeDocumentText={setDocumentText}
-                documentName={documentName}
-                onChangeDocumentName={setDocumentName}
-              />
-            </div>
-
-            {/* Stages & Papers Scheme Explorer */}
-            {(showStructureExplorer || structureScheme || isLoadingStructure) && (
-              <ExamStructureExplorer
-                structure={structureScheme}
-                isLoading={isLoadingStructure}
-                onSearchStructure={(q) => {
-                  setExamQuery(q);
-                  void handleFetchStructure(q);
-                }}
-                onSelectPaperForResearch={(paperTitle, stageName) => {
-                  const queryStr = `${structureScheme?.exam_name || examQuery} ${stageName} ${paperTitle}`;
-                  setExamQuery(queryStr);
-                  void handleStartResearch(undefined, queryStr);
-                }}
-                onSelectPaperForIntake={(_paper, _stage, _scheme) => {
-                  setActiveTab('INTAKE');
-                }}
-                onSelectPaperForMocks={(_paperTitle) => {
-                  setActiveTab('MOCKS');
-                }}
-                onClose={() => setShowStructureExplorer(false)}
-              />
-            )}
-
-            {/* Research Progress State */}
-            {isResearching && (
-              <div className="bg-white border border-blue-200 rounded-2xl p-6 text-center space-y-3 shadow-sm animate-pulse">
-                <div className="w-10 h-10 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-                <div className="text-sm font-bold text-slate-900">{researchStage}</div>
-                <p className="text-xs text-slate-500 max-w-md mx-auto">
-                  Adhering to strict protocol: Identifying entities first, searching official authority registry, and assigning Level 5 source trust.
-                </p>
-              </div>
-            )}
-
-            {/* Step 1: Examination Identification Result */}
-            {identification && !isResearching && (
-              <ExamIdentificationCard identification={identification} />
-            )}
-
-            {/* Source Trust Hierarchy Legend */}
-            {identification && !isResearching && (
-              <TrustHierarchyLegend />
-            )}
-
-            {/* Step 2: Discovered Facts with Source Verification */}
-            {(currentFacts.length > 0 || currentRunLog?.research_status === 'RESEARCH_PARTIAL_QUOTA_EXHAUSTED' || currentRunLog?.ui_message) && !isResearching && (
-              <FactsDisplay
-                facts={currentFacts}
-                summaryNotes={currentRunLog?.summary_notes}
-                researchMode={currentRunLog?.research_mode || selectedMode}
-                researchStatus={currentRunLog?.research_status}
-                unresolvedFacts={currentRunLog?.unresolved_facts}
-                fallbackApplied={currentRunLog?.fallback_applied}
-                uiMessage={currentRunLog?.ui_message}
-              />
-            )}
-
-            {/* Active Run Telemetry Banner */}
-            {currentRunLog && !isResearching && (
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-3">
-                <h3 className="font-bold text-sm">Collected sources ({currentRunLog.collected_sources?.length || 0})</h3>
-                <p className="text-xs text-slate-600">Source collection and exam verification are separate. Video metadata and secondary material require review.</p>
-                {currentRunLog.collected_sources?.map(source => <div key={source.url} className="text-sm">
-                  <a href={source.url} target="_blank" rel="noreferrer" className="text-blue-700 underline">{source.title}</a>
-                  <span className="ml-2 text-xs text-slate-500">{source.kind} · {source.characters.toLocaleString()} characters</span>
-                </div>)}
-                <details><summary className="text-sm cursor-pointer">Collection diagnostics</summary>
-                  <ul className="mt-3 space-y-2 text-xs">{currentRunLog.collection_diagnostics?.map((d,i) =>
-                    <li key={i}><strong>{d.stage}: {d.status}</strong> — {d.target}<br />{d.detail}</li>)}</ul>
-                </details>
-              </div>
-            )}
-            {currentRunLog && !isResearching && (
-              <div className="bg-white border border-slate-200 rounded-2xl p-4 text-xs text-slate-600 flex flex-wrap items-center justify-between gap-3 shadow-2xs">
-                <div className="flex items-center gap-4">
-                  <span className="font-mono text-slate-500">Run: {currentRunLog.run_id}</span>
-                  <span><strong>Mode:</strong> {currentRunLog.research_mode}</span>
-                  <span><strong>Duration:</strong> {(currentRunLog.duration_ms / 1000).toFixed(2)}s</span>
-                  <span><strong>Tokens:</strong> {currentRunLog.Gemini_tokens}</span>
-                  <span><strong>Search API Calls:</strong> {currentRunLog.Google_search_queries}</span>
-                  <span><strong>Cost:</strong> ${currentRunLog.estimated_cost}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('COMPARE')}
-                  className="text-blue-600 hover:underline font-semibold flex items-center gap-1 cursor-pointer"
-                >
-                  Compare with other modes <ArrowRight className="w-3 h-3" />
-                </button>
-              </div>
-            )}
-          </div>
+          <CleanMockStudio
+            exams={exams}
+            initialExamId={selectedMockExamId}
+            onNavigateToAdvanced={() => {
+              setShowAdvancedTools(true);
+              setActiveTab('MOCKS');
+            }}
+          />
         )}
 
         {/* SCREEN 3: COMPARE APPROACHES */}
@@ -784,7 +616,10 @@ export default function App() {
           <PYQIntelligenceScreen
             exams={exams}
             selectedExamId={selectedPYQExamId || exams[0]?.exam_id || 'tgpsc_group2_paper1'}
-            onSelectExam={(id) => setSelectedPYQExamId(id)}
+            onSelectExam={(id) => {
+              setSelectedPYQExamId(id);
+              fetchExams();
+            }}
           />
         )}
 
@@ -798,6 +633,7 @@ export default function App() {
               setSelectedMockExamId(selectedBlueprintExamId || exams[0]?.exam_id);
               setActiveTab('MOCKS');
             }}
+            onNavigateToCoverage={() => setActiveTab('COVERAGE')}
           />
         )}
 
@@ -861,9 +697,9 @@ export default function App() {
       {/* Footer */}
       <footer className="bg-white border-t border-slate-200 py-4 px-6 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-          <span>GovExam Mock Test Expert • Research Engine & Deduplication Architecture</span>
-          <span className="font-mono text-[11px]">
-            Mode A: Google API • Mode B: Direct Web • Mode C: Hybrid
+          <span>Varadhi Exam Studio • Admin Content & Test Generation Platform</span>
+          <span className="text-[11px] text-slate-400">
+            Syllabus Governed • Direct Varadhi Export
           </span>
         </div>
       </footer>

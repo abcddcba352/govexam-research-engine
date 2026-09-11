@@ -1,12 +1,14 @@
 import { extractSyllabusFromNotificationText } from './syllabusExtractor.ts';
 import { extractPdfText } from './pdfParser.ts';
+import { extractYoutubeVideoIntelligence } from './youtubeExtractor.ts';
 import type { Express, Request, RequestHandler } from 'express';
 import { withExamWorkflow } from './persistence/examWorkflow.ts';
-import { getExams, getExamById, createExamFromIntake, getSources, saveSource, updateExamStages } from './dbService.ts';
+import { getExams, getExamById, createExamFromIntake, getSources, saveSource, updateExamStages, updateExamRecord, deleteExamRecord, addExamStudyMaterial, deleteExamStudyMaterial, getMockById } from './dbService.ts';
 import { allowedPublisher, collectCurrentAffairs } from './currentAffairsService.ts';
 import { discoverCurrentAffairs } from './autonomousResearch.ts';
 import { saveAutonomousArticles } from './autonomousPersistence.ts';
-import { validDate, rankArticle, currentAffairsTopics } from '../src/currentAffairs.ts';
+import { validDate, isValidCutoffDate, rankArticle, currentAffairsTopics } from '../src/currentAffairs.ts';
+
 import { canGenerateMock, evaluatePreparationBasis } from './readinessService.ts';
 import { executeResearch, isQuotaExhaustedError, classifySourceTrustLevel } from './researchService.ts';
 import { generateMockTestForExam } from './mockService.ts';
@@ -44,7 +46,7 @@ export function registerExamRoutes(app: Express) {
   app.get('/api/research/coverage/:examId',examEndpoint(req=>{
     const exam=getExamById(req.params.examId);if(!exam) return {status:404,body:{error:'Examination not found.'}};
     const cutoff=req.query.cutoff_date||new Date().toISOString().slice(0,10);
-    if(!validDate(cutoff)||cutoff>new Date().toISOString().slice(0,10)) return {status:400,body:{error:'Invalid cutoff date.'}};
+    if(!isValidCutoffDate(cutoff)) return {status:400,body:{error:'Invalid cutoff date.'}};
     const sources=getSources();
     const normalized=evidencePool(exam,sources,cutoff).map(e=>({...sources.find(s=>s.source_id===e.source_id)!,research_evidence:e}));
     const coverage=buildCoverage(exam,normalized,cutoff);
@@ -56,7 +58,7 @@ export function registerExamRoutes(app: Express) {
     const exam=typeof exam_id==='string'?getExamById(exam_id):undefined;
     const publisher=typeof publisher_id==='string'?getSubjectPublisher(publisher_id):undefined;
     if(!exam||!publisher) return {status:404,body:{error:'Select a registered examination and publisher.'}};
-    if(!validDate(cutoff_date)||cutoff_date>new Date().toISOString().slice(0,10)) return {status:400,body:{error:'Invalid cutoff date.'}};
+    if(!isValidCutoffDate(cutoff_date)) return {status:400,body:{error:'Invalid cutoff date.'}};
     if(publisher.mode==='UNAVAILABLE'||!publisherApplies(publisher,exam)) return {status:409,body:{error:'This publisher is not available for the selected paper.'}};
     try {
       const sources=getSources();const seen=sources.flatMap(s=>s.research_evidence?[s.research_evidence]:[]);
@@ -74,8 +76,8 @@ export function registerExamRoutes(app: Express) {
     const { exam_id, cutoff_date } = req.body || {};
     const exam=typeof exam_id==='string' ? getExamById(exam_id) : undefined;
     if(!exam) return {status:404,body:{error:'Select an examination first.'}};
-    if(!validDate(cutoff_date) || cutoff_date>new Date().toISOString().slice(0,10))
-      return {status:400,body:{error:'Use a valid cutoff date no later than today.'}};
+    if(!isValidCutoffDate(cutoff_date))
+      return {status:400,body:{error:'Use a valid cutoff date.'}};
     const existing=getSources(exam_id).filter(s=>s.exam_id===exam_id);
     const result=await discoverCurrentAffairs(exam,cutoff_date,{existing:existing.flatMap(s=>s.collected_article?[s.collected_article]:[])});
     const saved=saveAutonomousArticles(exam_id,result);
@@ -85,7 +87,7 @@ export function registerExamRoutes(app: Express) {
     const exam=getExamById(req.params.examId);
     if(!exam) return {status:404,body:{error:'Examination not found.'}};
     const cutoff=req.query.cutoff_date ?? new Date().toISOString().slice(0,10);
-    if(!validDate(cutoff) || cutoff>new Date().toISOString().slice(0,10)) return {status:400,body:{error:'Invalid cutoff date.'}};
+    if(!isValidCutoffDate(cutoff)) return {status:400,body:{error:'Invalid cutoff date.'}};
     const articles=currentArticlePool(exam,getSources(),cutoff);
     return {body:{articles}};
   }));
@@ -93,8 +95,9 @@ export function registerExamRoutes(app: Express) {
     const { exam_id, urls, cutoff_date } = req.body || {};
     const exam = typeof exam_id === 'string' ? getExamById(exam_id) : undefined;
     if (!exam) return { status: 404, body: { error: 'Select an examination first.' } };
-    if (!validDate(cutoff_date) || cutoff_date > new Date().toISOString().slice(0, 10))
-      return { status: 400, body: { error: 'Use a valid cutoff date no later than today.' } };
+    if (!isValidCutoffDate(cutoff_date))
+      return { status: 400, body: { error: 'Use a valid cutoff date.' } };
+
     if (!Array.isArray(urls) || !urls.length || urls.length > 10 || urls.some(url => typeof url !== 'string' || !allowedPublisher(url)))
       return { status: 400, body: { error: 'Supply one to ten HTTPS article URLs from government or supported international institutions.' } };
     const result = await collectCurrentAffairs(exam, urls, cutoff_date);
@@ -167,7 +170,9 @@ export function registerExamRoutes(app: Express) {
     return { body: await executeResearch(payload) };
   }));
   app.post('/api/mocks/generate', examEndpoint(async req => {
-    if(process.env.AI_PROVIDER==='cloudflare')return {status:409,body:{error:'Open Syllabus Coverage → Question bank & paper builder. Queue questions, review evidence and answers, then assemble the checked paper. No unchecked paper was generated.'}};
+    if (process.env.AI_PROVIDER === 'cloudflare' && req.body?.provider !== 'gemini' && !process.env.GEMINI_API_KEY) {
+      return { status: 409, body: { error: 'Open Syllabus Coverage → Question bank & paper builder. Queue questions, review evidence and answers, then assemble the checked paper. No unchecked paper was generated.' } };
+    }
     const { exam_id, blueprint_id, question_count, difficulty, preparation_mode } = req.body || {};
     let target = exam_id;
     if (!target && blueprint_id) target = (await getRepositoryRegistry().blueprints.getBlueprintById(blueprint_id))?.exam_id;
@@ -182,12 +187,53 @@ export function registerExamRoutes(app: Express) {
     if (getPersistenceBackend() === 'DATABASE') await getRepositoryRegistry().mocks.saveMock(mock);
     return { body: { success: true, mock } };
   }));
+  app.get('/api/mocks/:id/varadhi-export', examEndpoint(async req => {
+    const mockId = req.params.id;
+    let mock = getMockById(mockId);
+    if (!mock && getPersistenceBackend() === 'DATABASE') {
+      mock = (await getRepositoryRegistry().mocks.getMockById(mockId)) || undefined;
+    }
+    if (!mock) return { status: 404, body: { error: 'Mock test not found.' } };
+
+    const questions = mock.sections.flatMap(s => s.questions).map((q, idx) => ({
+      number: idx + 1,
+      section: q.section_name,
+      topic: q.topic,
+      subtopic: q.subtopic,
+      difficulty: q.difficulty,
+      question: q.question_text,
+      options: q.options,
+      correct_option_index: q.correct_option_index,
+      correct_option_letter: ['A', 'B', 'C', 'D'][q.correct_option_index] || 'A',
+      explanation: q.explanation,
+      source_reference: q.source_reference
+    }));
+
+    return {
+      body: {
+        export_version: '1.0',
+        target_platform: 'varadhi',
+        mock_id: mock.mock_id,
+        title: mock.title,
+        exam_id: mock.exam_id,
+        exam_title: mock.exam_title,
+        total_questions: mock.total_questions,
+        total_marks: mock.total_marks,
+        duration_minutes: mock.duration_minutes,
+        negative_marking_rate: mock.negative_marking_rate,
+        created_at: mock.created_at,
+        questions
+      }
+    };
+  }));
   app.post('/api/research/exam-structure', examEndpoint(async req => {
     const query = typeof req.body?.query === 'string' ? req.body.query.trim() : '';
     if (!query) {
       return { status: 400, body: { error: 'query is required.' } };
     }
-    const structure = await fetchExamStructure(query);
+    const mode=req.body?.mode || 'HYBRID';
+    if(!['HYBRID','DIRECT_WEB','GOOGLE_API'].includes(mode))return {status:400,body:{error:'Invalid research mode.'}};
+    const structure = await fetchExamStructure(query,mode);
     return { body: { success: true, structure } };
   }));
   app.post('/api/research/extract-document', examEndpoint(async req => {
@@ -228,6 +274,62 @@ export function registerExamRoutes(app: Express) {
     if (!Array.isArray(stages)) return { status: 400, body: { error: 'stages must be an array' } };
     const updatedExam = updateExamStages(req.params.id, stages, structure_scheme);
     if (!updatedExam) return { status: 404, body: { error: 'Exam not found' } };
+    return { body: { success: true, exam: updatedExam } };
+  }));
+
+  app.post('/api/exams/:id/update', examEndpoint(async req => {
+    const updated = updateExamRecord(req.params.id, req.body || {});
+    if (!updated) return { status: 404, body: { error: 'Exam not found' } };
+    return { body: { success: true, exam: updated } };
+  }));
+
+  app.put('/api/exams/:id', examEndpoint(async req => {
+    const updated = updateExamRecord(req.params.id, req.body || {});
+    if (!updated) return { status: 404, body: { error: 'Exam not found' } };
+    return { body: { success: true, exam: updated } };
+  }));
+
+  app.delete('/api/exams/:id', async (req, res) => {
+    try {
+      const reply = await withExamWorkflow(async () => {
+        const deleted = deleteExamRecord(req.params.id);
+        if (!deleted) return { status: 404, body: { error: 'Exam not found' } };
+        return { body: { success: true, deleted_id: req.params.id } };
+      });
+      res.status(reply.status || 200).json(reply.body);
+    } catch (error: any) {
+      console.error('[DELETE_EXAM_FAILED]', error);
+      res.status(500).json({ error: error?.message || 'Failed to delete exam.' });
+    }
+  });
+
+  app.post('/api/research/extract-youtube', examEndpoint(async req => {
+    const url = typeof req.body?.url === 'string' ? req.body.url.trim() : '';
+    const examQuery = typeof req.body?.exam_query === 'string' ? req.body.exam_query.trim() : undefined;
+    if (!url) {
+      return { status: 400, body: { error: 'Please provide a valid YouTube video URL.' } };
+    }
+    try {
+      const material = await extractYoutubeVideoIntelligence(url, examQuery);
+      return { body: { success: true, material } };
+    } catch (err: any) {
+      return { status: 400, body: { error: err.message || 'Failed to extract YouTube video information.' } };
+    }
+  }));
+
+  app.post('/api/exams/:id/materials', examEndpoint(async req => {
+    const material = req.body?.material;
+    if (!material || !material.title) {
+      return { status: 400, body: { error: 'A valid study material item is required.' } };
+    }
+    const updatedExam = addExamStudyMaterial(req.params.id, material);
+    if (!updatedExam) return { status: 404, body: { error: 'Exam not found.' } };
+    return { body: { success: true, exam: updatedExam } };
+  }));
+
+  app.delete('/api/exams/:id/materials/:materialId', examEndpoint(async req => {
+    const updatedExam = deleteExamStudyMaterial(req.params.id, req.params.materialId);
+    if (!updatedExam) return { status: 404, body: { error: 'Exam not found.' } };
     return { body: { success: true, exam: updatedExam } };
   }));
 }

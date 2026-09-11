@@ -1,5 +1,6 @@
 import type { ExamRecord } from '../src/types.ts';
-import { rankArticle, currentAffairsTopics, validDate, parsePublicationDate, type CollectedArticle } from '../src/currentAffairs.ts';
+import { rankArticle, currentAffairsTopics, validDate, isValidCutoffDate, parsePublicationDate, type CollectedArticle } from '../src/currentAffairs.ts';
+
 import { allowedPublisher, collectCurrentAffairs } from './currentAffairsService.ts';
 import { readPublic, attributes, decodeHtml, textFromHtml } from './retrievalHttp.ts';
 
@@ -62,7 +63,8 @@ export function parsePublisherLinks(body:string, base:string):DiscoveryLink[] {
 export async function discoverCurrentAffairs(exam:ExamRecord, cutoff:string, options:{
   fetcher?:typeof fetch; publishers?:typeof DEFAULT_RESEARCH_PUBLISHERS; existing?:CollectedArticle[];
 }={}):Promise<AutoResearchResult> {
-  if(!validDate(cutoff) || cutoff>new Date().toISOString().slice(0,10)) throw Error('Invalid research cutoff.');
+  if(!isValidCutoffDate(cutoff)) throw Error('Invalid research cutoff.');
+
   const fetcher=options.fetcher||fetch;
   const topics=currentAffairsTopics(exam);
   const result:AutoResearchResult={articles:[],failures:[],diagnostics:[],candidates_found:0,articles_attempted:0,reused_articles:0,completed_at:'',model_calls:0,status:'NO_MATCHING_ARTICLES'};

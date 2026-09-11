@@ -17,10 +17,14 @@ import {
   FileText
 } from 'lucide-react';
 
+import { ExamStage, ExamStagePaper } from '../../types.ts';
+
 interface BlueprintCreateModalProps {
   isOpen: boolean;
   onClose: () => void;
   exam: ExamRecord;
+  selectedStage?: ExamStage | null;
+  selectedPaper?: ExamStagePaper | null;
   onCreate: (input: CreateBlueprintInput) => Promise<void>;
   isSubmitting: boolean;
 }
@@ -29,6 +33,8 @@ export function BlueprintCreateModal({
   isOpen,
   onClose,
   exam,
+  selectedStage,
+  selectedPaper,
   onCreate,
   isSubmitting
 }: BlueprintCreateModalProps) {
@@ -58,7 +64,7 @@ export function BlueprintCreateModal({
     if (!isOpen) return;
     // Set default question counts based on mode
     if (testMode === 'FULL_LENGTH') {
-      setQuestionCount(exam.pattern?.total_questions || 150);
+      setQuestionCount(selectedPaper?.total_questions || exam.pattern?.total_questions || 150);
     } else if (testMode === 'SUBJECT_WISE') {
       setQuestionCount(50);
     } else if (testMode === 'TOPIC_WISE') {
@@ -80,7 +86,7 @@ export function BlueprintCreateModal({
         }
       })
       .catch(() => {});
-  }, [isOpen, testMode, exam.exam_id]);
+  }, [isOpen, testMode, exam.exam_id, selectedPaper]);
 
   if (!isOpen) return null;
 
@@ -95,7 +101,15 @@ export function BlueprintCreateModal({
         question_count: questionCount,
         language,
         current_affairs_cutoff: caCutoff,
-        current_affairs_months: caMonths
+        current_affairs_months: caMonths,
+        stage_id: selectedStage?.stage_id,
+        paper_id: selectedPaper?.paper_id,
+        paper_title: selectedPaper?.title,
+        topics: (selectedPaper?.syllabus_topics && selectedPaper.syllabus_topics.length > 0)
+          ? selectedPaper.syllabus_topics
+          : (exam.syllabus_topics && exam.syllabus_topics.length > 0)
+          ? exam.syllabus_topics
+          : undefined
       },
       allow_cross_mode_reuse: allowCrossModeReuse
     };
@@ -111,7 +125,9 @@ export function BlueprintCreateModal({
     'General Abilities and Mental Aptitude'
   ];
 
-  const sampleTopics = exam.syllabus_topics && exam.syllabus_topics.length > 0
+  const sampleTopics = (selectedPaper?.syllabus_topics && selectedPaper.syllabus_topics.length > 0)
+    ? selectedPaper.syllabus_topics
+    : exam.syllabus_topics && exam.syllabus_topics.length > 0
     ? exam.syllabus_topics
     : [
         'Constitutional Law & Governance',
@@ -162,6 +178,34 @@ export function BlueprintCreateModal({
                 <p className="text-indigo-800 text-[11px] leading-relaxed">
                   {seriesSummary.pressure_details} ({seriesSummary.questions_used} facts registered). Zero question copy or direct duplicate facts allowed.
                 </p>
+              </div>
+            </div>
+          )}
+
+          {/* Target Stage & Paper Information Badge */}
+          {selectedPaper && (
+            <div className="p-3.5 bg-gradient-to-r from-emerald-50 to-indigo-50/60 border border-emerald-200 rounded-2xl flex items-center justify-between gap-3 text-xs shadow-2xs">
+              <div className="space-y-0.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-1">
+                  <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                  Target Paper & Selection Stage:
+                </span>
+                <p className="font-bold text-slate-900 text-xs sm:text-sm">
+                  {selectedPaper.title}
+                </p>
+                {selectedStage && (
+                  <p className="text-[11px] text-purple-700 font-semibold">
+                    {selectedStage.stage_name}
+                  </p>
+                )}
+              </div>
+              <div className="text-right shrink-0">
+                <span className="px-3 py-1 bg-emerald-600 text-white font-bold rounded-xl text-xs shadow-2xs inline-block">
+                  {selectedPaper.total_questions || exam.pattern?.total_questions || 150} Questions
+                </span>
+                <span className="block text-[10px] text-slate-500 mt-0.5">
+                  Official Specification
+                </span>
               </div>
             </div>
           )}

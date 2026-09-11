@@ -30,6 +30,13 @@ export async function withExamWorkflow<T>(work: () => T | Promise<T>): Promise<T
     for (const source of state.sources) {
       if (!sourceIds.has(source.source_id)) await repository.sources.saveSource(source);
     }
+    // Delete any exams removed during this request
+    const currentExamIds = new Set(state.exams.map(e => e.exam_id));
+    for (const examId of before.keys()) {
+      if (!currentExamIds.has(examId)) {
+        await repository.exams.deleteExam(examId);
+      }
+    }
     for (const exam of state.exams) {
       if (before.get(exam.exam_id) !== JSON.stringify(exam)) {
         for (const fact of Object.values(exam.fact_verifications || {})) {

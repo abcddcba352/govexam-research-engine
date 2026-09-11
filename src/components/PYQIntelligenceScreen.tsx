@@ -7,7 +7,10 @@ import {
   PYQClusterRecord,
   TopicTrend,
   ExamQuestionFormatProfile,
+  ExamStage,
+  ExamStagePaper,
 } from '../types.ts';
+import { ExamHierarchyFilter } from './common/ExamHierarchyFilter.tsx';
 import { PYQQuestionInspectorModal } from './PYQQuestionInspectorModal.tsx';
 import { PYQPaperUploadModal } from './PYQPaperUploadModal.tsx';
 import { groupExamsByJurisdiction } from '../utils/examJurisdiction.ts';
@@ -35,7 +38,14 @@ import {
   Zap,
   Bookmark,
   Shuffle,
-  Grid
+  Grid,
+  Download,
+  FileSpreadsheet,
+  Check,
+  Copy,
+  Calendar,
+  Globe,
+  ClipboardList
 } from 'lucide-react';
 
 interface Props {
@@ -49,17 +59,39 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
   selectedExamId,
   onSelectExam,
 }) => {
-  const [activeSubTab, setActiveSubTab] = useState<'OVERVIEW' | 'QUESTIONS' | 'PAPERS' | 'CLUSTERS'>('OVERVIEW');
+  const [activeSubTab, setActiveSubTab] = useState<'OVERVIEW' | 'QUESTIONS' | 'PAPERS' | 'CLUSTERS'>('QUESTIONS');
   const [papers, setPapers] = useState<PreviousPaperRecord[]>([]);
   const [questions, setQuestions] = useState<PYQQuestionRecord[]>([]);
   const [intelligence, setIntelligence] = useState<ExamIntelligenceProfile | null>(null);
   const [clusters, setClusters] = useState<PYQClusterRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [copiedPYQ, setCopiedPYQ] = useState(false);
+
+  // Hierarchy Stage & Paper
+  const [activeStage, setActiveStage] = useState<ExamStage | null>(null);
+  const [activePaper, setActivePaper] = useState<ExamStagePaper | null>(null);
 
   // Inspector & Ingestion Modals
   const [selectedQuestion, setSelectedQuestion] = useState<PYQQuestionRecord | null>(null);
-  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const p = new URLSearchParams(window.location.search).get('modal');
+      return p === 'upload' || p === 'paste';
+    }
+    return false;
+  });
+
+  const formatExamDate = (dateStr?: string) => {
+    if (!dateStr) return '';
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    } catch {
+      return dateStr;
+    }
+  };
 
   // Question Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -145,6 +177,85 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
     }
   };
 
+  // Export PYQ to Varadhi JSON format
+  const handleExportPYQJSON = () => {
+    if (questions.length === 0) return;
+    const targetQuestions = filteredQuestions.length > 0 ? filteredQuestions : questions;
+    const exportData = {
+      export_version: '1.0',
+      target_platform: 'varadhi',
+      exam_id: selectedExamId,
+      exam_title: selectedExam?.title || selectedExamId,
+      total_questions: targetQuestions.length,
+      questions: targetQuestions.map((q, idx) => ({
+        number: q.question_number || (idx + 1),
+        paper_id: q.paper_id,
+        section: q.primary_subject,
+        topic: q.primary_topic,
+        subtopic: q.subtopic,
+        difficulty: q.difficulty,
+        question_type: q.question_type,
+        question: q.question_en,
+        options: [q.option_a_en, q.option_b_en, q.option_c_en, q.option_d_en],
+        correct_option_letter: q.correct_answer,
+        correct_option_index: ['A', 'B', 'C', 'D'].indexOf(q.correct_answer),
+        explanation: q.reason_summary,
+        answer_citation: q.answer_source_citation
+      }))
+    };
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${selectedExamId}_pyq_varadhi.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Export PYQ to CSV
+  const handleExportPYQCSV = () => {
+    const targetQuestions = filteredQuestions.length > 0 ? filteredQuestions : questions;
+    if (targetQuestions.length === 0) return;
+    const headers = ['Q#', 'Paper', 'Subject', 'Topic', 'Difficulty', 'Question', 'Option A', 'Option B', 'Option C', 'Option D', 'Key', 'Why Asked / Explanation', 'Key Citation'];
+    const rows = targetQuestions.map((q, i) => [
+      q.question_number || (i + 1),
+      `"${(q.paper_id || '').replace(/"/g, '""')}"`,
+      `"${(q.primary_subject || '').replace(/"/g, '""')}"`,
+      `"${(q.primary_topic || '').replace(/"/g, '""')}"`,
+      q.difficulty,
+      `"${(q.question_en || '').replace(/"/g, '""')}"`,
+      `"${(q.option_a_en || '').replace(/"/g, '""')}"`,
+      `"${(q.option_b_en || '').replace(/"/g, '""')}"`,
+      `"${(q.option_c_en || '').replace(/"/g, '""')}"`,
+      `"${(q.option_d_en || '').replace(/"/g, '""')}"`,
+      q.correct_answer,
+      `"${(q.reason_summary || '').replace(/"/g, '""')}"`,
+      `"${(q.answer_source_citation || '').replace(/"/g, '""')}"`
+    ]);
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${selectedExamId}_pyq_bank.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Copy PYQ questions to clipboard
+  const handleCopyPYQAll = () => {
+    const targetQuestions = filteredQuestions.length > 0 ? filteredQuestions : questions;
+    if (targetQuestions.length === 0) return;
+    const text = targetQuestions.map((q, i) => {
+      return `Q${q.question_number || (i + 1)}. [${q.primary_subject} • ${q.primary_topic}]\n${q.question_en}\n(A) ${q.option_a_en}\n(B) ${q.option_b_en}\n(C) ${q.option_c_en}\n(D) ${q.option_d_en}\nAnswer: Option ${q.correct_answer}\nExplanation: ${q.reason_summary}\nCitation: ${q.answer_source_citation || 'Official Answer Key'}\n`;
+    }).join('\n---\n\n');
+
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedPYQ(true);
+      setTimeout(() => setCopiedPYQ(false), 2000);
+    });
+  };
+
   // Filter questions
   const filteredQuestions = questions.filter(q => {
     if (filterPaperId !== 'ALL' && q.paper_id !== filterPaperId) return false;
@@ -190,7 +301,24 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
 
   return (
     <div className="space-y-6 pb-16">
-      {/* Header & Exam Selector */}
+      {/* 5-Level Cascading Hierarchy Filter: State ➔ Board ➔ Exam ➔ Stage ➔ Paper */}
+      <div className="print:hidden">
+        <ExamHierarchyFilter
+          exams={exams}
+          selectedExamId={selectedExamId}
+          onSelectExam={onSelectExam}
+          onPaperChange={(stage, paper) => {
+            setActiveStage(stage);
+            setActivePaper(paper);
+          }}
+          title="Past Paper & Question Bank Hierarchy Filter"
+          subtitle="Filter through the official hierarchy: State ➔ Board ➔ Exam ➔ Stage ➔ Paper"
+          badgeLabel="State ➔ Board ➔ Exam ➔ Paper"
+          showSpecsStrip={true}
+        />
+      </div>
+
+      {/* Header & Status */}
       <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/90 shadow-2xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-start sm:items-center gap-3.5">
@@ -200,10 +328,10 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-                  PYQ Intelligence Engine
+                  Past Examination Question Bank (PYQ)
                 </h2>
-                <span className="text-[11px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
-                  Phases 1–36 Active
+                <span className="text-[11px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  Verified Official Papers
                 </span>
                 {intelligence && (
                   <span
@@ -215,51 +343,18 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
                         : 'bg-amber-50 text-amber-700 border-amber-200'
                     }`}
                   >
-                    Readiness: {intelligence.readiness_status}
+                    Status: {intelligence.readiness_status}
                   </span>
                 )}
               </div>
               <p className="text-xs text-slate-500 mt-1">
-                Deep cognitive analysis, "Why Was This Asked" reasoning, distractor traps & blueprint insights
+                Authentic previous year question papers, verified official keys, and syllabus blueprint mapping for Varadhi
               </p>
             </div>
           </div>
 
-          {/* Exam Switcher & Actions */}
+          {/* Action Buttons */}
           <div className="flex items-center gap-2.5 flex-wrap">
-            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl">
-              <span className="text-xs font-bold text-slate-600">Exam:</span>
-              {(() => {
-                const { central, states, stateNames } = groupExamsByJurisdiction(exams);
-                return (
-                  <select
-                    value={selectedExamId}
-                    onChange={e => onSelectExam(e.target.value)}
-                    className="text-xs font-bold text-slate-900 bg-transparent focus:outline-hidden cursor-pointer"
-                  >
-                    {central.length > 0 && (
-                      <optgroup label="🏛️ Central / National (All-India)">
-                        {central.map(ex => (
-                          <option key={ex.exam_id} value={ex.exam_id}>
-                            {ex.title}
-                          </option>
-                        ))}
-                      </optgroup>
-                    )}
-                    {stateNames.map(stateName => (
-                      <optgroup key={stateName} label={`🗺️ State: ${stateName}`}>
-                        {states[stateName].map(ex => (
-                          <option key={ex.exam_id} value={ex.exam_id}>
-                            {ex.title}
-                          </option>
-                        ))}
-                      </optgroup>
-                    ))}
-                  </select>
-                );
-              })()}
-            </div>
-
             <button
               type="button"
               onClick={handleRecalculateIntelligence}
@@ -267,16 +362,17 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
               className="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <RefreshCw className={`w-3.5 h-3.5 text-blue-600 ${refreshing ? 'animate-spin' : ''}`} />
-              <span>Refresh Profile</span>
+              <span>Refresh</span>
             </button>
+
 
             <button
               type="button"
               onClick={() => setShowUploadModal(true)}
               className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
             >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Ingest Paper</span>
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>+ Upload Paper & AI Weightage</span>
             </button>
           </div>
         </div>
@@ -284,7 +380,7 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
         {/* Top KPI Metrics Bar */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-6 pt-5 border-t border-slate-100">
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
-            <span className="text-[11px] font-semibold text-slate-500 block">Papers Analysed</span>
+            <span className="text-[11px] font-semibold text-slate-500 block">Papers Ingested</span>
             <div className="flex items-baseline gap-1 mt-0.5">
               <span className="text-xl font-bold text-slate-900">
                 {intelligence?.papers_analysed_count || papers.length}
@@ -294,12 +390,12 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
           </div>
 
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
-            <span className="text-[11px] font-semibold text-slate-500 block">Questions Analysed</span>
+            <span className="text-[11px] font-semibold text-slate-500 block">Questions Bank</span>
             <div className="flex items-baseline gap-1 mt-0.5">
               <span className="text-xl font-bold text-slate-900">
                 {intelligence?.questions_analysed_count || questions.length}
               </span>
-              <span className="text-[10px] text-slate-500">items</span>
+              <span className="text-[10px] text-slate-500">questions</span>
             </div>
           </div>
 
@@ -324,42 +420,105 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
           </div>
 
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
-            <span className="text-[11px] font-semibold text-slate-500 block">Distractor Traps</span>
+            <span className="text-[11px] font-semibold text-slate-500 block">Question Formats</span>
             <div className="flex items-baseline gap-1 mt-0.5">
               <span className="text-xl font-bold text-amber-700">
-                {questions.filter(q => q.distractor_style).length}
+                {uniqueQuestionTypes.length || 5}
               </span>
-              <span className="text-[10px] text-amber-600 font-medium">archetyped</span>
+              <span className="text-[10px] text-amber-600 font-medium">archetypes</span>
             </div>
           </div>
 
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
-            <span className="text-[11px] font-semibold text-slate-500 block">Intelligence Confidence</span>
+            <span className="text-[11px] font-semibold text-slate-500 block">Key Accuracy</span>
             <div className="flex items-baseline gap-1 mt-0.5">
               <span className="text-xl font-bold text-blue-700">
-                {intelligence?.confidence_score || 94}%
+                {intelligence?.confidence_score || 100}%
               </span>
-              <span className="text-[10px] text-blue-600 font-medium">high fidelity</span>
+              <span className="text-[10px] text-blue-600 font-medium">final official</span>
             </div>
+          </div>
+        </div>
+
+        {/* Historical Examination Sessions & Dates Timeline */}
+        <div className="mt-5 pt-4 border-t border-slate-100 space-y-2.5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-blue-600" />
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                Historical Exam Timeline & Dates When Exam Happened
+              </h3>
+              <span className="text-[11px] text-slate-500 font-medium">
+                (Click any exam date to filter question bank)
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
+            {/* All Exam Dates Pill */}
+            <button
+              type="button"
+              onClick={() => {
+                setFilterPaperId('ALL');
+                setActiveSubTab('QUESTIONS');
+              }}
+              className={`px-3 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer border flex items-center gap-2 ${
+                filterPaperId === 'ALL'
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                  : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>All Exam Dates ({papers.length} Papers)</span>
+            </button>
+
+            {/* Individual Exam Dates */}
+            {papers.map(p => {
+              const isActive = filterPaperId === p.paper_id;
+              const formattedDate = formatExamDate(p.exam_date);
+              return (
+                <button
+                  key={p.paper_id}
+                  type="button"
+                  onClick={() => {
+                    setFilterPaperId(p.paper_id);
+                    setActiveSubTab('QUESTIONS');
+                  }}
+                  className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all shrink-0 cursor-pointer border flex items-center gap-2 text-left ${
+                    isActive
+                      ? 'bg-blue-600 text-white border-blue-600 shadow-xs ring-2 ring-blue-600/30'
+                      : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
+                  }`}
+                >
+                  <Calendar className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-white' : 'text-blue-600'}`} />
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-bold">{formattedDate || `${p.year} Exam`}</span>
+                      <span
+                        className={`text-[10px] px-1.5 py-0.2 rounded font-mono font-bold ${
+                          isActive ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-700'
+                        }`}
+                      >
+                        {p.booklet_code}
+                      </span>
+                    </div>
+                    <div
+                      className={`text-[10px] truncate max-w-[200px] ${
+                        isActive ? 'text-blue-100' : 'text-slate-500'
+                      }`}
+                    >
+                      {p.question_count} Qs &bull; {p.recruitment_cycle || `${p.year} Cycle`}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
 
       {/* Navigation Sub-Tabs */}
       <div className="flex items-center gap-1.5 border-b border-slate-200 text-xs font-semibold overflow-x-auto pb-px">
-        <button
-          type="button"
-          onClick={() => setActiveSubTab('OVERVIEW')}
-          className={`px-4 py-2 rounded-t-lg transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
-            activeSubTab === 'OVERVIEW'
-              ? 'bg-white text-blue-700 border-t border-x border-slate-200 font-bold shadow-2xs -mb-px'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-          }`}
-        >
-          <BarChart3 className="w-4 h-4" />
-          <span>Intelligence & Blueprint Dimensions</span>
-        </button>
-
         <button
           type="button"
           onClick={() => setActiveSubTab('QUESTIONS')}
@@ -370,7 +529,7 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
           }`}
         >
           <Search className="w-4 h-4" />
-          <span>Question Explorer ({filteredQuestions.length})</span>
+          <span>Question Bank ({filteredQuestions.length})</span>
         </button>
 
         <button
@@ -383,7 +542,20 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
           }`}
         >
           <FileText className="w-4 h-4" />
-          <span>Previous Papers Registry ({papers.length})</span>
+          <span>Previous Papers ({papers.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveSubTab('OVERVIEW')}
+          className={`px-4 py-2 rounded-t-lg transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+            activeSubTab === 'OVERVIEW'
+              ? 'bg-white text-blue-700 border-t border-x border-slate-200 font-bold shadow-2xs -mb-px'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+          }`}
+        >
+          <BarChart3 className="w-4 h-4" />
+          <span>Syllabus Blueprint & Weightage</span>
         </button>
 
         <button
@@ -396,7 +568,7 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
           }`}
         >
           <Shuffle className="w-4 h-4" />
-          <span>Same-Fact Clusters ({clusters.length})</span>
+          <span>Topic Clusters ({clusters.length})</span>
         </button>
       </div>
 
@@ -723,7 +895,7 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
                   <option value="ALL">All Papers ({papers.length})</option>
                   {papers.map(p => (
                     <option key={p.paper_id} value={p.paper_id}>
-                      {p.year} {p.paper_name} ({p.booklet_code})
+                      {formatExamDate(p.exam_date) || p.year} • {p.paper_name} ({p.booklet_code})
                     </option>
                   ))}
                 </select>
@@ -807,8 +979,57 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
             </div>
           </div>
 
+          {/* Action Toolbar for Varadhi Export */}
+          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-slate-900">
+                Verified Question Bank
+              </span>
+              <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-xs font-semibold">
+                {filteredQuestions.length} Questions
+              </span>
+              {selectedExam && (
+                <span className="text-xs text-slate-500 hidden md:inline">
+                  • {selectedExam.title}
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                type="button"
+                onClick={handleExportPYQJSON}
+                className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+                title="Export verified PYQ questions in Varadhi JSON schema"
+              >
+                <Download className="w-3.5 h-3.5 text-indigo-200" />
+                <span>Export for Varadhi (JSON)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleExportPYQCSV}
+                className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs border border-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer"
+                title="Export as CSV"
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+                <span>CSV</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleCopyPYQAll}
+                className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs border border-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer"
+                title="Copy all questions"
+              >
+                {copiedPYQ ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-600" />}
+                <span>{copiedPYQ ? 'Copied!' : 'Copy'}</span>
+              </button>
+            </div>
+          </div>
+
           {/* Questions List */}
-          <div className="space-y-3">
+          <div className="space-y-4">
             {filteredQuestions.length === 0 ? (
               <div className="p-8 text-center bg-white rounded-2xl border border-slate-200 text-slate-500 text-xs">
                 No previous-year questions match the selected filters.
@@ -817,19 +1038,23 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
               filteredQuestions.map(q => (
                 <div
                   key={q.pyq_question_id}
-                  onClick={() => setSelectedQuestion(q)}
-                  className="p-4 rounded-xl bg-white border border-slate-200 hover:border-blue-400 hover:shadow-xs transition-all cursor-pointer space-y-2.5"
+                  className="p-5 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 shadow-2xs transition-all space-y-3.5"
                 >
-                  <div className="flex items-start justify-between gap-3">
+                  {/* Question Header Badge Bar */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="w-6 h-6 rounded-md bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
-                        {q.question_number}
+                      <span className="w-7 h-7 rounded-xl bg-slate-900 text-white font-black text-xs flex items-center justify-center font-mono">
+                        Q{q.question_number}
                       </span>
                       <span className="text-xs font-bold text-slate-800">{q.primary_subject}</span>
-                      <span className="text-slate-300">&bull;</span>
+                      <span className="text-slate-300">•</span>
                       <span className="text-xs text-slate-600 font-medium">{q.primary_topic}</span>
-                      <span className="text-slate-300">&bull;</span>
-                      <span className="text-xs text-slate-500">{q.subtopic}</span>
+                      {q.subtopic && (
+                        <>
+                          <span className="text-slate-300">•</span>
+                          <span className="text-xs text-slate-500">{q.subtopic}</span>
+                        </>
+                      )}
                     </div>
 
                     <div className="flex items-center gap-1.5 shrink-0">
@@ -847,29 +1072,98 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
                       >
                         {q.difficulty}
                       </span>
-                      <span className="text-[10px] px-2 py-0.5 rounded font-bold bg-indigo-50 text-indigo-700">
-                        Key: Option {q.correct_answer}
+                      <span className="text-[10px] px-2 py-0.5 rounded font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+                        <Check className="w-3 h-3 text-emerald-600" />
+                        <span>Official Key: Option {q.correct_answer}</span>
                       </span>
                     </div>
                   </div>
 
-                  <p className="text-xs sm:text-sm font-semibold text-slate-900 leading-snug line-clamp-2">
+                  {/* Question Stem */}
+                  <p className="text-sm sm:text-base font-semibold text-slate-900 leading-relaxed whitespace-pre-line">
                     {q.question_en}
                   </p>
 
-                  <div className="flex items-center justify-between text-xs text-slate-500 pt-1.5 border-t border-slate-100">
-                    <div className="flex items-center gap-3">
-                      <span>Why asked: {q.reason_summary.substring(0, 90)}...</span>
+                  {/* 4 Options Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                    {[
+                      { label: 'A', text: q.option_a_en },
+                      { label: 'B', text: q.option_b_en },
+                      { label: 'C', text: q.option_c_en },
+                      { label: 'D', text: q.option_d_en },
+                    ].map(opt => {
+                      const isCorrect = q.correct_answer === opt.label;
+                      return (
+                        <div
+                          key={opt.label}
+                          className={`p-3 rounded-xl border text-xs sm:text-sm flex items-start gap-2.5 transition-all ${
+                            isCorrect
+                              ? 'border-emerald-500 bg-emerald-50/70 text-emerald-950 font-medium ring-1 ring-emerald-500'
+                              : 'border-slate-200 bg-slate-50/50 text-slate-700'
+                          }`}
+                        >
+                          <span
+                            className={`w-5 h-5 rounded flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${
+                              isCorrect ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-600'
+                            }`}
+                          >
+                            {opt.label}
+                          </span>
+                          <span className="flex-1 leading-snug">{opt.text}</span>
+                          {isCorrect && (
+                            <span className="shrink-0 px-2 py-0.5 rounded bg-emerald-200 text-emerald-900 text-[10px] font-bold flex items-center gap-1">
+                              <Check className="w-3 h-3" />
+                              <span>Official Key</span>
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Reason & Statutory Citation */}
+                  {q.reason_summary && (
+                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs space-y-1">
+                      <div className="flex items-center justify-between gap-2 font-bold text-slate-800">
+                        <span>Cognitive Rationale & Blueprint Context:</span>
+                        {q.answer_source_citation && (
+                          <span className="text-[10px] px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 font-mono">
+                            {q.answer_source_citation}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-slate-600 leading-relaxed">{q.reason_summary}</p>
+                    </div>
+                  )}
+
+                  {/* Card Footer: Metadata & Inspect Button */}
+                  <div className="flex items-center justify-between text-xs text-slate-500 pt-1">
+                    <div className="flex items-center gap-3 flex-wrap">
+                      {(() => {
+                        const parent = papers.find(p => p.paper_id === q.paper_id);
+                        return (
+                          <span className="flex items-center gap-1.5 font-medium text-slate-700">
+                            <Calendar className="w-3.5 h-3.5 text-blue-600" />
+                            <span>Exam Date: {formatExamDate(parent?.exam_date) || parent?.year || 'Historical'}</span>
+                            <span className="text-slate-400">&bull;</span>
+                            <span className="font-mono text-slate-500">[{parent?.booklet_code || q.paper_id}]</span>
+                          </span>
+                        );
+                      })()}
                       {q.has_map && (
                         <span className="text-[10px] bg-purple-50 text-purple-700 font-bold px-1.5 py-0.5 rounded">
                           Map Question
                         </span>
                       )}
                     </div>
-                    <span className="text-blue-600 font-bold flex items-center gap-1 hover:underline">
-                      <span>Inspect</span>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedQuestion(q)}
+                      className="text-blue-600 font-bold flex items-center gap-1 hover:underline cursor-pointer"
+                    >
+                      <span>Inspect Traps & Deep Audit</span>
                       <ChevronRight className="w-3.5 h-3.5" />
-                    </span>
+                    </button>
                   </div>
                 </div>
               ))
@@ -894,14 +1188,17 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setShowUploadModal(true)}
-                className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Ingest New Paper</span>
-              </button>
+              <div className="flex items-center gap-2">
+
+                <button
+                  type="button"
+                  onClick={() => setShowUploadModal(true)}
+                  className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>+ Upload Paper & AI Weightage</span>
+                </button>
+              </div>
             </div>
 
             <div className="space-y-3">
@@ -912,14 +1209,18 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-sm font-bold text-slate-900">
                           {paper.year} &bull; {paper.paper_name}
+                        </span>
+                        <span className="text-xs px-2.5 py-0.5 rounded-md font-bold bg-blue-50 text-blue-800 border border-blue-200 flex items-center gap-1 font-mono">
+                          <Calendar className="w-3 h-3 text-blue-600" />
+                          <span>Exam Date: {formatExamDate(paper.exam_date) || `${paper.year} Exam`}</span>
                         </span>
                         <span className="text-xs px-2 py-0.5 rounded font-mono font-bold bg-slate-200 text-slate-800">
                           {paper.booklet_code}
                         </span>
-                        <span className="text-xs px-2 py-0.5 rounded font-bold bg-blue-50 text-blue-800 border border-blue-200">
+                        <span className="text-xs px-2 py-0.5 rounded font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
                           {paper.official_status}
                         </span>
                       </div>
@@ -1043,6 +1344,10 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
           onClose={() => setShowUploadModal(false)}
           onPaperCreated={newPaper => {
             setPapers(prev => [newPaper, ...prev]);
+            fetchExamPYQData(selectedExamId);
+          }}
+          onQuestionsImported={newQuestions => {
+            setQuestions(prev => [...newQuestions, ...prev]);
             fetchExamPYQData(selectedExamId);
           }}
         />
