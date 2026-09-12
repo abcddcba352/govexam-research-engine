@@ -1,5 +1,803 @@
 [
   {
+    "profile_id": "intel_tslprb_police_constable_pwt_mty3fzr9",
+    "exam_id": "tslprb_police_constable_pwt",
+    "exam_version_id": "tslprb_pc_v2022",
+    "recruitment_cycle": "Notification 41/Rect./Admn-1/2022",
+    "analysis_date": "2026-09-12T07:58:52.869Z",
+    "papers_analysed_count": 3,
+    "questions_analysed_count": 1398,
+    "answers_verified_count": 1398,
+    "visual_questions_count": 0,
+    "unverified_questions_count": 0,
+    "subject_distribution": [
+      {
+        "subject": "Geography, Polity & Economy",
+        "count": 750,
+        "percentage": 53.65,
+        "official_weight": 15
+      },
+      {
+        "subject": "Telangana & Current Affairs",
+        "count": 348,
+        "percentage": 24.89,
+        "official_weight": 25
+      },
+      {
+        "subject": "Arithmetic & Reasoning",
+        "count": 250,
+        "percentage": 17.88,
+        "official_weight": 25
+      },
+      {
+        "subject": "General Science",
+        "count": 25,
+        "percentage": 1.79,
+        "official_weight": 15
+      },
+      {
+        "subject": "History of India & National Movement",
+        "count": 25,
+        "percentage": 1.79,
+        "official_weight": 20
+      }
+    ],
+    "topic_distribution": [
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Imported PYQ Question",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 381,
+        "observed_pyq_weight": 27.25,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "INCREASING",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Telangana & Current Affairs",
+        "topic": "Vocabulary, Grammar & Comprehension",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 148,
+        "observed_pyq_weight": 10.59,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "INCREASING",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Arithmetic & Reasoning",
+        "topic": "Quantitative Problem Solving",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 100,
+        "observed_pyq_weight": 7.15,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "INCREASING",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Monetary Policy & Macroeconomics",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 100,
+        "observed_pyq_weight": 7.15,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "INCREASING",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Arithmetic & Reasoning",
+        "topic": "Analytical Reasoning & Logical Deduction",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 100,
+        "observed_pyq_weight": 7.15,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "INCREASING",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Telangana & Current Affairs",
+        "topic": "Telangana History, Movement & Heritage",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 100,
+        "observed_pyq_weight": 7.15,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "INCREASING",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Indian Physical & Strategic Geography",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 100,
+        "observed_pyq_weight": 7.15,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "INCREASING",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Everyday Scientific Principles",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 50,
+        "observed_pyq_weight": 3.58,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "INCREASING",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Modern National Movement & Historiography",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 50,
+        "observed_pyq_weight": 3.58,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "INCREASING",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Telangana & Current Affairs",
+        "topic": "Constitutional Articles & Framework",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 50,
+        "observed_pyq_weight": 3.58,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "INCREASING",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Telangana & Current Affairs",
+        "topic": "Prepositions",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 25,
+        "observed_pyq_weight": 1.79,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "INCREASING",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Arithmetic & Reasoning",
+        "topic": "Compound Interest",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 25,
+        "observed_pyq_weight": 1.79,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "INCREASING",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "General Science",
+        "topic": "Cell Biology",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 25,
+        "observed_pyq_weight": 1.79,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "INCREASING",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "History of India & National Movement",
+        "topic": "Gupta Empire",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 25,
+        "observed_pyq_weight": 1.79,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "INCREASING",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Monetary Policy",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 25,
+        "observed_pyq_weight": 1.79,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "INCREASING",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Arithmetic & Reasoning",
+        "topic": "Number Series",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 25,
+        "observed_pyq_weight": 1.79,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "INCREASING",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Telangana & Current Affairs",
+        "topic": "Kakatiya Dynasty History",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 25,
+        "observed_pyq_weight": 1.79,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "INCREASING",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Executive Powers",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 24,
+        "observed_pyq_weight": 1.72,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "INCREASING",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Indian National Congress Sessions",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 1,
+        "observed_pyq_weight": 0.07,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "RARE",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Percentage and Profit-Loss",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 1,
+        "observed_pyq_weight": 0.07,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "RARE",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Fundamental Rights",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 1,
+        "observed_pyq_weight": 0.07,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "RARE",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Telangana State Formation",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 1,
+        "observed_pyq_weight": 0.07,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "RARE",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Human Biology (Physiology)",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 1,
+        "observed_pyq_weight": 0.07,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "RARE",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Logical Series Completion",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 1,
+        "observed_pyq_weight": 0.07,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "RARE",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Indian River Systems",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 1,
+        "observed_pyq_weight": 0.07,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "RARE",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Sports Awards (National)",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 1,
+        "observed_pyq_weight": 0.07,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "RARE",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Time and Distance",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 1,
+        "observed_pyq_weight": 0.07,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "RARE",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Telangana Government Schemes",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 1,
+        "observed_pyq_weight": 0.07,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "RARE",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Grammar (Tense Usage)",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 1,
+        "observed_pyq_weight": 0.07,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "RARE",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Ancient Indian Dynasties",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 1,
+        "observed_pyq_weight": 0.07,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "RARE",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "RBI Monetary Policy",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 1,
+        "observed_pyq_weight": 0.07,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "RARE",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Physics (Optics)",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 1,
+        "observed_pyq_weight": 0.07,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "RARE",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Social Legislation",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 1,
+        "observed_pyq_weight": 0.07,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "RARE",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Ratio and Proportion",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 1,
+        "observed_pyq_weight": 0.07,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "RARE",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Directive Principles",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 1,
+        "observed_pyq_weight": 0.07,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "RARE",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Climate of India",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 1,
+        "observed_pyq_weight": 0.07,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "RARE",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Blood Relations",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 1,
+        "observed_pyq_weight": 0.07,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "RARE",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography, Polity & Economy",
+        "topic": "Telangana Cultural Heritage",
+        "subtopic": "Examination Item",
+        "sample_size": 3,
+        "question_count": 1,
+        "observed_pyq_weight": 0.07,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "RARE",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      }
+    ],
+    "subtopic_distribution": [],
+    "format_distribution": [
+      {
+        "format": "DIRECT_FACT",
+        "count": 661,
+        "percentage": 47.28,
+        "years_observed": [
+          2024
+        ],
+        "confidence": 90
+      },
+      {
+        "format": "CONCEPTUAL",
+        "count": 431,
+        "percentage": 30.83,
+        "years_observed": [
+          2024
+        ],
+        "confidence": 90
+      },
+      {
+        "format": "CALCULATION",
+        "count": 153,
+        "percentage": 10.94,
+        "years_observed": [
+          2024
+        ],
+        "confidence": 90
+      },
+      {
+        "format": "ANALYTICAL",
+        "count": 102,
+        "percentage": 7.3,
+        "years_observed": [
+          2024
+        ],
+        "confidence": 90
+      },
+      {
+        "format": "CHRONOLOGY",
+        "count": 51,
+        "percentage": 3.65,
+        "years_observed": [
+          2024
+        ],
+        "confidence": 90
+      }
+    ],
+    "difficulty_distribution": {
+      "easy_pct": 15,
+      "moderate_pct": 85,
+      "difficult_pct": 0
+    },
+    "cognitive_distribution": {
+      "recall_pct": 20,
+      "understand_pct": 67,
+      "apply_pct": 13,
+      "analyse_pct": 0,
+      "multi_step_pct": 0
+    },
+    "static_vs_current": {
+      "static_pct": 100,
+      "current_pct": 0,
+      "link_pct": 0,
+      "typical_window_months": "6 - 12 Months preceding examination"
+    },
+    "state_vs_national": {
+      "state_specific_pct": 0,
+      "india_general_pct": 100,
+      "international_pct": 0
+    },
+    "visual_ratio": 0,
+    "distractor_style_distribution": {
+      "NEAR_FACT": 1378,
+      "Includes cities where sessions were held but in different years, confusing candidates relying on location-based memory.": 1,
+      "Uses decimals and common rounding errors to trap students who don't perform the full multi-step calculation.": 1,
+      "Pairs rights with closely related but incorrect articles to test precision in constitutional knowledge.": 1,
+      "Lists dates that are significant to the movement but are not the specific date of legislative enactment.": 1,
+      "Uses technical terminology that sounds similar to correct scientific functions to mislead non-science stream candidates.": 1,
+      "Options include multiple numbers that could fit based on a shallow pattern, testing the candidate's ability to find the deeper, correct logic.": 1,
+      "Names tributaries of different river systems to test if the candidate can distinguish between major drainage basins.": 1,
+      "Includes famous athletes who didn't win the award in the target year.": 1,
+      "Provides units in different formats (km/hr vs m/s), punishing candidates who forget to perform conversions.": 1,
+      "Lists names of similar welfare schemes from other states or previous administrations to test memory precision.": 1,
+      "Offers syntactically 'correct-sounding' options that are grammatically incorrect in the specific context.": 1,
+      "Includes names of contemporary sub-dynasties to confuse the order of primary empires.": 1,
+      "Uses technical jargon that overlaps (e.g., Repo vs Reverse Repo) to test conceptual clarity.": 1,
+      "Commonly confused optical phenomena that appear similar to the uninitiated.": 1,
+      "Includes legal terms that sound punitive but do not apply to the specific social issue mentioned.": 1,
+      "Provides options representing common algebraic errors (e.g., inverting ratios).": 1,
+      "Presents a Fundamental Right as a Directive Principle to test the candidate's ability to classify constitutional articles.": 1,
+      "Lists monsoon directions that are common misconceptions.": 1,
+      "Uses multi-generational family trees to trap those who lose track of the subject.": 1,
+      "Names festivals or art forms from neighboring states that are culturally distinct.": 1
+    },
+    "answer_position_distribution": {
+      "A": 1398,
+      "B": 0,
+      "C": 0,
+      "D": 0,
+      "A_pct": 100,
+      "B_pct": 0,
+      "C_pct": 0,
+      "D_pct": 0
+    },
+    "top_recurring_themes": [
+      {
+        "theme": "Geography, Polity & Economy - Imported PYQ Question",
+        "count": 381,
+        "why_asked": "Appeared persistently across cycles (2024). High probability core focus area.",
+        "sample_question_ids": [
+          "pyq_imp_paper_tslprb_police_constable_pwt_2024_mty3fz2b_q123",
+          "pyq_imp_paper_tslprb_police_constable_pwt_2024_mty15z4j_q21",
+          "pyq_imp_paper_tslprb_police_constable_pwt_2024_mty15z4j_q22"
+        ]
+      },
+      {
+        "theme": "Telangana & Current Affairs - Vocabulary, Grammar & Comprehension",
+        "count": 148,
+        "why_asked": "Appeared persistently across cycles (2024). High probability core focus area.",
+        "sample_question_ids": [
+          "pyq_imp_paper_tslprb_police_constable_pwt_2024_mty1yj0m_q01",
+          "pyq_imp_paper_tslprb_police_constable_pwt_2024_mty1yj0m_q02",
+          "pyq_imp_paper_tslprb_police_constable_pwt_2024_mty1yj0m_q03"
+        ]
+      },
+      {
+        "theme": "Arithmetic & Reasoning - Quantitative Problem Solving",
+        "count": 100,
+        "why_asked": "Appeared persistently across cycles (2024). High probability core focus area.",
+        "sample_question_ids": [
+          "pyq_imp_paper_tslprb_police_constable_pwt_2024_mty1yj0m_q26",
+          "pyq_imp_paper_tslprb_police_constable_pwt_2024_mty1yj0m_q27",
+          "pyq_imp_paper_tslprb_police_constable_pwt_2024_mty1yj0m_q28"
+        ]
+      },
+      {
+        "theme": "Geography, Polity & Economy - Monetary Policy & Macroeconomics",
+        "count": 100,
+        "why_asked": "Appeared persistently across cycles (2024). High probability core focus area.",
+        "sample_question_ids": [
+          "pyq_imp_paper_tslprb_police_constable_pwt_2024_mty1yj0m_q126",
+          "pyq_imp_paper_tslprb_police_constable_pwt_2024_mty1yj0m_q127",
+          "pyq_imp_paper_tslprb_police_constable_pwt_2024_mty1yj0m_q128"
+        ]
+      },
+      {
+        "theme": "Arithmetic & Reasoning - Analytical Reasoning & Logical Deduction",
+        "count": 100,
+        "why_asked": "Appeared persistently across cycles (2024). High probability core focus area.",
+        "sample_question_ids": [
+          "pyq_imp_paper_tslprb_police_constable_pwt_2024_mty1yj0m_q151",
+          "pyq_imp_paper_tslprb_police_constable_pwt_2024_mty1yj0m_q152",
+          "pyq_imp_paper_tslprb_police_constable_pwt_2024_mty1yj0m_q153"
+        ]
+      }
+    ],
+    "emerging_themes": [
+      {
+        "theme": "Recent State Socio-Economic Survey & Welfare Schemes",
+        "first_appeared_year": 2016,
+        "latest_year": 2023,
+        "count": 6
+      }
+    ],
+    "rotational_topics": [
+      {
+        "topic": "Ancient Dynastic Art & Inscriptions",
+        "cycle_length_years": 2,
+        "last_seen_year": 2023
+      }
+    ],
+    "adjacent_testable_areas": [],
+    "confidence_score": 94,
+    "readiness_status": "HIGH_CONFIDENCE",
+    "comparable_exam_evidence": [
+      {
+        "comparable_exam": "TGPSC Group-I Preliminary Test",
+        "reason": "Shared commission testing standards, high syllabus overlap in Telangana History & Economy",
+        "observed_overlap": "85% subject congruence"
+      }
+    ]
+  },
+  {
     "profile_id": "intel_exam_telangana_police_constable_sct_p_mtxv9wwo_mtxxxroz",
     "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
     "exam_version_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_v1",

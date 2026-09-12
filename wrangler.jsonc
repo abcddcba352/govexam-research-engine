@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "govexam-staging",
+  "account_id": "a94632b49cf1306aa32d0361f75d4991",
   "main": "server/cloudflareWorker.ts",
   "compatibility_date": "2026-08-04",
   "compatibility_flags": [
@@ -19,7 +20,7 @@
   "ai": {"binding":"AI"},
   "durable_objects": {"bindings":[{"name":"FREE_ENGINE","class_name":"FreeEngineObject"}]},
   "migrations": [{"tag":"free-engine-v1","new_sqlite_classes":["FreeEngineObject"]}],
-  "kv_namespaces": [{"binding":"GOVEXAM_RESEARCH_STATE","id":"04fcd7b8c2b84948bcfbd248c0ba4ff9"}],
+  "kv_namespaces": [{"binding":"GOVEXAM_RESEARCH_STATE","id":"f2d1b395148f4d31b0edb32556e83fda"}],
   "vars": {
     "NODE_ENV": "staging",
     "ENVIRONMENT": "staging",
