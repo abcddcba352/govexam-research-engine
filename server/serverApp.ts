@@ -869,7 +869,7 @@ export function createApp(): express.Application {
     }
   });
 
-  // Extract text from uploaded PDF
+  // Extract text from uploaded PDF with strict timeout protection to avoid Cloudflare 503
   app.post("/api/pyq/extract-pdf", async (req, res) => {
     try {
       const { base64, filename } = req.body;
@@ -877,23 +877,38 @@ export function createApp(): express.Application {
         return res.status(400).json({ error: "Missing base64 PDF data" });
       }
 
-      const buffer = Buffer.from(base64, 'base64');
-      
-      // 1. Try native fast stream extraction (~1-2ms)
-      const parsed = await extractPdfText(buffer);
-      if (parsed && parsed.success && parsed.text && parsed.text.length > 50) {
-        return res.json({
-          success: true,
-          text: parsed.text,
-          page_count: parsed.page_count,
-          method: 'PDF_PARSER'
+      // If PDF payload is too large for Cloudflare Worker memory (> 8MB base64), reject quickly with JSON
+      if (base64.length > 10 * 1024 * 1024) {
+        return res.status(413).json({
+          error: "PDF is too large for cloud extraction. Please open the PDF on your computer, copy the text, and paste it directly into the text box."
         });
       }
 
-      // 2. Fallback to Gemini Multimodal PDF extraction
+      const buffer = Buffer.from(base64, 'base64');
+      
+      // 1. Try native fast stream extraction
+      try {
+        const parsed = await extractPdfText(buffer);
+        if (parsed && parsed.success && parsed.text && parsed.text.length > 50) {
+          return res.json({
+            success: true,
+            text: parsed.text,
+            page_count: parsed.page_count,
+            method: 'PDF_PARSER'
+          });
+        }
+      } catch (streamErr: any) {
+        console.warn('[PDF Extract] Stream extraction error:', streamErr?.message);
+      }
+
+      // 2. Multimodal PDF extraction with 12s timeout guard
       let geminiText = '';
       try {
-        await executeWithGeminiFailover(async (ai) => {
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('TIMEOUT')), 12000)
+        );
+
+        const geminiPromise = executeWithGeminiFailover(async (ai) => {
           const response = await ai.models.generateContent({
             model: getPrimaryModel(),
             contents: [
@@ -906,27 +921,31 @@ export function createApp(): express.Application {
               'Extract all questions from this question paper PDF into plain text. Format each question clearly as:\nQ1. [Question text]\n(A) [Option A]\n(B) [Option B]\n(C) [Option C]\n(D) [Option D]\nAnswer: Option [A/B/C/D]\nExplanation: [Explanation if available]\n\nInclude all multiple-choice questions verbatim.'
             ]
           });
-          geminiText = response.text || '';
+          return response.text || '';
         });
+
+        geminiText = (await Promise.race([geminiPromise, timeoutPromise])) as string;
       } catch (geminiErr: any) {
-        console.warn('[PDF Extract] Gemini fallback failed:', geminiErr?.message);
+        console.warn('[PDF Extract] Gemini fallback notice:', geminiErr?.message);
       }
 
       if (geminiText && geminiText.trim().length > 30) {
         return res.json({
           success: true,
           text: geminiText.trim(),
-          page_count: parsed?.page_count || 1,
+          page_count: 1,
           method: 'GEMINI_MULTIMODAL'
         });
       }
 
-      res.status(422).json({
+      return res.status(422).json({
         error: "Could not automatically extract text from this PDF. It may be a scanned image without an OCR layer. Please paste the question paper text directly into the text box."
       });
     } catch (err: any) {
       console.error("[PDF Extract Error]", err);
-      res.status(500).json({ error: err.message || "Failed to extract PDF text" });
+      return res.status(422).json({
+        error: err.message || "Failed to extract PDF text. Please copy and paste the question paper text directly."
+      });
     }
   });
 

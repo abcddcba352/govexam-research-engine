@@ -34,6 +34,7 @@ import {
   isCentralExam,
   getExamState,
 } from '../utils/examJurisdiction.ts';
+import { extractPdfTextInBrowser } from '../utils/clientPdfExtractor.ts';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PYQ Intelligence Screen — Clean rewrite
@@ -152,17 +153,28 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
     if (file.name.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf') {
       setIsExtractingPdf(true);
       setError(null);
-      const reader = new FileReader();
-      reader.onload = async (ev) => {
+      (async () => {
         try {
-          if (file.size > 20 * 1024 * 1024) {
-            throw new Error(`The PDF is ${(file.size / 1024 / 1024).toFixed(1)} MB, which exceeds the 20 MB upload limit. Please select a smaller PDF or copy and paste the question text directly.`);
+          if (file.size > 30 * 1024 * 1024) {
+            throw new Error(`The PDF is ${(file.size / 1024 / 1024).toFixed(1)} MB, which exceeds the 30 MB upload limit. Please select a smaller PDF or copy and paste the question text directly.`);
           }
 
-          const arrayBuf = ev.target?.result as ArrayBuffer;
-          if (!arrayBuf) throw new Error('Could not read PDF file');
-          
-          // Convert array buffer to base64 cleanly in chunks to prevent stack overflow
+          // A. Attempt client-side in-browser text extraction first (instantaneous, 0 network payload, 0 timeout risk)
+          let extracted: { text: string; page_count: number } | null = null;
+          try {
+            extracted = await extractPdfTextInBrowser(file);
+          } catch (clientErr: any) {
+            console.warn('[PDF Extract] Client-side extraction notice:', clientErr?.message);
+          }
+
+          if (extracted && extracted.text && extracted.text.length > 50) {
+            setPastedText(extracted.text);
+            setSuccessMsg(`Extracted question paper text from "${file.name}" (${extracted.page_count} pages)! Review the text below and click "Analyse Paper".`);
+            return;
+          }
+
+          // B. Server fallback with timeout if client could not parse complex streams
+          const arrayBuf = await file.arrayBuffer();
           const uint8 = new Uint8Array(arrayBuf);
           let binary = '';
           const chunkSize = 8192;
@@ -172,41 +184,43 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
           }
           const base64 = btoa(binary);
 
-          const res = await fetch('/api/pyq/extract-pdf', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ base64, filename: file.name })
-          });
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 20000);
 
-          const contentType = res.headers.get('content-type') || '';
-          let data: any = {};
-          if (contentType.includes('application/json')) {
-            data = await res.json().catch(() => ({}));
-          } else {
-            const rawText = await res.text().catch(() => '');
-            if (res.status === 413 || rawText.includes('Payload Too Large')) {
-              throw new Error(`The uploaded PDF is too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Please select a smaller PDF or copy/paste text directly.`);
+          try {
+            const res = await fetch('/api/pyq/extract-pdf', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ base64, filename: file.name }),
+              signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+
+            const contentType = res.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+              const data = await res.json().catch(() => ({}));
+              if (res.ok && data.success && data.text) {
+                setPastedText(data.text);
+                setSuccessMsg(`Extracted question paper text from "${file.name}" (${data.page_count || 1} pages)! Review the text below and click "Analyse Paper".`);
+                return;
+              }
+              if (data.error) {
+                throw new Error(data.error);
+              }
             }
-            throw new Error(`Server returned error (${res.status}): ${res.statusText}. Please copy and paste the text directly.`);
+          } catch (serverErr: any) {
+            clearTimeout(timeoutId);
+            console.warn('[PDF Extract] Server fallback notice:', serverErr?.message);
           }
 
-          if (!res.ok || !data.success) {
-            throw new Error(data.error || 'Failed to extract text from PDF.');
-          }
-
-          setPastedText(data.text);
-          setSuccessMsg(`Extracted question paper text from "${file.name}" (${data.page_count || 1} pages)! Review the text below and click "Analyse Paper".`);
+          // C. If both could not extract text, give clear and helpful guidance
+          throw new Error(`Could not automatically extract text from "${file.name}". This PDF may be a scanned image or restricted document. Please copy and paste the question paper text directly into the text box below.`);
         } catch (err: any) {
           setError(err.message || 'Error processing PDF file. You can also open the PDF, copy all text, and paste it directly into the text box below.');
         } finally {
           setIsExtractingPdf(false);
         }
-      };
-      reader.onerror = () => {
-        setError('Error reading PDF file from disk.');
-        setIsExtractingPdf(false);
-      };
-      reader.readAsArrayBuffer(file);
+      })();
       return;
     }
 

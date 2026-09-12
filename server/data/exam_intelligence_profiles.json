@@ -1,35 +1,35 @@
 [
   {
-    "profile_id": "intel_exam_telangana_police_constable_sct_p_mtxv9wwo_mtxvz3n0",
+    "profile_id": "intel_exam_telangana_police_constable_sct_p_mtxv9wwo_mtxwrw3q",
     "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
     "exam_version_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_v1",
     "recruitment_cycle": "2024 Notification Cycle",
-    "analysis_date": "2026-09-12T04:29:47.436Z",
+    "analysis_date": "2026-09-12T04:52:10.694Z",
     "papers_analysed_count": 1,
-    "questions_analysed_count": 10,
-    "answers_verified_count": 10,
+    "questions_analysed_count": 15,
+    "answers_verified_count": 15,
     "visual_questions_count": 0,
     "unverified_questions_count": 0,
     "subject_distribution": [
       {
         "subject": "Contents pertaining to the State of Telangana",
-        "count": 5,
-        "percentage": 50
+        "count": 7,
+        "percentage": 46.67
       },
       {
         "subject": "Indian Economy & Banking",
-        "count": 2,
+        "count": 3,
         "percentage": 20
       },
       {
         "subject": "Geography & Environment",
-        "count": 2,
+        "count": 3,
         "percentage": 20
       },
       {
         "subject": "Indian Polity & Constitution",
-        "count": 1,
-        "percentage": 10
+        "count": 2,
+        "percentage": 13.33
       }
     ],
     "topic_distribution": [
@@ -38,14 +38,14 @@
         "topic": "Kakatiya Architecture & Ramappa Temple",
         "subtopic": "Examination Item",
         "sample_size": 1,
-        "question_count": 2,
+        "question_count": 3,
         "observed_pyq_weight": 20,
         "years_appeared": [
           2024
         ],
         "consecutive_year_appearances": 1,
         "recurrence_interval_years": null,
-        "trend_direction": "CYCLICAL",
+        "trend_direction": "INCREASING",
         "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
       },
       {
@@ -53,8 +53,23 @@
         "topic": "RBI Monetary Instruments",
         "subtopic": "Examination Item",
         "sample_size": 1,
-        "question_count": 2,
+        "question_count": 3,
         "observed_pyq_weight": 20,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "INCREASING",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Indian Polity & Constitution",
+        "topic": "Article 371-D Local Cadre Safeguards",
+        "subtopic": "Examination Item",
+        "sample_size": 1,
+        "question_count": 2,
+        "observed_pyq_weight": 13.33,
         "years_appeared": [
           2024
         ],
@@ -64,12 +79,27 @@
         "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
       },
       {
-        "subject": "Indian Polity & Constitution",
-        "topic": "Article 371-D Local Cadre Safeguards",
+        "subject": "Contents pertaining to the State of Telangana",
+        "topic": "Statehood Movement History",
         "subtopic": "Examination Item",
         "sample_size": 1,
         "question_count": 1,
-        "observed_pyq_weight": 10,
+        "observed_pyq_weight": 6.67,
+        "years_appeared": [
+          2024
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "RARE",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Geography & Environment",
+        "topic": "Himalayan Mountain Passes & International Borders",
+        "subtopic": "Examination Item",
+        "sample_size": 1,
+        "question_count": 1,
+        "observed_pyq_weight": 6.67,
         "years_appeared": [
           2024
         ],
@@ -84,7 +114,7 @@
         "subtopic": "Examination Item",
         "sample_size": 1,
         "question_count": 1,
-        "observed_pyq_weight": 10,
+        "observed_pyq_weight": 6.67,
         "years_appeared": [
           2024
         ],
@@ -99,7 +129,7 @@
         "subtopic": "Examination Item",
         "sample_size": 1,
         "question_count": 1,
-        "observed_pyq_weight": 10,
+        "observed_pyq_weight": 6.67,
         "years_appeared": [
           2024
         ],
@@ -114,7 +144,7 @@
         "subtopic": "Examination Item",
         "sample_size": 1,
         "question_count": 1,
-        "observed_pyq_weight": 10,
+        "observed_pyq_weight": 6.67,
         "years_appeared": [
           2024
         ],
@@ -129,7 +159,7 @@
         "subtopic": "Examination Item",
         "sample_size": 1,
         "question_count": 1,
-        "observed_pyq_weight": 10,
+        "observed_pyq_weight": 6.67,
         "years_appeared": [
           2024
         ],
@@ -144,7 +174,7 @@
         "subtopic": "Examination Item",
         "sample_size": 1,
         "question_count": 1,
-        "observed_pyq_weight": 10,
+        "observed_pyq_weight": 6.67,
         "years_appeared": [
           2024
         ],
@@ -158,17 +188,8 @@
     "format_distribution": [
       {
         "format": "DIRECT_FACT",
-        "count": 6,
-        "percentage": 60,
-        "years_observed": [
-          2024
-        ],
-        "confidence": 90
-      },
-      {
-        "format": "CHRONOLOGY",
-        "count": 2,
-        "percentage": 20,
+        "count": 8,
+        "percentage": 53.33,
         "years_observed": [
           2024
         ],
@@ -176,7 +197,16 @@
       },
       {
         "format": "CONCEPTUAL",
-        "count": 2,
+        "count": 4,
+        "percentage": 26.67,
+        "years_observed": [
+          2024
+        ],
+        "confidence": 90
+      },
+      {
+        "format": "CHRONOLOGY",
+        "count": 3,
         "percentage": 20,
         "years_observed": [
           2024
@@ -186,13 +216,13 @@
     ],
     "difficulty_distribution": {
       "easy_pct": 40,
-      "moderate_pct": 50,
-      "difficult_pct": 10
+      "moderate_pct": 53,
+      "difficult_pct": 7
     },
     "cognitive_distribution": {
-      "recall_pct": 70,
-      "understand_pct": 20,
-      "apply_pct": 10,
+      "recall_pct": 67,
+      "understand_pct": 27,
+      "apply_pct": 7,
       "analyse_pct": 0,
       "multi_step_pct": 0
     },
@@ -209,6 +239,11 @@
     },
     "visual_ratio": 0,
     "distractor_style_distribution": {
+      "Includes plausible-sounding constitutional jargon like 'NJAC guidelines' to bait candidates who recognize the article number but lack precision on its specific mandate.": 1,
+      "Lists prominent Kakatiya monarchs (Ganapati Deva, Rudrama Devi) as distractors, relying on the common misconception that the ruler always personally constructs every major site.": 1,
+      "Uses key years in Telangana history (1953 state formation, 1969 agitation) to confuse candidates who conflate the agreement with the resulting political protests.": 1,
+      "Includes other valid RBI tools (Moral Suasion, Credit Rationing) which are qualitative, forcing the candidate to distinguish between the two classifications.": 1,
+      "Uses states like West Bengal and Arunachal Pradesh which share multiple borders, requiring precise knowledge of the tri-junction geometry.": 1,
       "Options B and D mimic 'special provision' language to confuse candidates who recognize the article number but lack precision regarding its actual functional scope.": 1,
       "Includes the names of famous Kakatiya rulers (Ganapati Deva, Rudrama Devi) as primary distractors, banking on the candidate's impulse to pick the most famous royal name.": 1,
       "Option C (1969) is a classic distractor representing the first major Telangana agitation, testing if the candidate conflates the agreement date with the later peak of regional unrest.": 1,
@@ -221,9 +256,9 @@
       "Option C (West Bengal) is a trap because it shares a border with three countries (Nepal, Bhutan, Bangladesh), testing if the candidate reads the 'China' requirement carefully.": 1
     },
     "answer_position_distribution": {
-      "A": 4,
-      "B": 2,
-      "C": 4,
+      "A": 6,
+      "B": 3,
+      "C": 6,
       "D": 0,
       "A_pct": 40,
       "B_pct": 20,
@@ -233,33 +268,36 @@
     "top_recurring_themes": [
       {
         "theme": "Contents pertaining to the State of Telangana - Kakatiya Architecture & Ramappa Temple",
-        "count": 2,
+        "count": 3,
         "why_asked": "Appeared persistently across cycles (2024). High probability core focus area.",
         "sample_question_ids": [
+          "pyq_imp_paper_exam_telangana_police_constable_sct_p_mtxv9wwo_2024_mtxva1a4_q02",
           "pyq_imp_paper_exam_telangana_police_constable_sct_p_mtxv9wwo_2024_mtxva1a4_q02",
           "pyq_imp_paper_exam_telangana_police_constable_sct_p_mtxv9wwo_2024_mtxva1a4_q02"
         ]
       },
       {
         "theme": "Indian Economy & Banking - RBI Monetary Instruments",
-        "count": 2,
+        "count": 3,
         "why_asked": "Appeared persistently across cycles (2024). High probability core focus area.",
         "sample_question_ids": [
+          "pyq_imp_paper_exam_telangana_police_constable_sct_p_mtxv9wwo_2024_mtxva1a4_q04",
           "pyq_imp_paper_exam_telangana_police_constable_sct_p_mtxv9wwo_2024_mtxva1a4_q04",
           "pyq_imp_paper_exam_telangana_police_constable_sct_p_mtxv9wwo_2024_mtxva1a4_q04"
         ]
       },
       {
         "theme": "Indian Polity & Constitution - Article 371-D Local Cadre Safeguards",
-        "count": 1,
+        "count": 2,
         "why_asked": "Appeared persistently across cycles (2024). High probability core focus area.",
         "sample_question_ids": [
+          "pyq_imp_paper_exam_telangana_police_constable_sct_p_mtxv9wwo_2024_mtxva1a4_q01",
           "pyq_imp_paper_exam_telangana_police_constable_sct_p_mtxv9wwo_2024_mtxva1a4_q01",
           "pyq_imp_paper_exam_telangana_police_constable_sct_p_mtxv9wwo_2024_mtxva1a4_q01"
         ]
       },
       {
-        "theme": "Contents pertaining to the State of Telangana - Formation of Andhra Pradesh / State History",
+        "theme": "Contents pertaining to the State of Telangana - Statehood Movement History",
         "count": 1,
         "why_asked": "Appeared persistently across cycles (2024). High probability core focus area.",
         "sample_question_ids": [
@@ -267,7 +305,7 @@
         ]
       },
       {
-        "theme": "Geography & Environment - Himalayan Mountain Passes / Political Geography",
+        "theme": "Geography & Environment - Himalayan Mountain Passes & International Borders",
         "count": 1,
         "why_asked": "Appeared persistently across cycles (2024). High probability core focus area.",
         "sample_question_ids": [
@@ -295,20 +333,20 @@
     "readiness_status": "LIMITED_DATA"
   },
   {
-    "profile_id": "intel_exam_test_exam_mtxv37t5_mtxvz027",
+    "profile_id": "intel_exam_test_exam_mtxv37t5_mtxwrs8b",
     "exam_id": "exam_test_exam_mtxv37t5",
     "exam_version_id": "exam_test_exam_mtxv37t5_v1",
     "recruitment_cycle": "2026 Notification Cycle",
-    "analysis_date": "2026-09-12T04:29:42.799Z",
+    "analysis_date": "2026-09-12T04:52:05.675Z",
     "papers_analysed_count": 1,
-    "questions_analysed_count": 5,
-    "answers_verified_count": 5,
+    "questions_analysed_count": 6,
+    "answers_verified_count": 6,
     "visual_questions_count": 0,
     "unverified_questions_count": 0,
     "subject_distribution": [
       {
         "subject": "Indian Polity",
-        "count": 5,
+        "count": 6,
         "percentage": 100,
         "official_weight": 33.3
       }
@@ -316,11 +354,26 @@
     "topic_distribution": [
       {
         "subject": "Indian Polity",
+        "topic": "Constitutional Provisions - Election Commission of India",
+        "subtopic": "Examination Item",
+        "sample_size": 1,
+        "question_count": 2,
+        "observed_pyq_weight": 33.33,
+        "years_appeared": [
+          2026
+        ],
+        "consecutive_year_appearances": 1,
+        "recurrence_interval_years": null,
+        "trend_direction": "CYCLICAL",
+        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
+      },
+      {
+        "subject": "Indian Polity",
         "topic": "Imported PYQ Question",
         "subtopic": "Examination Item",
         "sample_size": 1,
         "question_count": 2,
-        "observed_pyq_weight": 40,
+        "observed_pyq_weight": 33.33,
         "years_appeared": [
           2026
         ],
@@ -335,7 +388,7 @@
         "subtopic": "Examination Item",
         "sample_size": 1,
         "question_count": 1,
-        "observed_pyq_weight": 20,
+        "observed_pyq_weight": 16.67,
         "years_appeared": [
           2026
         ],
@@ -350,22 +403,7 @@
         "subtopic": "Examination Item",
         "sample_size": 1,
         "question_count": 1,
-        "observed_pyq_weight": 20,
-        "years_appeared": [
-          2026
-        ],
-        "consecutive_year_appearances": 1,
-        "recurrence_interval_years": null,
-        "trend_direction": "RARE",
-        "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
-      },
-      {
-        "subject": "Indian Polity",
-        "topic": "Constitutional Provisions - Election Commission of India",
-        "subtopic": "Examination Item",
-        "sample_size": 1,
-        "question_count": 1,
-        "observed_pyq_weight": 20,
+        "observed_pyq_weight": 16.67,
         "years_appeared": [
           2026
         ],
@@ -379,7 +417,7 @@
     "format_distribution": [
       {
         "format": "DIRECT_FACT",
-        "count": 5,
+        "count": 6,
         "percentage": 100,
         "years_observed": [
           2026
@@ -388,13 +426,13 @@
       }
     ],
     "difficulty_distribution": {
-      "easy_pct": 60,
-      "moderate_pct": 40,
+      "easy_pct": 67,
+      "moderate_pct": 33,
       "difficult_pct": 0
     },
     "cognitive_distribution": {
-      "recall_pct": 60,
-      "understand_pct": 40,
+      "recall_pct": 67,
+      "understand_pct": 33,
       "apply_pct": 0,
       "analyse_pct": 0,
       "multi_step_pct": 0
@@ -406,19 +444,20 @@
       "typical_window_months": "6 - 12 Months preceding examination"
     },
     "state_vs_national": {
-      "state_specific_pct": 40,
-      "india_general_pct": 60,
+      "state_specific_pct": 33,
+      "india_general_pct": 67,
       "international_pct": 0
     },
     "visual_ratio": 0,
     "distractor_style_distribution": {
+      "The distractors represent high-frequency articles (356: Emergency, 370: J&K, 280: Finance Commission) that are frequently encountered in preparation, intended to trigger 'recognition' errors in candidates who haven't verified the exact article number.": 1,
       "The distractors are popular constitutional provisions (President's Rule, J&K special status, Finance Commission) designed to lure candidates who have memorized a list of articles but lack the specificity of their respective functions.": 1,
       "The distractors include Article 356 (President's Rule) and Article 370 (J&K status), which are high-visibility articles that often confuse candidates who recognize them as 'important' but fail to recall their specific functional purpose.": 1,
       "The distractors (356, 370, 280) are high-profile articles representing President's Rule, the former special status of J&K, and the Finance Commission, respectively, designed to confuse candidates who recognize the numbers but lack specific conceptual alignment.": 1,
       "NEAR_FACT": 2
     },
     "answer_position_distribution": {
-      "A": 5,
+      "A": 6,
       "B": 0,
       "C": 0,
       "D": 0,
@@ -428,6 +467,15 @@
       "D_pct": 0
     },
     "top_recurring_themes": [
+      {
+        "theme": "Indian Polity - Constitutional Provisions - Election Commission of India",
+        "count": 2,
+        "why_asked": "Appeared persistently across cycles (2026). High probability core focus area.",
+        "sample_question_ids": [
+          "pyq_imp_paper_exam_test_exam_mtxv37t5_2026_mtxv38kv_q01",
+          "pyq_imp_paper_exam_test_exam_mtxv37t5_2026_mtxv38kv_q01"
+        ]
+      },
       {
         "theme": "Indian Polity - Imported PYQ Question",
         "count": 2,
@@ -447,14 +495,6 @@
       },
       {
         "theme": "Indian Polity - Constitutional Provisions - Election Commission",
-        "count": 1,
-        "why_asked": "Appeared persistently across cycles (2026). High probability core focus area.",
-        "sample_question_ids": [
-          "pyq_imp_paper_exam_test_exam_mtxv37t5_2026_mtxv38kv_q01"
-        ]
-      },
-      {
-        "theme": "Indian Polity - Constitutional Provisions - Election Commission of India",
         "count": 1,
         "why_asked": "Appeared persistently across cycles (2026). High probability core focus area.",
         "sample_question_ids": [
@@ -595,32 +635,32 @@
     "readiness_status": "LIMITED_DATA"
   },
   {
-    "profile_id": "intel_exam_custom_state_administrative_exam_mtwx9y3y_mtxvyxgi",
+    "profile_id": "intel_exam_custom_state_administrative_exam_mtwx9y3y_mtxwrpjk",
     "exam_id": "exam_custom_state_administrative_exam_mtwx9y3y",
     "exam_version_id": "exam_custom_state_administrative_exam_mtwx9y3y_v1",
     "recruitment_cycle": "2026 Notification Cycle",
-    "analysis_date": "2026-09-12T04:29:39.426Z",
+    "analysis_date": "2026-09-12T04:52:02.192Z",
     "papers_analysed_count": 1,
-    "questions_analysed_count": 40,
-    "answers_verified_count": 40,
+    "questions_analysed_count": 45,
+    "answers_verified_count": 45,
     "visual_questions_count": 0,
     "unverified_questions_count": 0,
     "subject_distribution": [
       {
         "subject": "Indian Polity & Constitution",
-        "count": 16,
+        "count": 18,
         "percentage": 40,
         "official_weight": 33.3
       },
       {
         "subject": "Indian Economy & Banking",
-        "count": 16,
+        "count": 18,
         "percentage": 40,
         "official_weight": 33.3
       },
       {
         "subject": "Geography & Environment",
-        "count": 8,
+        "count": 9,
         "percentage": 20,
         "official_weight": 33.3
       }
@@ -631,7 +671,7 @@
         "topic": "Fundamental Rights",
         "subtopic": "Examination Item",
         "sample_size": 1,
-        "question_count": 8,
+        "question_count": 9,
         "observed_pyq_weight": 20,
         "years_appeared": [
           2026
@@ -646,7 +686,7 @@
         "topic": "Directive Principles",
         "subtopic": "Examination Item",
         "sample_size": 1,
-        "question_count": 8,
+        "question_count": 9,
         "observed_pyq_weight": 20,
         "years_appeared": [
           2026
@@ -661,7 +701,7 @@
         "topic": "Monetary System & Banking",
         "subtopic": "Examination Item",
         "sample_size": 1,
-        "question_count": 8,
+        "question_count": 9,
         "observed_pyq_weight": 20,
         "years_appeared": [
           2026
@@ -676,7 +716,7 @@
         "topic": "Monetary Policy",
         "subtopic": "Examination Item",
         "sample_size": 1,
-        "question_count": 8,
+        "question_count": 9,
         "observed_pyq_weight": 20,
         "years_appeared": [
           2026
@@ -691,7 +731,7 @@
         "topic": "Himalayan Mountain Passes",
         "subtopic": "Examination Item",
         "sample_size": 1,
-        "question_count": 8,
+        "question_count": 9,
         "observed_pyq_weight": 20,
         "years_appeared": [
           2026
@@ -706,8 +746,8 @@
     "format_distribution": [
       {
         "format": "DIRECT_FACT",
-        "count": 28,
-        "percentage": 70,
+        "count": 29,
+        "percentage": 64.44,
         "years_observed": [
           2026
         ],
@@ -715,8 +755,8 @@
       },
       {
         "format": "CONCEPTUAL",
-        "count": 12,
-        "percentage": 30,
+        "count": 16,
+        "percentage": 35.56,
         "years_observed": [
           2026
         ],
@@ -742,17 +782,17 @@
       "typical_window_months": "6 - 12 Months preceding examination"
     },
     "state_vs_national": {
-      "state_specific_pct": 63,
-      "india_general_pct": 38,
+      "state_specific_pct": 56,
+      "india_general_pct": 44,
       "international_pct": 0
     },
     "visual_ratio": 0,
     "distractor_style_distribution": {
-      "NEAR_FACT": 40
+      "NEAR_FACT": 45
     },
     "answer_position_distribution": {
-      "A": 24,
-      "B": 16,
+      "A": 27,
+      "B": 18,
       "C": 0,
       "D": 0,
       "A_pct": 60,
@@ -763,7 +803,7 @@
     "top_recurring_themes": [
       {
         "theme": "Indian Polity & Constitution - Fundamental Rights",
-        "count": 8,
+        "count": 9,
         "why_asked": "Appeared persistently across cycles (2026). High probability core focus area.",
         "sample_question_ids": [
           "pyq_imp_paper_exam_custom_state_administrative_exam_mtwx9y3y_2026_mtwx9y7p_q01",
@@ -773,7 +813,7 @@
       },
       {
         "theme": "Indian Polity & Constitution - Directive Principles",
-        "count": 8,
+        "count": 9,
         "why_asked": "Appeared persistently across cycles (2026). High probability core focus area.",
         "sample_question_ids": [
           "pyq_imp_paper_exam_custom_state_administrative_exam_mtwx9y3y_2026_mtwx9y7p_q02",
@@ -783,7 +823,7 @@
       },
       {
         "theme": "Indian Economy & Banking - Monetary System & Banking",
-        "count": 8,
+        "count": 9,
         "why_asked": "Appeared persistently across cycles (2026). High probability core focus area.",
         "sample_question_ids": [
           "pyq_imp_paper_exam_custom_state_administrative_exam_mtwx9y3y_2026_mtwx9y7p_q03",
@@ -793,7 +833,7 @@
       },
       {
         "theme": "Indian Economy & Banking - Monetary Policy",
-        "count": 8,
+        "count": 9,
         "why_asked": "Appeared persistently across cycles (2026). High probability core focus area.",
         "sample_question_ids": [
           "pyq_imp_paper_exam_custom_state_administrative_exam_mtwx9y3y_2026_mtwx9y7p_q04",
@@ -803,7 +843,7 @@
       },
       {
         "theme": "Geography & Environment - Himalayan Mountain Passes",
-        "count": 8,
+        "count": 9,
         "why_asked": "Appeared persistently across cycles (2026). High probability core focus area.",
         "sample_question_ids": [
           "pyq_imp_paper_exam_custom_state_administrative_exam_mtwx9y3y_2026_mtwx9y7p_q05",
@@ -817,7 +857,7 @@
         "theme": "Recent State Socio-Economic Survey & Welfare Schemes",
         "first_appeared_year": 2016,
         "latest_year": 2023,
-        "count": 3
+        "count": 4
       }
     ],
     "rotational_topics": [
