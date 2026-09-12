@@ -314,70 +314,79 @@ export async function extractScannedPdfWithVisionOcr(
 
   const accumulatedPages: { pageNum: number; text: string; qCount: number }[] = [];
   const missingPages: number[] = [];
-  const BATCH_SIZE = 2;
+  let totalQuestionsFound = 0;
 
-  for (let i = 0; i < targetPages.length; i += BATCH_SIZE) {
-    const batchPages = targetPages.slice(i, i + BATCH_SIZE);
-    const progressLabel = batchPages.length > 1
-      ? `AI Vision OCR: Scanning Pages ${batchPages[0]}-${batchPages[batchPages.length - 1]} of ${targetPages.length} (total doc: ${totalPages} pages)...`
-      : `AI Vision OCR: Scanning Page ${batchPages[0]} of ${targetPages.length} (total doc: ${totalPages} pages)...`;
+  for (let i = 0; i < targetPages.length; i++) {
+    const pageNum = targetPages[i];
+    const progressLabel = `AI Vision OCR: Scanning Page ${pageNum} (${i + 1}/${targetPages.length}) • ${totalQuestionsFound} questions found...`;
     onProgress?.(progressLabel, i + 1, targetPages.length);
 
-    const batchPromises = batchPages.map(pageNum => (async () => {
-      let attempts = 0;
-      const maxAttempts = 4;
+    let attempts = 0;
+    const maxAttempts = 8;
+    let pageTranscribed = false;
 
-      while (attempts < maxAttempts) {
-        attempts++;
-        try {
-          const page = await pdf.getPage(pageNum);
-          const imageBase64 = await renderPageToJpegBase64(page, 1.3);
+    while (attempts < maxAttempts && !pageTranscribed) {
+      attempts++;
+      try {
+        const page = await pdf.getPage(pageNum);
+        const imageBase64 = await renderPageToJpegBase64(page, 1.3);
 
-          const res = await fetch('/api/pyq/ocr-page', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              image: imageBase64,
-              pageNumber: pageNum,
-              totalPages
-            })
-          });
+        const res = await fetch('/api/pyq/ocr-page', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image: imageBase64,
+            pageNumber: pageNum,
+            totalPages
+          })
+        });
 
-          if (res.ok) {
-            const data = await res.json();
-            if (data.success && data.text) {
-              return {
-                pageNum,
-                text: `--- Page ${pageNum} ---\n` + data.text,
-                qCount: data.questionCount || 0
-              };
-            }
-          } else if (res.status === 429 || res.status === 500 || res.status === 503) {
-            const waitSec = attempts * 4;
-            onProgress?.(`Page ${pageNum}: API quota limit reached, cooling down ${waitSec}s before retry (attempt ${attempts}/${maxAttempts})...`, pageNum, targetPages.length);
-            await new Promise(r => setTimeout(r, waitSec * 1000));
-            continue;
-          } else {
-            console.warn(`[Vision OCR] Page ${pageNum} returned status ${res.status}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            const pageText = (data.text || '').trim();
+            const qCount = data.questionCount || 0;
+            totalQuestionsFound += qCount;
+            accumulatedPages.push({
+              pageNum,
+              text: `--- Page ${pageNum} ---\n` + (pageText || '[Page scanned - no exam questions detected]'),
+              qCount
+            });
+            pageTranscribed = true;
+            break;
           }
-        } catch (pageErr: any) {
-          console.warn(`[Vision OCR] Error scanning page ${pageNum} (attempt ${attempts}):`, pageErr?.message);
-          await new Promise(r => setTimeout(r, attempts * 2000));
+        } else if (res.status === 429 || res.status === 500 || res.status === 503) {
+          // Gemini free tier resets on a rolling 60-second window. A 15-25s cooldown allows the quota bucket to drain.
+          const waitSec = 15 + (attempts - 1) * 5;
+          onProgress?.(
+            `Page ${pageNum}: API quota limit reached. Pausing ${waitSec}s for quota cooldown before retry (attempt ${attempts}/${maxAttempts})...`,
+            i + 1,
+            targetPages.length
+          );
+          await new Promise(r => setTimeout(r, waitSec * 1000));
+          continue;
+        } else {
+          console.warn(`[Vision OCR] Page ${pageNum} returned unexpected status ${res.status}`);
+          await new Promise(r => setTimeout(r, attempts * 3000));
         }
+      } catch (pageErr: any) {
+        console.warn(`[Vision OCR] Error scanning page ${pageNum} (attempt ${attempts}):`, pageErr?.message);
+        await new Promise(r => setTimeout(r, attempts * 3000));
       }
-
-      missingPages.push(pageNum);
-      return { pageNum, text: '', qCount: 0 };
-    })());
-
-    const batchResults = await Promise.all(batchPromises);
-    for (const r of batchResults) {
-      if (r.text) accumulatedPages.push(r);
     }
 
-    // Pacing delay between batches to stay comfortably within Gemini's 15 RPM free tier limit
-    if (i + BATCH_SIZE < targetPages.length) {
-      await new Promise(r => setTimeout(r, 1600));
+    if (!pageTranscribed) {
+      missingPages.push(pageNum);
+      accumulatedPages.push({
+        pageNum,
+        text: `--- Page ${pageNum} ---\n[Page ${pageNum} failed to transcribe after ${maxAttempts} attempts]`,
+        qCount: 0
+      });
+    }
+
+    // Pacing delay between pages to stay comfortably within Gemini's 15 RPM limit (~12 requests/minute)
+    if (i < targetPages.length - 1) {
+      await new Promise(r => setTimeout(r, 2500));
     }
   }
 
