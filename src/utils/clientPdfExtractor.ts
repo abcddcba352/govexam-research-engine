@@ -291,9 +291,14 @@ async function renderPageToJpegBase64(page: any, scale: number = 1.3): Promise<s
 }
 
 /**
- * Scanned PDF Visual OCR Engine:
- * Renders pages to HTML5 canvas and sends lightweight (~80-120KB) JPEG images
- * to Gemini 3.1 Flash Lite to extract questions verbatim from photocopied or image papers.
+ * Scanned PDF Visual OCR Engine (Multi-Pass with Auto-Recovery):
+ * Renders pages to HTML5 canvas and sends JPEG images to Gemini to extract questions.
+ * 
+ * Key design decisions:
+ * - Sequential (1 page at a time) with 5s inter-page pacing = 12 RPM, safely under Gemini's 15 RPM free tier
+ * - Empty/short Gemini responses are NOT accepted — they trigger a retry
+ * - After Pass 1, any failed pages are automatically re-scanned in Pass 2 (and Pass 3 if needed)
+ * - 30s+ cooldown on quota errors to let the rolling 60s window fully drain
  */
 export async function extractScannedPdfWithVisionOcr(
   file: File,
@@ -312,33 +317,41 @@ export async function extractScannedPdfWithVisionOcr(
     ? specificPages.filter(p => p >= 1 && p <= totalPages)
     : Array.from({ length: Math.min(totalPages, maxPages) }, (_, idx) => idx + 1);
 
-  const accumulatedPages: { pageNum: number; text: string; qCount: number }[] = [];
-  const missingPages: number[] = [];
-  let totalQuestionsFound = 0;
+  // ── Results map (pageNum → result). Using a Map so recovery passes can overwrite failed entries. ──
+  const pageResults = new Map<number, { pageNum: number; text: string; qCount: number }>();
   const scanStartTime = Date.now();
 
-  // ── CRITICAL PACING CONSTANTS ──
-  // Gemini free tier = 15 RPM (requests per minute).
-  // 5000ms between pages = 12 RPM → safely below 15 RPM ceiling.
-  // Quota cooldown on 429 = 30s minimum → ensures the rolling 60s window drains.
-  const INTER_PAGE_DELAY_MS = 5000;
-  const QUOTA_COOLDOWN_BASE_SEC = 30;
-  const MAX_ATTEMPTS_PER_PAGE = 5;
+  // ── PACING CONSTANTS ──
+  const INTER_PAGE_DELAY_MS = 5000;      // 5s between pages = ~12 RPM (under 15 RPM ceiling)
+  const QUOTA_COOLDOWN_BASE_SEC = 30;     // 30s minimum wait on 429 errors
 
-  for (let i = 0; i < targetPages.length; i++) {
-    const pageNum = targetPages[i];
-    const elapsedSec = Math.round((Date.now() - scanStartTime) / 1000);
-    const elapsedMin = Math.floor(elapsedSec / 60);
-    const elapsedRemSec = elapsedSec % 60;
-    const timeStr = elapsedMin > 0 ? `${elapsedMin}m ${elapsedRemSec}s` : `${elapsedRemSec}s`;
-    const progressLabel = `AI Vision OCR: Page ${pageNum} (${i + 1}/${targetPages.length}) • ${totalQuestionsFound} Qs found • ${timeStr} elapsed`;
-    onProgress?.(progressLabel, i + 1, targetPages.length);
+  /** Formats elapsed time since scan start */
+  function elapsed(): string {
+    const sec = Math.round((Date.now() - scanStartTime) / 1000);
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return m > 0 ? `${m}m ${s}s` : `${s}s`;
+  }
 
-    let attempts = 0;
-    let pageTranscribed = false;
+  /** Returns total questions found so far across all successfully scanned pages */
+  function totalQs(): number {
+    return Array.from(pageResults.values()).reduce((sum, p) => sum + p.qCount, 0);
+  }
 
-    while (attempts < MAX_ATTEMPTS_PER_PAGE && !pageTranscribed) {
-      attempts++;
+  /**
+   * Attempts to scan a single page. Returns true if the page was transcribed
+   * with meaningful content (>30 chars), false otherwise.
+   */
+  async function scanOnePage(
+    pageNum: number, maxAttempts: number, passLabel: string, idx: number, total: number
+  ): Promise<boolean> {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      onProgress?.(
+        `${passLabel}: Page ${pageNum} (${idx}/${total}) • ${totalQs()} Qs • ${elapsed()}` +
+        (attempt > 1 ? ` [retry ${attempt}/${maxAttempts}]` : ''),
+        idx, total
+      );
+
       try {
         const page = await pdf.getPage(pageNum);
         const imageBase64 = await renderPageToJpegBase64(page, 1.3);
@@ -346,71 +359,124 @@ export async function extractScannedPdfWithVisionOcr(
         const res = await fetch('/api/pyq/ocr-page', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            image: imageBase64,
-            pageNumber: pageNum,
-            totalPages
-          })
+          body: JSON.stringify({ image: imageBase64, pageNumber: pageNum, totalPages })
         });
 
         if (res.ok) {
           const data = await res.json();
           if (data.success) {
             const pageText = (data.text || '').trim();
-            const qCount = data.questionCount || 0;
-            totalQuestionsFound += qCount;
-            accumulatedPages.push({
+
+            // ── CRITICAL: Reject empty/very-short responses ──
+            // Gemini sometimes returns success with empty text on rate-limited or complex pages.
+            // Title/ad pages produce 50+ char descriptions, so 30 chars is a safe floor.
+            if (pageText.length < 30) {
+              console.warn(`[Vision OCR] Page ${pageNum}: only ${pageText.length} chars returned — retrying`);
+              if (attempt < maxAttempts) {
+                await new Promise(r => setTimeout(r, 8000));
+                continue;
+              }
+              // On final attempt, accept whatever we got (might be a genuinely blank page)
+            }
+
+            pageResults.set(pageNum, {
               pageNum,
-              text: `--- Page ${pageNum} ---\n` + (pageText || '[Page scanned - no exam questions detected]'),
-              qCount
+              text: `--- Page ${pageNum} ---\n` + (pageText || '[Page scanned - no content detected]'),
+              qCount: data.questionCount || 0
             });
-            pageTranscribed = true;
-            break;
+            return true;
           }
         }
 
-        // On ANY non-ok response, pause and retry. For 429 quota errors use a long cooldown.
+        // ── Non-OK response: pause and retry ──
         const isQuota = res.status === 429;
         const waitSec = isQuota
-          ? QUOTA_COOLDOWN_BASE_SEC + (attempts - 1) * 10   // 30s, 40s, 50s, 60s, 70s
-          : 6 + attempts * 3;                                // 9s, 12s, 15s, 18s, 21s
+          ? QUOTA_COOLDOWN_BASE_SEC + (attempt - 1) * 10   // 30s, 40s, 50s, 60s, 70s
+          : 6 + attempt * 3;                                // 9s, 12s, 15s, 18s, 21s
         onProgress?.(
-          `Page ${pageNum}: ${isQuota ? 'Gemini quota reached' : `Server response ${res.status}`}. Cooling down ${waitSec}s (retry ${attempts}/${MAX_ATTEMPTS_PER_PAGE})...`,
-          i + 1,
-          targetPages.length
+          `Page ${pageNum}: ${isQuota ? 'Gemini quota reached' : `Status ${res.status}`}. ` +
+          `Cooling ${waitSec}s (retry ${attempt}/${maxAttempts})...`,
+          idx, total
         );
         await new Promise(r => setTimeout(r, waitSec * 1000));
-      } catch (pageErr: any) {
-        console.warn(`[Vision OCR] Error scanning page ${pageNum} (attempt ${attempts}):`, pageErr?.message);
-        const waitSec = 6 + attempts * 3;
-        onProgress?.(
-          `Page ${pageNum}: Network error, retrying in ${waitSec}s (retry ${attempts}/${MAX_ATTEMPTS_PER_PAGE})...`,
-          i + 1,
-          targetPages.length
-        );
+      } catch (err: any) {
+        console.warn(`[Vision OCR] Page ${pageNum} error (attempt ${attempt}):`, err?.message);
+        const waitSec = 6 + attempt * 3;
+        onProgress?.(`Page ${pageNum}: Error — retrying in ${waitSec}s...`, idx, total);
         await new Promise(r => setTimeout(r, waitSec * 1000));
       }
     }
+    return false;
+  }
 
-    if (!pageTranscribed) {
-      missingPages.push(pageNum);
-    }
+  // ════════════════════════════════════════════════════════════════
+  // PASS 1 — Initial scan of all target pages
+  // ════════════════════════════════════════════════════════════════
+  let failedPages: number[] = [];
 
-    // Pacing delay between pages: 5s = ~12 requests/min, safely under Gemini's 15 RPM free-tier limit
+  for (let i = 0; i < targetPages.length; i++) {
+    const pageNum = targetPages[i];
+    const ok = await scanOnePage(pageNum, 5, 'Scanning', i + 1, targetPages.length);
+    if (!ok) failedPages.push(pageNum);
+
     if (i < targetPages.length - 1) {
       await new Promise(r => setTimeout(r, INTER_PAGE_DELAY_MS));
     }
   }
 
-  accumulatedPages.sort((a, b) => a.pageNum - b.pageNum);
-  const combinedText = accumulatedPages.map(p => p.text).join('\n\n').trim();
-  const totalQuestions = accumulatedPages.reduce((acc, p) => acc + p.qCount, 0);
+  // ════════════════════════════════════════════════════════════════
+  // PASS 2 — Auto-recovery of any failed pages
+  // ════════════════════════════════════════════════════════════════
+  if (failedPages.length > 0) {
+    onProgress?.(`Recovery: Re-scanning ${failedPages.length} failed pages after 15s cooldown...`, 1, 1);
+    await new Promise(r => setTimeout(r, 15000));
+
+    const stillFailed: number[] = [];
+    for (let i = 0; i < failedPages.length; i++) {
+      const ok = await scanOnePage(failedPages[i], 4, 'Recovery', i + 1, failedPages.length);
+      if (!ok) stillFailed.push(failedPages[i]);
+      if (i < failedPages.length - 1) {
+        await new Promise(r => setTimeout(r, 6000));
+      }
+    }
+    failedPages = stillFailed;
+  }
+
+  // ════════════════════════════════════════════════════════════════
+  // PASS 3 — Final attempt for any remaining failures
+  // ════════════════════════════════════════════════════════════════
+  if (failedPages.length > 0) {
+    onProgress?.(`Final retry: ${failedPages.length} pages remaining after 20s cooldown...`, 1, 1);
+    await new Promise(r => setTimeout(r, 20000));
+
+    for (let i = 0; i < failedPages.length; i++) {
+      await scanOnePage(failedPages[i], 3, 'Final retry', i + 1, failedPages.length);
+      if (i < failedPages.length - 1) {
+        await new Promise(r => setTimeout(r, 8000));
+      }
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════════
+  // Assemble final results
+  // ════════════════════════════════════════════════════════════════
+  const allPages = Array.from(pageResults.values()).sort((a, b) => a.pageNum - b.pageNum);
+  const combinedText = allPages.map(p => p.text).join('\n\n').trim();
+  const totalQuestions = allPages.reduce((acc, p) => acc + p.qCount, 0);
+  const missingPages = targetPages.filter(p => !pageResults.has(p));
+
+  onProgress?.(
+    `Done! ${totalQuestions} questions from ${allPages.length}/${targetPages.length} pages in ${elapsed()}` +
+    (missingPages.length > 0 ? ` (${missingPages.length} pages could not be scanned)` : ''),
+    targetPages.length, targetPages.length
+  );
 
   return {
     text: combinedText,
     page_count: totalPages,
     question_count: totalQuestions,
     missing_pages: missingPages,
-    scanned_pages: accumulatedPages
+    scanned_pages: allPages
   };
 }
+
