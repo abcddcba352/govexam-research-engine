@@ -315,17 +315,29 @@ export async function extractScannedPdfWithVisionOcr(
   const accumulatedPages: { pageNum: number; text: string; qCount: number }[] = [];
   const missingPages: number[] = [];
   let totalQuestionsFound = 0;
+  const scanStartTime = Date.now();
+
+  // ── CRITICAL PACING CONSTANTS ──
+  // Gemini free tier = 15 RPM (requests per minute).
+  // 5000ms between pages = 12 RPM → safely below 15 RPM ceiling.
+  // Quota cooldown on 429 = 30s minimum → ensures the rolling 60s window drains.
+  const INTER_PAGE_DELAY_MS = 5000;
+  const QUOTA_COOLDOWN_BASE_SEC = 30;
+  const MAX_ATTEMPTS_PER_PAGE = 5;
 
   for (let i = 0; i < targetPages.length; i++) {
     const pageNum = targetPages[i];
-    const progressLabel = `AI Vision OCR: Scanning Page ${pageNum} (${i + 1}/${targetPages.length}) • ${totalQuestionsFound} questions found...`;
+    const elapsedSec = Math.round((Date.now() - scanStartTime) / 1000);
+    const elapsedMin = Math.floor(elapsedSec / 60);
+    const elapsedRemSec = elapsedSec % 60;
+    const timeStr = elapsedMin > 0 ? `${elapsedMin}m ${elapsedRemSec}s` : `${elapsedRemSec}s`;
+    const progressLabel = `AI Vision OCR: Page ${pageNum} (${i + 1}/${targetPages.length}) • ${totalQuestionsFound} Qs found • ${timeStr} elapsed`;
     onProgress?.(progressLabel, i + 1, targetPages.length);
 
     let attempts = 0;
-    const maxAttempts = 8;
     let pageTranscribed = false;
 
-    while (attempts < maxAttempts && !pageTranscribed) {
+    while (attempts < MAX_ATTEMPTS_PER_PAGE && !pageTranscribed) {
       attempts++;
       try {
         const page = await pdf.getPage(pageNum);
@@ -357,29 +369,36 @@ export async function extractScannedPdfWithVisionOcr(
           }
         }
 
-        // Retry logic on any failure (rate-limits, 5xx server issues, or cloudflare timeouts)
+        // On ANY non-ok response, pause and retry. For 429 quota errors use a long cooldown.
         const isQuota = res.status === 429;
-        const waitSec = isQuota ? (15 + (attempts - 1) * 5) : (4 + attempts * 2);
+        const waitSec = isQuota
+          ? QUOTA_COOLDOWN_BASE_SEC + (attempts - 1) * 10   // 30s, 40s, 50s, 60s, 70s
+          : 6 + attempts * 3;                                // 9s, 12s, 15s, 18s, 21s
         onProgress?.(
-          `Page ${pageNum}: ${isQuota ? 'API quota limit reached' : `Server busy (status ${res.status})`}. Pausing ${waitSec}s before retry (attempt ${attempts}/${maxAttempts})...`,
+          `Page ${pageNum}: ${isQuota ? 'Gemini quota reached' : `Server response ${res.status}`}. Cooling down ${waitSec}s (retry ${attempts}/${MAX_ATTEMPTS_PER_PAGE})...`,
           i + 1,
           targetPages.length
         );
         await new Promise(r => setTimeout(r, waitSec * 1000));
       } catch (pageErr: any) {
         console.warn(`[Vision OCR] Error scanning page ${pageNum} (attempt ${attempts}):`, pageErr?.message);
-        await new Promise(r => setTimeout(r, (4 + attempts * 2) * 1000));
+        const waitSec = 6 + attempts * 3;
+        onProgress?.(
+          `Page ${pageNum}: Network error, retrying in ${waitSec}s (retry ${attempts}/${MAX_ATTEMPTS_PER_PAGE})...`,
+          i + 1,
+          targetPages.length
+        );
+        await new Promise(r => setTimeout(r, waitSec * 1000));
       }
     }
 
     if (!pageTranscribed) {
       missingPages.push(pageNum);
-      // Note: Do not push dummy text into accumulatedPages so the gap remains cleanly detectable and retrievable
     }
 
-    // Pacing delay between pages to stay comfortably within Gemini's 15 RPM limit (~12 requests/minute)
+    // Pacing delay between pages: 5s = ~12 requests/min, safely under Gemini's 15 RPM free-tier limit
     if (i < targetPages.length - 1) {
-      await new Promise(r => setTimeout(r, 2500));
+      await new Promise(r => setTimeout(r, INTER_PAGE_DELAY_MS));
     }
   }
 
