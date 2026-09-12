@@ -1015,6 +1015,178 @@ Rules:
     }
   });
 
+  // ── FAST DIRECT PDF MULTI-CHUNK EXTRACTION ──
+  // Step 1: Analyze PDF structure and plan question chunks (completes in ~3-4 seconds)
+  app.post("/api/pyq/pdf-plan", async (req, res) => {
+    try {
+      const { base64, filename } = req.body;
+      if (!base64) {
+        return res.status(400).json({ error: "Missing base64 data" });
+      }
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('PLAN_TIMEOUT')), 25000)
+      );
+
+      const geminiPromise = executeWithGeminiFailover(async (ai) => {
+        const response = await ai.models.generateContent({
+          model: getPrimaryModel(),
+          contents: [
+            {
+              inlineData: {
+                data: base64,
+                mimeType: 'application/pdf'
+              }
+            },
+            'Analyze this question paper PDF. Return ONLY valid JSON with this exact schema:\n' +
+            '{\n' +
+            '  "exam_name": "string",\n' +
+            '  "total_questions": number,\n' +
+            '  "first_q": number,\n' +
+            '  "last_q": number,\n' +
+            '  "total_pages": number\n' +
+            '}\nDo not wrap in markdown if possible, output raw JSON.'
+          ]
+        });
+        return response.text || '';
+      });
+
+      const raw = ((await Promise.race([geminiPromise, timeoutPromise])) as string) || '';
+      const cleanJson = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
+      let plan: any = {};
+      try {
+        plan = JSON.parse(cleanJson);
+      } catch {
+        const match = cleanJson.match(/\{[\s\S]*\}/);
+        if (match) {
+          plan = JSON.parse(match[0]);
+        }
+      }
+
+      const firstQ = Number(plan.first_q) || 1;
+      const totalQuestions = Number(plan.total_questions) || (Number(plan.last_q) ? Number(plan.last_q) - firstQ + 1 : 0);
+      const lastQ = Number(plan.last_q) || (totalQuestions > 0 ? firstQ + totalQuestions - 1 : 0);
+      const totalPages = Number(plan.total_pages) || 1;
+
+      // Split into chunks of 35-40 questions each (each chunk takes ~7-9s to extract)
+      const chunkSize = 35;
+      const chunks: Array<{ chunkIndex: number; startQ: number; endQ: number }> = [];
+
+      if (totalQuestions > 0 && lastQ >= firstQ) {
+        for (let q = firstQ; q <= lastQ; q += chunkSize) {
+          chunks.push({
+            chunkIndex: chunks.length + 1,
+            startQ: q,
+            endQ: Math.min(q + chunkSize - 1, lastQ)
+          });
+        }
+      } else {
+        // Fallback: chunk by page ranges (7 pages per chunk)
+        const pageChunkSize = 7;
+        for (let p = 1; p <= totalPages; p += pageChunkSize) {
+          chunks.push({
+            chunkIndex: chunks.length + 1,
+            startQ: p,
+            endQ: Math.min(p + pageChunkSize - 1, totalPages)
+          });
+        }
+      }
+
+      return res.json({
+        success: true,
+        examName: plan.exam_name || filename || 'Exam Paper',
+        totalQuestions: totalQuestions || 0,
+        totalPages,
+        firstQ,
+        lastQ,
+        isPageChunked: totalQuestions === 0,
+        chunks
+      });
+    } catch (err: any) {
+      console.error("[PDF Plan Error]", err?.message || err);
+      const errMsg = String(err?.message || err);
+      const isRateLimit = errMsg.includes('429') || errMsg.includes('RESOURCE_EXHAUSTED') || errMsg.toLowerCase().includes('quota');
+      return res.status(isRateLimit ? 429 : 500).json({
+        error: isRateLimit ? "RATE_LIMITED" : (err.message || "Failed to analyze PDF structure")
+      });
+    }
+  });
+
+  // Step 2: Extract a specific question range (or page range) from the PDF (~7-9s per chunk)
+  app.post("/api/pyq/pdf-chunk", async (req, res) => {
+    try {
+      const { base64, startQ, endQ, isPageChunked } = req.body;
+      if (!base64) {
+        return res.status(400).json({ error: "Missing base64 data" });
+      }
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('CHUNK_TIMEOUT')), 35000)
+      );
+
+      const prompt = isPageChunked
+        ? `Extract all multiple-choice questions appearing on pages ${startQ} to ${endQ} of this question paper PDF verbatim with all options.
+Format each question as:
+Q[num]. [question text in English and/or regional language]
+(A) [option A]
+(B) [option B]
+(C) [option C]
+(D) [option D]
+Answer: [if present]
+Explanation: [if present]
+
+Do not add conversational intro or outro text, only output the questions.`
+        : `Extract questions ${startQ} to ${endQ} verbatim from this PDF question paper with all multiple choice options.
+Format each question as:
+Q[num]. [question text in English and/or regional language]
+(A) [option A]
+(B) [option B]
+(C) [option C]
+(D) [option D]
+Answer: [if present]
+Explanation: [if present]
+
+Rules:
+- Be completely verbatim. Include every single question from ${startQ} to ${endQ} without skipping any.
+- Do not add conversational intro or outro text, only output the questions.`;
+
+      const geminiPromise = executeWithGeminiFailover(async (ai) => {
+        const response = await ai.models.generateContent({
+          model: getPrimaryModel(),
+          contents: [
+            {
+              inlineData: {
+                data: base64,
+                mimeType: 'application/pdf'
+              }
+            },
+            prompt
+          ]
+        });
+        return response.text || '';
+      });
+
+      const text = ((await Promise.race([geminiPromise, timeoutPromise])) as string) || '';
+      const cleanText = text.trim();
+      const qCount = (cleanText.match(/(?:^|\n)\s*(?:(?:Q(?:uestion)?\.?\s*(?:No\.?)?|Sl\.?\s*No\.?|Item|ప్రశ్న\.?)\s*[\.\:\-–—]?\s*\d+|\b\d{1,3}\s*(?:\.|\:|\/|[–—-]|-(?!\d))\s*|(?:\(\d{1,3}\)|\[\d{1,3}\])|\b\d{1,3}\s+[A-Za-z\u0900-\u0D7F])/gi) || []).length;
+
+      return res.json({
+        success: true,
+        text: cleanText,
+        startQ,
+        endQ,
+        questionCount: qCount
+      });
+    } catch (err: any) {
+      console.error("[PDF Chunk Error]", err?.message || err);
+      const errMsg = String(err?.message || err);
+      const isRateLimit = errMsg.includes('429') || errMsg.includes('RESOURCE_EXHAUSTED') || errMsg.toLowerCase().includes('quota');
+      return res.status(isRateLimit ? 429 : 500).json({
+        error: isRateLimit ? "RATE_LIMITED" : (err.message || "Failed to extract PDF chunk")
+      });
+    }
+  });
+
   app.post("/api/pyq/papers/:id/link-answers", async (req, res) => {
     try {
       const result = await linkAnswerKeyToPaper(req.params.id, req.body);

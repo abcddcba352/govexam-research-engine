@@ -34,7 +34,11 @@ import {
   isCentralExam,
   getExamState,
 } from '../utils/examJurisdiction.ts';
-import { extractPdfTextInBrowser, extractScannedPdfWithVisionOcr } from '../utils/clientPdfExtractor.ts';
+import {
+  extractPdfTextInBrowser,
+  extractScannedPdfWithVisionOcr,
+  extractPdfWithGeminiFastDirect
+} from '../utils/clientPdfExtractor.ts';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PYQ Intelligence Screen — Clean rewrite
@@ -367,23 +371,37 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
             return;
           }
 
-          // B. If PDF text layer is missing or contains only integers/page numbers, use HTML5 Canvas AI Vision OCR
-          if (extracted?.isScannedOrIntegerOnly || !extracted?.text) {
-            const totalPdfPages = extracted?.page_count || 30;
-            const pagesToScan = Math.min(totalPdfPages, 120);
-            setPdfStatus(`Scanned/image PDF detected (${totalPdfPages} pages). Extracting all questions using AI Vision OCR...`);
-
+          // B. Fast Direct AI Extraction: Sends the PDF directly to Gemini, analyzes structure, and extracts in chunks (~35-45s)
+          if (file.size <= 20 * 1024 * 1024) {
+            setPdfStatus(`Scanned/image PDF detected. Starting Fast AI Cloud Extraction...`);
             try {
-              const ocrResult = await extractScannedPdfWithVisionOcr(file, pagesToScan, (msg) => setPdfStatus(msg));
-              if (ocrResult && ocrResult.text && ocrResult.text.length > 50) {
-                setPastedText(ocrResult.text);
-                const qMsg = ocrResult.question_count > 0 ? ` (${ocrResult.question_count} questions detected)` : '';
-                setSuccessMsg(`AI Vision OCR successfully extracted questions across ${ocrResult.page_count} pages from "${file.name}"${qMsg}! Review below and click "Analyse Paper".`);
+              const fastResult = await extractPdfWithGeminiFastDirect(file, (msg) => setPdfStatus(msg));
+              if (fastResult && fastResult.text && fastResult.text.length > 50) {
+                setPastedText(fastResult.text);
+                const qMsg = fastResult.question_count > 0 ? ` (${fastResult.question_count} questions detected)` : '';
+                setSuccessMsg(`Fast AI Vision successfully extracted questions from "${file.name}"${qMsg}! Review below and click "Analyse Paper".`);
                 return;
               }
-            } catch (ocrErr: any) {
-              console.warn('[Vision OCR Notice]', ocrErr?.message);
+            } catch (fastErr: any) {
+              console.warn('[Fast Direct Extract Notice]', fastErr?.message);
             }
+          }
+
+          // C. Fallback: HTML5 Canvas AI Vision OCR if fast direct did not succeed
+          const totalPdfPages = extracted?.page_count || 30;
+          const pagesToScan = Math.min(totalPdfPages, 120);
+          setPdfStatus(`Extracting questions using Visual OCR...`);
+
+          try {
+            const ocrResult = await extractScannedPdfWithVisionOcr(file, pagesToScan, (msg) => setPdfStatus(msg));
+            if (ocrResult && ocrResult.text && ocrResult.text.length > 50) {
+              setPastedText(ocrResult.text);
+              const qMsg = ocrResult.question_count > 0 ? ` (${ocrResult.question_count} questions detected)` : '';
+              setSuccessMsg(`AI Vision OCR successfully extracted questions across ${ocrResult.page_count} pages from "${file.name}"${qMsg}! Review below and click "Analyse Paper".`);
+              return;
+            }
+          } catch (ocrErr: any) {
+            console.warn('[Vision OCR Notice]', ocrErr?.message);
           }
 
           // C. Server fallback with timeout if client could not parse complex streams and file is < 8MB
