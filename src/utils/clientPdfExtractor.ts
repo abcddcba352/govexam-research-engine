@@ -298,76 +298,86 @@ async function renderPageToJpegBase64(page: any, scale: number = 1.3): Promise<s
 export async function extractScannedPdfWithVisionOcr(
   file: File,
   maxPages: number = 120,
-  onProgress?: (msg: string, current: number, total: number) => void
-): Promise<{ text: string; page_count: number; question_count: number }> {
+  onProgress?: (msg: string, current: number, total: number) => void,
+  specificPages?: number[]
+): Promise<{ text: string; page_count: number; question_count: number; missing_pages: number[]; scanned_pages: { pageNum: number; text: string; qCount: number }[] }> {
   const arrayBuffer = await file.arrayBuffer();
   const uint8 = new Uint8Array(arrayBuffer);
 
   onProgress?.('Preparing document for AI Vision OCR...', 0, 1);
   const pdf = await loadPdfDocument(uint8);
   const totalPages = pdf.numPages;
-  const pagesToScan = Math.min(totalPages, maxPages);
+
+  const targetPages: number[] = Array.isArray(specificPages) && specificPages.length > 0
+    ? specificPages.filter(p => p >= 1 && p <= totalPages)
+    : Array.from({ length: Math.min(totalPages, maxPages) }, (_, idx) => idx + 1);
 
   const accumulatedPages: { pageNum: number; text: string; qCount: number }[] = [];
-  const BATCH_SIZE = 3;
+  const missingPages: number[] = [];
+  const BATCH_SIZE = 2;
 
-  for (let i = 1; i <= pagesToScan; i += BATCH_SIZE) {
-    const batchEnd = Math.min(i + BATCH_SIZE - 1, pagesToScan);
-    const progressLabel = batchEnd > i
-      ? `AI Vision OCR: Scanning Pages ${i}-${batchEnd} of ${pagesToScan}...`
-      : `AI Vision OCR: Scanning Page ${i} of ${pagesToScan}...`;
-    onProgress?.(progressLabel, i, pagesToScan);
+  for (let i = 0; i < targetPages.length; i += BATCH_SIZE) {
+    const batchPages = targetPages.slice(i, i + BATCH_SIZE);
+    const progressLabel = batchPages.length > 1
+      ? `AI Vision OCR: Scanning Pages ${batchPages[0]}-${batchPages[batchPages.length - 1]} of ${targetPages.length} (total doc: ${totalPages} pages)...`
+      : `AI Vision OCR: Scanning Page ${batchPages[0]} of ${targetPages.length} (total doc: ${totalPages} pages)...`;
+    onProgress?.(progressLabel, i + 1, targetPages.length);
 
-    const batchPromises = [];
-    for (let p = i; p <= batchEnd; p++) {
-      const pageNum = p;
-      batchPromises.push((async () => {
-        let attempts = 0;
-        const maxAttempts = 2;
+    const batchPromises = batchPages.map(pageNum => (async () => {
+      let attempts = 0;
+      const maxAttempts = 4;
 
-        while (attempts < maxAttempts) {
-          attempts++;
-          try {
-            const page = await pdf.getPage(pageNum);
-            const imageBase64 = await renderPageToJpegBase64(page, 1.3);
+      while (attempts < maxAttempts) {
+        attempts++;
+        try {
+          const page = await pdf.getPage(pageNum);
+          const imageBase64 = await renderPageToJpegBase64(page, 1.3);
 
-            const res = await fetch('/api/pyq/ocr-page', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                image: imageBase64,
-                pageNumber: pageNum,
-                totalPages: pagesToScan
-              })
-            });
+          const res = await fetch('/api/pyq/ocr-page', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              image: imageBase64,
+              pageNumber: pageNum,
+              totalPages
+            })
+          });
 
-            if (res.ok) {
-              const data = await res.json();
-              if (data.success && data.text) {
-                return {
-                  pageNum,
-                  text: `--- Page ${pageNum} ---\n` + data.text,
-                  qCount: data.questionCount || 0
-                };
-              }
-            } else {
-              console.warn(`[Vision OCR] Page ${pageNum} returned status ${res.status} (attempt ${attempts})`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && data.text) {
+              return {
+                pageNum,
+                text: `--- Page ${pageNum} ---\n` + data.text,
+                qCount: data.questionCount || 0
+              };
             }
-          } catch (pageErr: any) {
-            console.warn(`[Vision OCR] Error scanning page ${pageNum} (attempt ${attempts}):`, pageErr?.message);
+          } else if (res.status === 429 || res.status === 500 || res.status === 503) {
+            const waitSec = attempts * 4;
+            onProgress?.(`Page ${pageNum}: API quota limit reached, cooling down ${waitSec}s before retry (attempt ${attempts}/${maxAttempts})...`, pageNum, targetPages.length);
+            await new Promise(r => setTimeout(r, waitSec * 1000));
+            continue;
+          } else {
+            console.warn(`[Vision OCR] Page ${pageNum} returned status ${res.status}`);
           }
-
-          if (attempts < maxAttempts) {
-            await new Promise(r => setTimeout(r, 800));
-          }
+        } catch (pageErr: any) {
+          console.warn(`[Vision OCR] Error scanning page ${pageNum} (attempt ${attempts}):`, pageErr?.message);
+          await new Promise(r => setTimeout(r, attempts * 2000));
         }
-        return { pageNum, text: '', qCount: 0 };
-      })());
-    }
+      }
+
+      missingPages.push(pageNum);
+      return { pageNum, text: '', qCount: 0 };
+    })());
 
     const batchResults = await Promise.all(batchPromises);
     for (const r of batchResults) {
       if (r.text) accumulatedPages.push(r);
+    }
+
+    // Pacing delay between batches to stay comfortably within Gemini's 15 RPM free tier limit
+    if (i + BATCH_SIZE < targetPages.length) {
+      await new Promise(r => setTimeout(r, 1600));
     }
   }
 
@@ -378,6 +388,8 @@ export async function extractScannedPdfWithVisionOcr(
   return {
     text: combinedText,
     page_count: totalPages,
-    question_count: totalQuestions
+    question_count: totalQuestions,
+    missing_pages: missingPages,
+    scanned_pages: accumulatedPages
   };
 }

@@ -67,6 +67,7 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
   // ── Upload state ──
   const [pastedText, setPastedText] = useState('');
   const [fileName, setFileName] = useState('');
+  const [uploadedPdfFile, setUploadedPdfFile] = useState<File | null>(null);
   const [year, setYear] = useState<number>(2024);
   const [paperName, setPaperName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -218,6 +219,78 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
     return count;
   }, [pastedText]);
 
+  // ── Missing Page Gap Detector (detects dropped pages like Page 16 to Page 29) ──
+  const missingPageGap = useMemo(() => {
+    if (!pastedText) return null;
+    const pageMatches = [...pastedText.matchAll(/---\s*Page\s*(\d+)\s*---/gi)].map(m => parseInt(m[1], 10));
+    if (pageMatches.length <= 1) return null;
+
+    const pageSet = new Set(pageMatches);
+    const minPage = Math.min(...pageMatches);
+    const maxPage = Math.max(...pageMatches);
+    const missing: number[] = [];
+
+    for (let p = minPage; p <= maxPage; p++) {
+      if (!pageSet.has(p)) missing.push(p);
+    }
+
+    if (missing.length === 0) return null;
+    return missing;
+  }, [pastedText]);
+
+  const handleScanMissingPages = async (fileOverride?: File) => {
+    const fileToUse = fileOverride || uploadedPdfFile;
+    if (!fileToUse || !missingPageGap || missingPageGap.length === 0) return;
+    setIsExtractingPdf(true);
+    setPdfStatus(`Scanning missing pages (${missingPageGap.join(', ')})...`);
+    setError(null);
+
+    try {
+      const ocrResult = await extractScannedPdfWithVisionOcr(
+        fileToUse,
+        120,
+        (msg) => setPdfStatus(msg),
+        missingPageGap
+      );
+
+      if (ocrResult && ocrResult.scanned_pages && ocrResult.scanned_pages.length > 0) {
+        // Parse existing pages from pastedText
+        const pageChunks = pastedText.split(/(?=---\s*Page\s*\d+\s*---)/gi);
+        const allPagesMap = new Map<number, string>();
+
+        for (const chunk of pageChunks) {
+          const match = chunk.match(/---\s*Page\s*(\d+)\s*---/i);
+          if (match) {
+            allPagesMap.set(parseInt(match[1], 10), chunk.trim());
+          }
+        }
+
+        // Add newly scanned pages
+        for (const sp of ocrResult.scanned_pages) {
+          if (sp.text) {
+            allPagesMap.set(sp.pageNum, sp.text.trim());
+          }
+        }
+
+        // Reassemble in strict numerical order
+        const sortedPages = Array.from(allPagesMap.entries())
+          .sort((a, b) => a[0] - b[0])
+          .map(([, content]) => content);
+
+        const merged = sortedPages.join('\n\n');
+        setPastedText(merged);
+        setSuccessMsg(`Successfully scanned missing pages (${missingPageGap.join(', ')})! Question paper now complete.`);
+      } else {
+        setError(`Could not scan pages ${missingPageGap.join(', ')}. Please try again.`);
+      }
+    } catch (err: any) {
+      setError(`Failed to scan missing pages: ${err?.message || err}`);
+    } finally {
+      setIsExtractingPdf(false);
+      setPdfStatus('');
+    }
+  };
+
   // ── Handlers ──
   const handleStateChange = (newState: string) => {
     setSelectedState(newState);
@@ -238,6 +311,7 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
     const file = e.target.files?.[0];
     if (!file) return;
     setFileName(file.name);
+    setUploadedPdfFile(file);
     setError(null);
     setSuccessMsg(null);
 
@@ -642,6 +716,55 @@ Explanation: Sikkim is bounded by Tibet (China), Bhutan, and Nepal.`);
             </p>
           </div>
         </div>
+
+        {/* Missing Page Alert & Recovery Action */}
+        {missingPageGap && missingPageGap.length > 0 && (
+          <div className="p-3 bg-amber-50 border border-amber-300 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-amber-900 shadow-sm animate-in fade-in">
+            <div className="flex items-start gap-2.5">
+              <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold text-amber-800">
+                  Missing Page Gap Detected (Pages {missingPageGap[0]} to {missingPageGap[missingPageGap.length - 1]} &bull; {missingPageGap.length} {missingPageGap.length === 1 ? 'page' : 'pages'} missing)
+                </p>
+                <p className="text-[11px] text-amber-700">
+                  These pages were skipped (e.g. dropped during rapid OCR rate-limiting). You can scan only these missing pages and automatically merge them into the paper.
+                </p>
+              </div>
+            </div>
+
+            <div className="shrink-0 flex items-center gap-2">
+              {uploadedPdfFile ? (
+                <button
+                  type="button"
+                  onClick={() => handleScanMissingPages()}
+                  disabled={isExtractingPdf}
+                  className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow transition-colors disabled:opacity-50 cursor-pointer"
+                >
+                  {isExtractingPdf ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                  <span>Scan & Merge Missing Pages</span>
+                </button>
+              ) : (
+                <label className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow transition-colors cursor-pointer">
+                  {isExtractingPdf ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
+                  <span>Select PDF to Scan Missing Pages</span>
+                  <input
+                    type="file"
+                    accept=".pdf,application/pdf"
+                    disabled={isExtractingPdf}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setUploadedPdfFile(file);
+                        handleScanMissingPages(file);
+                      }
+                    }}
+                    className="hidden"
+                  />
+                </label>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Text Area */}
         <div>

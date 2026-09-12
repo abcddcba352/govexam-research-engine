@@ -963,7 +963,7 @@ export function createApp(): express.Application {
       }
 
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('TIMEOUT')), 15000)
+        setTimeout(() => reject(new Error('TIMEOUT')), 25000)
       );
 
       const geminiPromise = executeWithGeminiFailover(async (ai) => {
@@ -1007,8 +1007,10 @@ Rules:
       });
     } catch (err: any) {
       console.error("[OCR Page Error]", err?.message || err);
-      return res.status(500).json({
-        error: err.message || "Failed to transcribe exam page image"
+      const errMsg = String(err?.message || err);
+      const isRateLimit = errMsg.includes('429') || errMsg.includes('RESOURCE_EXHAUSTED') || errMsg.toLowerCase().includes('quota');
+      return res.status(isRateLimit ? 429 : 500).json({
+        error: isRateLimit ? "RATE_LIMITED" : (err.message || "Failed to transcribe exam page image")
       });
     }
   });
