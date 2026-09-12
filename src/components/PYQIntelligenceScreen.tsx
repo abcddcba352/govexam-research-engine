@@ -34,7 +34,7 @@ import {
   isCentralExam,
   getExamState,
 } from '../utils/examJurisdiction.ts';
-import { extractPdfTextInBrowser } from '../utils/clientPdfExtractor.ts';
+import { extractPdfTextInBrowser, extractScannedPdfWithVisionOcr } from '../utils/clientPdfExtractor.ts';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PYQ Intelligence Screen — Clean rewrite
@@ -162,20 +162,38 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
           }
 
           // A. Attempt client-side in-browser text extraction first (instantaneous, 0 network payload, 0 timeout risk)
-          let extracted: { text: string; page_count: number } | null = null;
+          let extracted: any = null;
           try {
             extracted = await extractPdfTextInBrowser(file, (msg) => setPdfStatus(msg));
           } catch (clientErr: any) {
             console.warn('[PDF Extract] Client-side extraction notice:', clientErr?.message);
           }
 
-          if (extracted && extracted.text && extracted.text.length > 50) {
+          if (extracted && extracted.text && !extracted.isScannedOrIntegerOnly) {
             setPastedText(extracted.text);
             setSuccessMsg(`Extracted question paper text from "${file.name}" (${extracted.page_count} pages)! Review the text below and click "Analyse Paper".`);
             return;
           }
 
-          // B. Server fallback with timeout if client could not parse complex streams and file is < 8MB
+          // B. If PDF text layer is missing or contains only integers/page numbers, use HTML5 Canvas AI Vision OCR
+          if (extracted?.isScannedOrIntegerOnly || !extracted?.text) {
+            const pagesToScan = Math.min(extracted?.page_count || 6, 8);
+            setPdfStatus(`Scanned/image PDF detected. Extracting questions using AI Vision OCR (Page 1 of ${pagesToScan})...`);
+
+            try {
+              const ocrResult = await extractScannedPdfWithVisionOcr(file, 8, (msg) => setPdfStatus(msg));
+              if (ocrResult && ocrResult.text && ocrResult.text.length > 50) {
+                setPastedText(ocrResult.text);
+                const qMsg = ocrResult.question_count > 0 ? ` (${ocrResult.question_count} questions detected)` : '';
+                setSuccessMsg(`AI Vision OCR successfully extracted questions from scanned paper "${file.name}"${qMsg}! Review below and click "Analyse Paper".`);
+                return;
+              }
+            } catch (ocrErr: any) {
+              console.warn('[Vision OCR Notice]', ocrErr?.message);
+            }
+          }
+
+          // C. Server fallback with timeout if client could not parse complex streams and file is < 8MB
           if (file.size <= 8 * 1024 * 1024) {
             setPdfStatus('Processing with cloud assistance...');
             const arrayBuf = await file.arrayBuffer();
@@ -218,8 +236,8 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
             }
           }
 
-          // C. If text could not be extracted (e.g. scanned image / non-selectable PDF)
-          throw new Error(`Could not automatically extract selectable text from "${file.name}". This PDF may be a scanned image without an OCR text layer. Please open the PDF on your computer, copy the questions, and paste them directly into the text box below.`);
+          // D. If text could not be extracted (e.g. illegible photocopy or unsupported layout)
+          throw new Error(`Could not automatically extract readable questions from "${file.name}". The document appears to be a photocopied or scanned image without an OCR text layer. Please open the PDF, copy the questions, and paste them directly into the text box below.`);
         } catch (err: any) {
           setError(err.message || 'Error processing PDF file. You can also open the PDF, copy all text, and paste it directly into the text box below.');
         } finally {
@@ -521,6 +539,9 @@ Explanation: Sikkim is bounded by Tibet (China), Bhutan, and Nepal.`);
                 className="hidden"
               />
             </label>
+            <p className="text-[10px] text-slate-400 mt-1">
+              Supports searchable PDFs, bilingual papers, and scanned photocopies (via AI Vision OCR).
+            </p>
           </div>
         </div>
 

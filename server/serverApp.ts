@@ -890,12 +890,17 @@ export function createApp(): express.Application {
       try {
         const parsed = await extractPdfText(buffer);
         if (parsed && parsed.success && parsed.text && parsed.text.length > 50) {
-          return res.json({
-            success: true,
-            text: parsed.text,
-            page_count: parsed.page_count,
-            method: 'PDF_PARSER'
-          });
+          const letterMatches = parsed.text.match(/[a-zA-Z\u0900-\u0D7F]/g) || [];
+          const wordMatches = parsed.text.match(/[a-zA-Z\u0900-\u0D7F]{2,}/g) || [];
+          // Ensure the text has substantial words and is not just an integer dump
+          if (letterMatches.length >= 35 && wordMatches.length >= 10) {
+            return res.json({
+              success: true,
+              text: parsed.text,
+              page_count: parsed.page_count,
+              method: 'PDF_PARSER'
+            });
+          }
         }
       } catch (streamErr: any) {
         console.warn('[PDF Extract] Stream extraction error:', streamErr?.message);
@@ -918,7 +923,7 @@ export function createApp(): express.Application {
                   mimeType: 'application/pdf'
                 }
               },
-              'Extract all questions from this question paper PDF into plain text. Format each question clearly as:\nQ1. [Question text]\n(A) [Option A]\n(B) [Option B]\n(C) [Option C]\n(D) [Option D]\nAnswer: Option [A/B/C/D]\nExplanation: [Explanation if available]\n\nInclude all multiple-choice questions verbatim.'
+              'Extract all questions from this question paper PDF into plain text. Format each question clearly as:\nQ1. [Question text]\n(A) [Option A]\n(B) [Option B]\n(C) [Option C]\n(D) [Option D]\nAnswer: Option [A/B/C/D]\nExplanation: [Explanation if available]\n\nInclude all multiple-choice questions verbatim in English or regional language.'
             ]
           });
           return response.text || '';
@@ -945,6 +950,65 @@ export function createApp(): express.Application {
       console.error("[PDF Extract Error]", err);
       return res.status(422).json({
         error: err.message || "Failed to extract PDF text. Please copy and paste the question paper text directly."
+      });
+    }
+  });
+
+  // OCR a single page image using Gemini Vision (ultra-lightweight ~90KB payload, eliminates Cloudflare 503 timeouts)
+  app.post("/api/pyq/ocr-page", async (req, res) => {
+    try {
+      const { image, pageNumber, totalPages } = req.body;
+      if (!image) {
+        return res.status(400).json({ error: "Missing image base64 data" });
+      }
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('TIMEOUT')), 15000)
+      );
+
+      const geminiPromise = executeWithGeminiFailover(async (ai) => {
+        const response = await ai.models.generateContent({
+          model: getPrimaryModel(),
+          contents: [
+            {
+              inlineData: {
+                data: image,
+                mimeType: 'image/jpeg'
+              }
+            },
+            `You are an expert exam question paper transcriber.
+Transcribe all multiple-choice questions visible on this exam page (Page ${pageNumber || 1} of ${totalPages || 1}).
+Format each question consistently:
+Q[Number]. [Question text]
+(A) [Option A]
+(B) [Option B]
+(C) [Option C]
+(D) [Option D]
+Answer: [Correct option if indicated on the page, otherwise omit]
+
+Rules:
+- Preserve question numbers and option texts verbatim.
+- If the question is bilingual (English and Telugu/Hindi), include the English text (and regional text if clearly legible).
+- Do not add conversational intro or outro text, only output the questions.`
+          ]
+        });
+        return response.text || '';
+      });
+
+      const text = ((await Promise.race([geminiPromise, timeoutPromise])) as string) || '';
+      const cleanText = text.trim();
+      const qCount = (cleanText.match(/(?:^|\n)\s*(?:Q\s*\d+|\b\d+[\.\)])/gi) || []).length;
+
+      return res.json({
+        success: true,
+        text: cleanText,
+        pageNumber: pageNumber || 1,
+        questionCount: qCount
+      });
+    } catch (err: any) {
+      console.error("[OCR Page Error]", err?.message || err);
+      return res.status(500).json({
+        error: err.message || "Failed to transcribe exam page image"
       });
     }
   });

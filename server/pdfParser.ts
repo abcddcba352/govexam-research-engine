@@ -64,24 +64,48 @@ export function fastExtractPdfText(buffer: ArrayBuffer | Uint8Array | Buffer): P
         }
       }
 
-      // 1. Extract array strings: [(str1) 12 (str2)] TJ
+      // 1. Extract array strings: [(str1) 12 (str2)] TJ or [<0041> 12 <0042>] TJ
       const tjArrayRegex = /\[([\s\S]*?)\]\s*TJ/g;
       let tjMatch: RegExpExecArray | null;
       while ((tjMatch = tjArrayRegex.exec(decompressed)) !== null) {
         const inner = tjMatch[1];
-        const strMatches = inner.match(/\((?:[^\\)]|\\.)*\)/g);
-        if (strMatches) {
-          const line = strMatches.map(s => unescapePdfStr(s.slice(1, -1))).join('');
+        const tokenRegex = /\((?:[^\\)]|\\.)*\)|<[0-9a-fA-F]+>/g;
+        const tokens = inner.match(tokenRegex);
+        if (tokens) {
+          const line = tokens.map(t => {
+            if (t.startsWith('(')) {
+              return unescapePdfStr(t.slice(1, -1));
+            } else if (t.startsWith('<')) {
+              const hex = t.slice(1, -1);
+              let s = '';
+              for (let i = 0; i < hex.length; i += 2) {
+                const byte = parseInt(hex.substr(i, 2), 16);
+                if (byte >= 32 && byte <= 126) s += String.fromCharCode(byte);
+              }
+              return s;
+            }
+            return '';
+          }).join('');
           if (line.trim()) extractedText += line + ' ';
         }
       }
 
-      // 2. Direct strings: (string) Tj or ' string or " string
-      const tjDirectRegex = /\(((?:[^\\)]|\\.)*)\)\s*(?:Tj|'|")/g;
+      // 2. Direct strings: (string) Tj or <hex> Tj
+      const tjDirectRegex = /(?:\(((?:[^\\)]|\\.)*)\)|<([0-9a-fA-F]+)>)\s*(?:Tj|'|")/g;
       let dirMatch: RegExpExecArray | null;
       while ((dirMatch = tjDirectRegex.exec(decompressed)) !== null) {
-        const line = unescapePdfStr(dirMatch[1]);
-        if (line.trim()) extractedText += line + '\n';
+        if (dirMatch[1] !== undefined) {
+          const line = unescapePdfStr(dirMatch[1]);
+          if (line.trim()) extractedText += line + '\n';
+        } else if (dirMatch[2] !== undefined) {
+          const hex = dirMatch[2];
+          let s = '';
+          for (let i = 0; i < hex.length; i += 2) {
+            const byte = parseInt(hex.substr(i, 2), 16);
+            if (byte >= 32 && byte <= 126) s += String.fromCharCode(byte);
+          }
+          if (s.trim()) extractedText += s + '\n';
+        }
       }
     }
 
@@ -94,7 +118,16 @@ export function fastExtractPdfText(buffer: ArrayBuffer | Uint8Array | Buffer): P
       .replace(/\n{3,}/g, '\n\n')
       .trim();
 
-    if (cleaned.length >= 20) {
+    // Verify the extracted text contains meaningful words and letters, NOT just digits/integers
+    const letterMatches = cleaned.match(/[a-zA-Z\u0900-\u0D7F]/g) || [];
+    const digitMatches = cleaned.match(/[0-9]/g) || [];
+    const wordMatches = cleaned.match(/[a-zA-Z\u0900-\u0D7F]{2,}/g) || [];
+    const letterCount = letterMatches.length;
+    const digitCount = digitMatches.length;
+    const totalAlphanumeric = letterCount + digitCount;
+    const letterRatio = totalAlphanumeric > 0 ? letterCount / totalAlphanumeric : 0;
+
+    if (cleaned.length >= 40 && letterCount >= 25 && wordMatches.length >= 8 && letterRatio >= 0.35) {
       return { text: cleaned, page_count, success: true };
     }
     return null;
