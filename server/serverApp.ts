@@ -114,7 +114,7 @@ import { extractPdfText } from "./pdfParser.ts";
 export function createApp(): express.Application {
   const app = express();
 
-  app.use(express.json({ limit: '10mb' }));
+  app.use(express.json({ limit: '50mb' }));
 
   // Production startup persistence validation
   try {
@@ -1337,6 +1337,15 @@ export function createApp(): express.Application {
     }
   });
 
-  return app;
+  // Ensure all errors (including 413 Payload Too Large) return clean JSON instead of HTML
+  app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (err.type === 'entity.too.large' || err.status === 413) {
+      return res.status(413).json({
+        error: "The uploaded file is too large (maximum size is 50MB). Please select a smaller PDF or copy/paste the question text directly."
+      });
+    }
+    res.status(err.status || 500).json({ error: err.message || "An unexpected server error occurred." });
+  });
 
+  return app;
 }

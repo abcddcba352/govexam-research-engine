@@ -150,6 +150,10 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
       const reader = new FileReader();
       reader.onload = async (ev) => {
         try {
+          if (file.size > 20 * 1024 * 1024) {
+            throw new Error(`The PDF is ${(file.size / 1024 / 1024).toFixed(1)} MB, which exceeds the 20 MB upload limit. Please select a smaller PDF or copy and paste the question text directly.`);
+          }
+
           const arrayBuf = ev.target?.result as ArrayBuffer;
           if (!arrayBuf) throw new Error('Could not read PDF file');
           
@@ -169,7 +173,18 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
             body: JSON.stringify({ base64, filename: file.name })
           });
 
-          const data = await res.json();
+          const contentType = res.headers.get('content-type') || '';
+          let data: any = {};
+          if (contentType.includes('application/json')) {
+            data = await res.json().catch(() => ({}));
+          } else {
+            const rawText = await res.text().catch(() => '');
+            if (res.status === 413 || rawText.includes('Payload Too Large')) {
+              throw new Error(`The uploaded PDF is too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Please select a smaller PDF or copy/paste text directly.`);
+            }
+            throw new Error(`Server returned error (${res.status}): ${res.statusText}. Please copy and paste the text directly.`);
+          }
+
           if (!res.ok || !data.success) {
             throw new Error(data.error || 'Failed to extract text from PDF.');
           }
@@ -252,12 +267,18 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || 'Failed to parse and analyse paper');
+      const contentType = res.headers.get('content-type') || '';
+      let result: any = {};
+      if (contentType.includes('application/json')) {
+        result = await res.json().catch(() => ({}));
+      } else {
+        const txt = await res.text().catch(() => '');
+        result = { error: `Server returned ${res.status}: ${txt.slice(0, 150) || res.statusText}` };
       }
 
-      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.error || 'Failed to parse and analyse paper');
+      }
       setSuccessMsg(`✅ Successfully analysed ${result.count} questions!`);
       setImportedQuestions(result.questions || []);
       setImportedPaper(result.paper || null);
