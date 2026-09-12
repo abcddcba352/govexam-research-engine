@@ -22,6 +22,7 @@ import {
 import type { ExamRecord, MockTestRecord, MockQuestion } from '../types.ts';
 import { getCleanExamTitle } from '../utils/examJurisdiction.ts';
 import { mockTestLabel } from '../utils/stateExamCatalog.ts';
+import { buildVaradhiCsv, buildVaradhiExcelXml } from '../mockExport.ts';
 
 interface CleanMockStudioProps {
   exams: ExamRecord[];
@@ -138,7 +139,9 @@ export const CleanMockStudio: React.FC<CleanMockStudioProps> = ({
           question_count: count,
           difficulty: selectedDifficulty,
           provider: 'gemini',
-          preparation_mode: selectedExam?.preparation_mode || 'PRE_NOTIFICATION_PREPARATION'
+          preparation_mode: selectedExam?.preparation_mode || 'PRE_NOTIFICATION_PREPARATION',
+          paper_id: selectedExam?.exam_id,
+          paper_title: selectedExam?.paper,
         })
       });
 
@@ -235,28 +238,22 @@ export const CleanMockStudio: React.FC<CleanMockStudioProps> = ({
   // Export to CSV
   const handleExportCSV = () => {
     if (!activeMock || allQuestions.length === 0) return;
-    const headers = ['Q#', 'Subject', 'Topic', 'Difficulty', 'Question', 'Option A', 'Option B', 'Option C', 'Option D', 'Correct Key', 'Explanation', 'Statutory Source'];
-    const rows = allQuestions.map((q, i) => [
-      i + 1,
-      `"${(q.section_name || '').replace(/"/g, '""')}"`,
-      `"${(q.topic || '').replace(/"/g, '""')}"`,
-      q.difficulty,
-      `"${(q.question_text || '').replace(/"/g, '""')}"`,
-      `"${(q.options[0] || '').replace(/"/g, '""')}"`,
-      `"${(q.options[1] || '').replace(/"/g, '""')}"`,
-      `"${(q.options[2] || '').replace(/"/g, '""')}"`,
-      `"${(q.options[3] || '').replace(/"/g, '""')}"`,
-      ['A', 'B', 'C', 'D'][q.correct_option_index] || '',
-      `"${(q.explanation || '').replace(/"/g, '""')}"`,
-      `"${(q.source_reference || '').replace(/"/g, '""')}"`
-    ]);
-
-    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([`\uFEFF${buildVaradhiCsv(activeMock)}`], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `${activeMock.exam_id}_mock_${activeMock.mock_number}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportExcel = () => {
+    if (!activeMock || allQuestions.length === 0) return;
+    const workbook = buildVaradhiExcelXml(activeMock);
+    const url = URL.createObjectURL(new Blob([workbook], { type: 'application/vnd.ms-excel;charset=utf-8' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${activeMock.exam_id}_mock_${activeMock.mock_number}.xls`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -484,6 +481,16 @@ export const CleanMockStudio: React.FC<CleanMockStudioProps> = ({
               >
                 <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
                 <span>CSV</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleExportExcel}
+                className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs border border-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer"
+                title="Export the bilingual Varadhi import workbook for Excel"
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5 text-lime-600" />
+                <span>Excel</span>
               </button>
 
               <button

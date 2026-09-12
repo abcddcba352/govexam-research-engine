@@ -810,6 +810,11 @@ export interface MockQuestion {
   replacement_attempts?: number;
   validation_blockers?: string[];
   generation_model_id?: string;
+  source_exam_date?: string;
+  content_lifecycle?: 'PERMANENT' | 'REVIEW';
+  review_on?: string;
+  expires_on?: string;
+  is_active?: boolean;
 }
 
 export interface MockSection {
@@ -857,6 +862,9 @@ export interface MockTestRecord {
   mock_id: string;
   exam_id: string;
   exam_title: string;
+  stage_id?: string;
+  paper_id?: string;
+  paper_title?: string;
   mock_number: number;
   title: string;
   blueprint_id?: string;
@@ -926,6 +934,7 @@ export interface DuplicateLedgerEntry {
   series_id?: string;
   test_mode?: string;
   exam_id: string;
+  paper_id?: string;
   first_registered_at: string;
   duplicate_attempts_blocked: number;
   similarity_cluster_key: string;

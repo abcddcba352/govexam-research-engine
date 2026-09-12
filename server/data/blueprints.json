@@ -1,5 +1,748 @@
 [
   {
+    "blueprint_id": "bp_e2e_test_mtxqcmmo",
+    "exam_id": "tgpsc_group_2_paper_1",
+    "exam_version_id": "tgpsc_g2_v2022",
+    "recruitment_cycle": "Notification 28/2022 (Current Cycle 2024-2025)",
+    "series_id": "series_tgpsc_prenotif_v2022_fl",
+    "preparation_mode": "PRE_NOTIFICATION_PREPARATION",
+    "preparation_basis_id": "pb_tgpsc_group_2_paper_1_pre_notification_preparation_tgpsc_g2_v2022",
+    "mock_number": 2,
+    "test_mode": "FULL_LENGTH",
+    "language": "English",
+    "question_count": 10,
+    "total_marks": 10,
+    "negative_marking": 0.25,
+    "duration_minutes": 15,
+    "current_affairs_cutoff": "2025-11-15",
+    "status": "DRAFT",
+    "blueprint_version": 1,
+    "created_at": "2026-09-12T01:52:20.884Z",
+    "updated_at": "2026-09-12T01:52:20.884Z",
+    "allow_cross_mode_reuse": false,
+    "slots": [
+      {
+        "slot_id": "slot_bp_e2e_test_mtxqcmmo_q1",
+        "blueprint_id": "bp_e2e_test_mtxqcmmo",
+        "question_number": 1,
+        "subject": "Economy and Development",
+        "topic": "Telangana Socio-Economic Outlook & Budget Highlights",
+        "subtopic": "Sectional Focus: Telangana Socio-Economic Outlook & Budget Highlights",
+        "microtopic": "Telangana Socio-Economic Outlook & Budget Highlights - Key Provisions & Core Analytical Facts",
+        "question_type": "DIRECT_FACT",
+        "question_archetype": "FACTUAL_APPLICATION",
+        "difficulty": "EASY",
+        "cognitive_level": "RECALL",
+        "static_current": "CURRENT",
+        "state_scope": "STATE_SPECIFIC",
+        "core_concept_target": "Telangana Socio-Economic Outlook & Budget Highlights fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Telangana_Socio_Economic_Outlook___Budget_Highlights_concept_2",
+        "source_requirement": "Official Government PIB Release / Gazette / State Portal (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "current_affairs_window": {
+          "window_start": "2024-11-20",
+          "window_end": "2025-11-15",
+          "cutoff_date": "2025-11-15",
+          "category": "ECONOMY"
+        },
+        "pyq_relationship": "CURRENT_EXTENSION",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the mahalakshmi scheme is a flagship initiative of the telangana government whi",
+          "both statements are correct the rythu bharosa scheme formerly rythu bandhu pr",
+          "article 15 of the constitution of india prohibits discrimination on grounds of r",
+          "the 86th constitutional amendment act 2002 inserted article 21a into the const",
+          "both statements are correct the supreme court in the kesavananda bharati case o"
+        ],
+        "avoid_question_fingerprints": [
+          "ef373dbb9c308a2b",
+          "e7c42a3a8e6a0b8b",
+          "d60c125a6a287f89",
+          "f8446bbaca5d6eb1",
+          "938d2d6d1ec4d196"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "D",
+        "distractor_strategy": "NEAR_FACT",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Contemporary policy/scheme within the 2025-11-15 current-affairs window.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Telangana Socio-Economic Outlook & Budget Highlights",
+        "status": "READY"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtxqcmmo_q2",
+        "blueprint_id": "bp_e2e_test_mtxqcmmo",
+        "question_number": 2,
+        "subject": "Indian Constitution and Polity",
+        "topic": "Articles 14-32 Fundamental Rights & Judicial Doctrines",
+        "subtopic": "Sectional Focus: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+        "microtopic": "Articles 14-32 Fundamental Rights & Judicial Doctrines - Key Provisions & Core Analytical Facts",
+        "question_type": "DIRECT_FACT",
+        "question_archetype": "FACTUAL_APPLICATION",
+        "difficulty": "EASY",
+        "cognitive_level": "RECALL",
+        "static_current": "STATIC",
+        "state_scope": "STATE_SPECIFIC",
+        "core_concept_target": "Articles 14-32 Fundamental Rights & Judicial Doctrines fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_3",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "UNDERTESTED_SYLLABUS",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the mahalakshmi scheme is a flagship initiative of the telangana government whi",
+          "both statements are correct the rythu bharosa scheme formerly rythu bandhu pr",
+          "article 15 of the constitution of india prohibits discrimination on grounds of r",
+          "the 86th constitutional amendment act 2002 inserted article 21a into the const",
+          "both statements are correct the supreme court in the kesavananda bharati case o"
+        ],
+        "avoid_question_fingerprints": [
+          "ef373dbb9c308a2b",
+          "e7c42a3a8e6a0b8b",
+          "d60c125a6a287f89",
+          "f8446bbaca5d6eb1",
+          "938d2d6d1ec4d196"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "B",
+        "distractor_strategy": "COMMON_MISCONCEPTION",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Valid gazetted syllabus area under-tested in previous papers; included to prevent candidate memorization.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+        "status": "READY"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtxqcmmo_q3",
+        "blueprint_id": "bp_e2e_test_mtxqcmmo",
+        "question_number": 3,
+        "subject": "Indian Constitution and Polity",
+        "topic": "Articles 14-32 Fundamental Rights & Judicial Doctrines",
+        "subtopic": "Sectional Focus: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+        "microtopic": "Articles 14-32 Fundamental Rights & Judicial Doctrines - Key Provisions & Core Analytical Facts",
+        "question_type": "DIRECT_FACT",
+        "question_archetype": "FACTUAL_APPLICATION",
+        "difficulty": "EASY",
+        "cognitive_level": "RECALL",
+        "static_current": "STATIC",
+        "state_scope": "STATE_SPECIFIC",
+        "core_concept_target": "Articles 14-32 Fundamental Rights & Judicial Doctrines fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Articles_14_32_Fundamental_Rights___Judicial_Doctrines_concept_4",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "UNDERTESTED_SYLLABUS",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the mahalakshmi scheme is a flagship initiative of the telangana government whi",
+          "both statements are correct the rythu bharosa scheme formerly rythu bandhu pr",
+          "article 15 of the constitution of india prohibits discrimination on grounds of r",
+          "the 86th constitutional amendment act 2002 inserted article 21a into the const",
+          "both statements are correct the supreme court in the kesavananda bharati case o"
+        ],
+        "avoid_question_fingerprints": [
+          "ef373dbb9c308a2b",
+          "e7c42a3a8e6a0b8b",
+          "d60c125a6a287f89",
+          "f8446bbaca5d6eb1",
+          "938d2d6d1ec4d196"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "A",
+        "distractor_strategy": "DATE_CONFUSION",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Valid gazetted syllabus area under-tested in previous papers; included to prevent candidate memorization.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Articles 14-32 Fundamental Rights & Judicial Doctrines",
+        "status": "READY"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtxqcmmo_q4",
+        "blueprint_id": "bp_e2e_test_mtxqcmmo",
+        "question_number": 4,
+        "subject": "History and Cultural Heritage",
+        "topic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+        "subtopic": "Sectional Focus: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+        "microtopic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions - Key Provisions & Core Analytical Facts",
+        "question_type": "DIRECT_FACT",
+        "question_archetype": "FACTUAL_APPLICATION",
+        "difficulty": "MODERATE",
+        "cognitive_level": "UNDERSTAND",
+        "static_current": "STATIC",
+        "state_scope": "STATE_SPECIFIC",
+        "core_concept_target": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_5",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "ROTATIONAL_TOPIC",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the mahalakshmi scheme is a flagship initiative of the telangana government whi",
+          "both statements are correct the rythu bharosa scheme formerly rythu bandhu pr",
+          "article 15 of the constitution of india prohibits discrimination on grounds of r",
+          "the 86th constitutional amendment act 2002 inserted article 21a into the const",
+          "both statements are correct the supreme court in the kesavananda bharati case o"
+        ],
+        "avoid_question_fingerprints": [
+          "ef373dbb9c308a2b",
+          "e7c42a3a8e6a0b8b",
+          "d60c125a6a287f89",
+          "f8446bbaca5d6eb1",
+          "938d2d6d1ec4d196"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "B",
+        "distractor_strategy": "CONCEPT_REVERSAL",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Official syllabus topic with moderate recent coverage; included for rotational syllabus coverage.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+        "status": "READY"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtxqcmmo_q5",
+        "blueprint_id": "bp_e2e_test_mtxqcmmo",
+        "question_number": 5,
+        "subject": "History and Cultural Heritage",
+        "topic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+        "subtopic": "Sectional Focus: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+        "microtopic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions - Key Provisions & Core Analytical Facts",
+        "question_type": "STATEMENT_COMBINATION",
+        "question_archetype": "MULTI_STATEMENT_PAIRWISE_EVALUATION",
+        "difficulty": "MODERATE",
+        "cognitive_level": "UNDERSTAND",
+        "static_current": "STATIC",
+        "state_scope": "INDIA_GENERAL",
+        "core_concept_target": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Kakatiya___Asaf_Jahi_Dynasty_Architecture___Inscriptions_concept_6",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "ROTATIONAL_TOPIC",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the mahalakshmi scheme is a flagship initiative of the telangana government whi",
+          "both statements are correct the rythu bharosa scheme formerly rythu bandhu pr",
+          "article 15 of the constitution of india prohibits discrimination on grounds of r",
+          "the 86th constitutional amendment act 2002 inserted article 21a into the const",
+          "both statements are correct the supreme court in the kesavananda bharati case o"
+        ],
+        "avoid_question_fingerprints": [
+          "ef373dbb9c308a2b",
+          "e7c42a3a8e6a0b8b",
+          "d60c125a6a287f89",
+          "f8446bbaca5d6eb1",
+          "938d2d6d1ec4d196"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "A",
+        "distractor_strategy": "NUMERICAL_NEAR_MISS",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Official syllabus topic with moderate recent coverage; included for rotational syllabus coverage.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+        "status": "READY"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtxqcmmo_q6",
+        "blueprint_id": "bp_e2e_test_mtxqcmmo",
+        "question_number": 6,
+        "subject": "Economy and Development",
+        "topic": "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+        "subtopic": "Sectional Focus: Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+        "microtopic": "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes - Key Provisions & Core Analytical Facts",
+        "question_type": "STATEMENT_COMBINATION",
+        "question_archetype": "MULTI_STATEMENT_PAIRWISE_EVALUATION",
+        "difficulty": "MODERATE",
+        "cognitive_level": "UNDERSTAND",
+        "static_current": "CURRENT",
+        "state_scope": "INDIA_GENERAL",
+        "core_concept_target": "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Rythu_Bandhu___Rythu_Bharosa___Mission_Kakatiya_Schemes_concept_7",
+        "source_requirement": "Official Government PIB Release / Gazette / State Portal (Level 5 Official)",
+        "visual_requirement": true,
+        "visual_type": "BAR_CHART",
+        "current_affairs_window": {
+          "window_start": "2024-11-20",
+          "window_end": "2025-11-15",
+          "cutoff_date": "2025-11-15",
+          "category": "NATIONAL"
+        },
+        "pyq_relationship": "CURRENT_EXTENSION",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the mahalakshmi scheme is a flagship initiative of the telangana government whi",
+          "both statements are correct the rythu bharosa scheme formerly rythu bandhu pr",
+          "article 15 of the constitution of india prohibits discrimination on grounds of r",
+          "the 86th constitutional amendment act 2002 inserted article 21a into the const",
+          "both statements are correct the supreme court in the kesavananda bharati case o"
+        ],
+        "avoid_question_fingerprints": [
+          "ef373dbb9c308a2b",
+          "e7c42a3a8e6a0b8b",
+          "d60c125a6a287f89",
+          "f8446bbaca5d6eb1",
+          "938d2d6d1ec4d196"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "B",
+        "distractor_strategy": "LEGAL_SECTION_CONFUSION",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Contemporary policy/scheme within the 2025-11-15 current-affairs window.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+        "status": "READY"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtxqcmmo_q7",
+        "blueprint_id": "bp_e2e_test_mtxqcmmo",
+        "question_number": 7,
+        "subject": "Indian Constitution and Polity",
+        "topic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+        "subtopic": "Sectional Focus: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+        "microtopic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments - Key Provisions & Core Analytical Facts",
+        "question_type": "STATEMENT_COMBINATION",
+        "question_archetype": "MULTI_STATEMENT_PAIRWISE_EVALUATION",
+        "difficulty": "MODERATE",
+        "cognitive_level": "UNDERSTAND",
+        "static_current": "STATIC",
+        "state_scope": "INDIA_GENERAL",
+        "core_concept_target": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_8",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "ROTATIONAL_TOPIC",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the mahalakshmi scheme is a flagship initiative of the telangana government whi",
+          "both statements are correct the rythu bharosa scheme formerly rythu bandhu pr",
+          "article 15 of the constitution of india prohibits discrimination on grounds of r",
+          "the 86th constitutional amendment act 2002 inserted article 21a into the const",
+          "both statements are correct the supreme court in the kesavananda bharati case o"
+        ],
+        "avoid_question_fingerprints": [
+          "ef373dbb9c308a2b",
+          "e7c42a3a8e6a0b8b",
+          "d60c125a6a287f89",
+          "f8446bbaca5d6eb1",
+          "938d2d6d1ec4d196"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "A",
+        "distractor_strategy": "SAME_CATEGORY",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Official syllabus topic with moderate recent coverage; included for rotational syllabus coverage.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+        "status": "READY"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtxqcmmo_q8",
+        "blueprint_id": "bp_e2e_test_mtxqcmmo",
+        "question_number": 8,
+        "subject": "Indian Constitution and Polity",
+        "topic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+        "subtopic": "Sectional Focus: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+        "microtopic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments - Key Provisions & Core Analytical Facts",
+        "question_type": "CONCEPTUAL",
+        "question_archetype": "FACTUAL_APPLICATION",
+        "difficulty": "MODERATE",
+        "cognitive_level": "APPLY",
+        "static_current": "STATIC",
+        "state_scope": "INDIA_GENERAL",
+        "core_concept_target": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Preamble__Basic_Structure_Doctrine___73rd_74th_Amendments_concept_9",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "ROTATIONAL_TOPIC",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the mahalakshmi scheme is a flagship initiative of the telangana government whi",
+          "both statements are correct the rythu bharosa scheme formerly rythu bandhu pr",
+          "article 15 of the constitution of india prohibits discrimination on grounds of r",
+          "the 86th constitutional amendment act 2002 inserted article 21a into the const",
+          "both statements are correct the supreme court in the kesavananda bharati case o"
+        ],
+        "avoid_question_fingerprints": [
+          "ef373dbb9c308a2b",
+          "e7c42a3a8e6a0b8b",
+          "d60c125a6a287f89",
+          "f8446bbaca5d6eb1",
+          "938d2d6d1ec4d196"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "D",
+        "distractor_strategy": "NEAR_FACT",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Official syllabus topic with moderate recent coverage; included for rotational syllabus coverage.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+        "status": "READY"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtxqcmmo_q9",
+        "blueprint_id": "bp_e2e_test_mtxqcmmo",
+        "question_number": 9,
+        "subject": "General Studies",
+        "topic": "Western Ghats vs Eastern Ghats Agro-climatic systems",
+        "subtopic": "Sectional Focus: Western Ghats vs Eastern Ghats Agro-climatic systems",
+        "microtopic": "Western Ghats vs Eastern Ghats Agro-climatic systems - Key Provisions & Core Analytical Facts",
+        "question_type": "CONCEPTUAL",
+        "question_archetype": "FACTUAL_APPLICATION",
+        "difficulty": "DIFFICULT",
+        "cognitive_level": "APPLY",
+        "static_current": "STATIC",
+        "state_scope": "INDIA_GENERAL",
+        "core_concept_target": "Western Ghats vs Eastern Ghats Agro-climatic systems fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_10",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "UNDERTESTED_SYLLABUS",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the mahalakshmi scheme is a flagship initiative of the telangana government whi",
+          "both statements are correct the rythu bharosa scheme formerly rythu bandhu pr",
+          "article 15 of the constitution of india prohibits discrimination on grounds of r",
+          "the 86th constitutional amendment act 2002 inserted article 21a into the const",
+          "both statements are correct the supreme court in the kesavananda bharati case o"
+        ],
+        "avoid_question_fingerprints": [
+          "ef373dbb9c308a2b",
+          "e7c42a3a8e6a0b8b",
+          "d60c125a6a287f89",
+          "f8446bbaca5d6eb1",
+          "938d2d6d1ec4d196"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "C",
+        "distractor_strategy": "COMMON_MISCONCEPTION",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Valid gazetted syllabus area under-tested in previous papers; included to prevent candidate memorization.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Western Ghats vs Eastern Ghats Agro-climatic systems",
+        "status": "READY"
+      },
+      {
+        "slot_id": "slot_bp_e2e_test_mtxqcmmo_q10",
+        "blueprint_id": "bp_e2e_test_mtxqcmmo",
+        "question_number": 10,
+        "subject": "General Studies",
+        "topic": "Western Ghats vs Eastern Ghats Agro-climatic systems",
+        "subtopic": "Sectional Focus: Western Ghats vs Eastern Ghats Agro-climatic systems",
+        "microtopic": "Western Ghats vs Eastern Ghats Agro-climatic systems - Key Provisions & Core Analytical Facts",
+        "question_type": "MATCHING",
+        "question_archetype": "DUAL_COLUMN_RELATIONAL_MATCH",
+        "difficulty": "DIFFICULT",
+        "cognitive_level": "ANALYSE",
+        "static_current": "STATIC",
+        "state_scope": "INTERNATIONAL",
+        "core_concept_target": "Western Ghats vs Eastern Ghats Agro-climatic systems fundamental principle and statutory applicability",
+        "answerable_fact_family": "Family: Western_Ghats_vs_Eastern_Ghats_Agro_climatic_systems_concept_11",
+        "source_requirement": "Statutory Act, Official Textbook, or Constitution Text (Level 5 Official)",
+        "visual_requirement": false,
+        "visual_type": "NONE",
+        "pyq_relationship": "UNDERTESTED_SYLLABUS",
+        "future_relevance": "HIGH",
+        "avoid_fact_fingerprints": [
+          "the mahalakshmi scheme is a flagship initiative of the telangana government whi",
+          "both statements are correct the rythu bharosa scheme formerly rythu bandhu pr",
+          "article 15 of the constitution of india prohibits discrimination on grounds of r",
+          "the 86th constitutional amendment act 2002 inserted article 21a into the const",
+          "both statements are correct the supreme court in the kesavananda bharati case o"
+        ],
+        "avoid_question_fingerprints": [
+          "ef373dbb9c308a2b",
+          "e7c42a3a8e6a0b8b",
+          "d60c125a6a287f89",
+          "f8446bbaca5d6eb1",
+          "938d2d6d1ec4d196"
+        ],
+        "avoid_archetype_patterns": [
+          "TRIVIAL_DIRECT_LOOKUP",
+          "AMBIGUOUS_CURRENT_SPECULATION"
+        ],
+        "target_answer_position": "C",
+        "distractor_strategy": "DATE_CONFUSION",
+        "language_requirement": "BILINGUAL",
+        "reason_for_inclusion": "Valid gazetted syllabus area under-tested in previous papers; included to prevent candidate memorization.",
+        "evidence_basis": "Commission Pattern Gazette Rule & Syllabus Topic: Western Ghats vs Eastern Ghats Agro-climatic systems",
+        "status": "READY"
+      }
+    ],
+    "allocation_summary": {
+      "totalQuestions": 10,
+      "sections": [
+        {
+          "section_name": "Current Affairs (Regional, National & International)",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "International Relations and Events",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "General Science in everyday life",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "Environmental Issues and Disaster Management",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "Economy of India and Telangana",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "Geography of India and Telangana",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "History and Cultural Heritage of India & Telangana",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "Indian Constitution and Polity",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "Society, Culture, Heritage, Arts and Literature of Telangana",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "Policies of Telangana State",
+          "count": 1,
+          "official_count": 12
+        },
+        {
+          "section_name": "Logical Reasoning, Analytical Ability and Data Interpretation",
+          "count": 0,
+          "official_count": 12
+        },
+        {
+          "section_name": "Basic English (10th Standard)",
+          "count": 0,
+          "official_count": 12
+        }
+      ],
+      "subjects": [
+        {
+          "subject": "Current Affairs (Regional, National & International)",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "International Relations and Events",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "General Science in everyday life",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Environmental Issues and Disaster Management",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Economy of India and Telangana",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Geography of India and Telangana",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "History and Cultural Heritage of India & Telangana",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Indian Constitution and Polity",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Society, Culture, Heritage, Arts and Literature of Telangana",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Policies of Telangana State",
+          "count": 1,
+          "target_weight_pct": 10,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Logical Reasoning, Analytical Ability and Data Interpretation",
+          "count": 0,
+          "target_weight_pct": 0,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        },
+        {
+          "subject": "Basic English (10th Standard)",
+          "count": 0,
+          "target_weight_pct": 0,
+          "rationale": "Evenly distributed across official syllabus core subjects."
+        }
+      ],
+      "topics": [
+        {
+          "topic": "Telangana Socio-Economic Outlook & Budget Highlights",
+          "subject": "Economy and Development",
+          "count": 1,
+          "tag": "CURRENT_EXTENSION",
+          "relevance_score": 40
+        },
+        {
+          "topic": "Articles 14-32 Fundamental Rights & Judicial Doctrines",
+          "subject": "Indian Constitution and Polity",
+          "count": 2,
+          "tag": "UNDERTESTED_SYLLABUS",
+          "relevance_score": 50
+        },
+        {
+          "topic": "Kakatiya & Asaf Jahi Dynasty Architecture & Inscriptions",
+          "subject": "History and Cultural Heritage",
+          "count": 2,
+          "tag": "ROTATIONAL_COVERAGE",
+          "relevance_score": 60
+        },
+        {
+          "topic": "Rythu Bandhu / Rythu Bharosa & Mission Kakatiya Schemes",
+          "subject": "Economy and Development",
+          "count": 1,
+          "tag": "CURRENT_EXTENSION",
+          "relevance_score": 40
+        },
+        {
+          "topic": "Preamble, Basic Structure Doctrine & 73rd/74th Amendments",
+          "subject": "Indian Constitution and Polity",
+          "count": 2,
+          "tag": "ROTATIONAL_COVERAGE",
+          "relevance_score": 60
+        },
+        {
+          "topic": "Western Ghats vs Eastern Ghats Agro-climatic systems",
+          "subject": "General Studies",
+          "count": 2,
+          "tag": "UNDERTESTED_SYLLABUS",
+          "relevance_score": 50
+        }
+      ],
+      "difficulties": {
+        "easy_count": 3,
+        "moderate_count": 5,
+        "difficult_count": 2
+      },
+      "cognitive": {
+        "recall": 3,
+        "understand": 4,
+        "apply": 2,
+        "analyse": 1,
+        "multi_step": 0
+      },
+      "formats": [
+        {
+          "format": "DIRECT_FACT",
+          "count": 4
+        },
+        {
+          "format": "STATEMENT_COMBINATION",
+          "count": 3
+        },
+        {
+          "format": "CONCEPTUAL",
+          "count": 2
+        },
+        {
+          "format": "MATCHING",
+          "count": 1
+        },
+        {
+          "format": "ASSERTION_REASON",
+          "count": 0
+        },
+        {
+          "format": "CHRONOLOGY",
+          "count": 0
+        }
+      ],
+      "static_current": {
+        "static_count": 8,
+        "current_count": 2,
+        "linked_count": 0
+      },
+      "state_scope": {
+        "state_count": 4,
+        "india_count": 5,
+        "international_count": 1
+      },
+      "visual_count": 1,
+      "answer_positions": {
+        "A": 3,
+        "B": 3,
+        "C": 2,
+        "D": 2
+      },
+      "pyq_relationships": {
+        "STABLE_CORE_NEW_FACT": 4,
+        "ADJACENT_TO_PYQ": 3,
+        "ROTATIONAL_TOPIC": 1,
+        "CURRENT_EXTENSION": 1,
+        "UNDERTESTED_SYLLABUS": 1
+      }
+    },
+    "pyq_intelligence_status": "SUFFICIENT",
+    "data_provenance": "RETRIEVED_OFFICIAL"
+  },
+  {
     "blueprint_id": "bp_e2e_test_mtv0afd8",
     "exam_id": "tgpsc_group_2_paper_1",
     "exam_version_id": "tgpsc_g2_v2022",

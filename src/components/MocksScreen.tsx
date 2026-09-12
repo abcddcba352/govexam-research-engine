@@ -42,6 +42,7 @@ import {
 } from '../types.ts';
 import { getBoardForExam, groupExamsByJurisdiction } from '../utils/examJurisdiction.ts';
 import { ExamHierarchyFilter } from './common/ExamHierarchyFilter.tsx';
+import { buildVaradhiCsv, buildVaradhiExcelXml } from '../mockExport.ts';
 
 interface MocksScreenProps {
   exams: ExamRecord[];
@@ -454,57 +455,28 @@ export const MocksScreen: React.FC<MocksScreenProps> = ({
 
   const handleExportCSV = () => {
     if (!activeMock) return;
-    const headers = [
-      "Question_Number",
-      "Section",
-      "Topic",
-      "Subtopic",
-      "Question_Text",
-      "Option_A",
-      "Option_B",
-      "Option_C",
-      "Option_D",
-      "Correct_Key",
-      "Difficulty",
-      "Cognitive_Level",
-      "Blueprint_Slot",
-      "Canonical_Hash",
-      "Statutory_Reference",
-      "Official_Explanation"
-    ];
-
-    const escapeCsv = (str: string = '') => `"${(str || '').replace(/"/g, '""')}"`;
-
-    const rows = allQuestions.map((q, idx) => {
-      const keyLetter = ['A', 'B', 'C', 'D'][q.correct_option_index] || '';
-      return [
-        idx + 1,
-        escapeCsv(q.section_name),
-        escapeCsv(q.topic),
-        escapeCsv(q.subtopic || ''),
-        escapeCsv(q.question_text),
-        escapeCsv(q.options[0] || ''),
-        escapeCsv(q.options[1] || ''),
-        escapeCsv(q.options[2] || ''),
-        escapeCsv(q.options[3] || ''),
-        keyLetter,
-        q.difficulty || '',
-        escapeCsv(q.cognitive_level || ''),
-        escapeCsv(q.slot_id || ''),
-        escapeCsv(q.canonical_hash || ''),
-        escapeCsv(q.source_reference || ''),
-        escapeCsv(q.explanation || '')
-      ].join(',');
-    });
-
-    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join('\n');
-    const encodedUri = encodeURI(csvContent);
+    const csvContent = `\uFEFF${buildVaradhiCsv(activeMock)}`;
+    const url = URL.createObjectURL(new Blob([csvContent], { type: 'text/csv;charset=utf-8' }));
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
+    link.setAttribute('href', url);
     link.setAttribute('download', `${activeMock.exam_id}_paper_${activeMock.mock_number}_question_bank.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportExcel = () => {
+    if (!activeMock) return;
+    const workbook = buildVaradhiExcelXml(activeMock);
+    const url = URL.createObjectURL(new Blob([workbook], { type: 'application/vnd.ms-excel;charset=utf-8' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${activeMock.exam_id}_paper_${activeMock.mock_number}_question_bank.xls`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleCopyQuestion = (q: MockQuestion, globalIdx: number) => {
@@ -885,6 +857,16 @@ export const MocksScreen: React.FC<MocksScreenProps> = ({
               >
                 <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
                 <span>CSV</span>
+              </button>
+
+              <button
+                onClick={handleExportExcel}
+                disabled={!activeMock}
+                className="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-200 text-xs font-medium border border-slate-700 transition-colors inline-flex items-center gap-1.5 cursor-pointer shadow-xs"
+                title="Export the bilingual Varadhi import sheet for Excel"
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5 text-lime-400" />
+                <span>Excel</span>
               </button>
 
               <button
@@ -1630,6 +1612,13 @@ export const MocksScreen: React.FC<MocksScreenProps> = ({
                   >
                     <Download className="w-3.5 h-3.5 text-emerald-600" />
                     <span>Export CSV</span>
+                  </button>
+                  <button
+                    onClick={handleExportExcel}
+                    className="px-3 py-1.5 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                  >
+                    <FileSpreadsheet className="w-3.5 h-3.5 text-lime-600" />
+                    <span>Export Excel</span>
                   </button>
                   <button
                     onClick={handlePrintMasterPaper}

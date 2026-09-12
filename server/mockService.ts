@@ -49,6 +49,47 @@ import { getCleanExamTitle } from '../src/utils/examJurisdiction.ts';
 const MAX_ATTEMPTS = 3;
 const BATCH_SIZE = 5;
 
+function addDays(date: string, days: number): string {
+  const value = new Date(date);
+  value.setUTCDate(value.getUTCDate() + days);
+  return value.toISOString().slice(0, 10);
+}
+
+function languageRequirementFor(subject: string, blueprint: MockBlueprintRecord | undefined, exam: ExamRecord): string {
+  const slotException = exam.exceptions?.find(item => item.subject.toLowerCase() === subject.toLowerCase());
+  return slotException?.language || blueprint?.language || exam.languages?.join(' + ') || 'English Only';
+}
+
+function bilingualFromModel(value: any, requiredLanguage: string): MockQuestion['bilingual'] | undefined {
+  if (!/(telugu|hindi|urdu|tamil|kannada|malayalam|bilingual|\+)/i.test(requiredLanguage)) return undefined;
+  if (!value || typeof value.question_text !== 'string' || !Array.isArray(value.options) || value.options.length !== 4) return undefined;
+  return {
+    secondary_language: String(value.secondary_language || requiredLanguage),
+    question_text: value.question_text,
+    options: value.options.map(String),
+    explanation: String(value.explanation || ''),
+    parity_score: Number(value.parity_score || 0),
+  };
+}
+
+function lifecycleForSlot(slot: BlueprintQuestionSlot, createdAt: string) {
+  if (slot.static_current === 'STATIC') {
+    return { content_lifecycle: 'PERMANENT' as const, review_on: undefined, expires_on: undefined };
+  }
+  return {
+    content_lifecycle: 'REVIEW' as const,
+    review_on: addDays(createdAt, 90),
+    expires_on: addDays(createdAt, 365),
+  };
+}
+
+function lifecycleForGeneratedQuestion(section: string, topic: string, createdAt: string) {
+  const needsReview = /current\s*affairs?|latest|recent event/i.test(`${section} ${topic}`);
+  return needsReview
+    ? { content_lifecycle: 'REVIEW' as const, review_on: addDays(createdAt, 90), expires_on: addDays(createdAt, 365) }
+    : { content_lifecycle: 'PERMANENT' as const, review_on: undefined, expires_on: undefined };
+}
+
 function parseJsonArraySafe(responseText: string): any[] {
   const cleaned = responseText.replace(/```json/gi, '').replace(/```/g, '').trim();
   try {
@@ -226,6 +267,9 @@ export interface GenerateMockParams {
   desiredQuestionCount?: number;
   difficulty?: 'Standard' | 'Hard' | 'Previous Year Pattern';
   preparation_mode?: PreparationMode;
+  stage_id?: string;
+  paper_id?: string;
+  paper_title?: string;
 }
 
 /**
@@ -246,6 +290,9 @@ export async function generateMockTestForExam(
   let blueprint_id: string | undefined = blueprintIdParam;
   let targetCount = desiredQuestionCount;
   let requestedDiff = difficulty;
+  let stage_id: string | undefined;
+  let paper_id: string | undefined;
+  let paper_title: string | undefined;
 
   if ('title' in examOrParams && 'commission' in examOrParams) {
     exam = examOrParams as ExamRecord;
@@ -254,6 +301,9 @@ export async function generateMockTestForExam(
     blueprint_id = params.blueprint_id;
     targetCount = params.desiredQuestionCount || 10;
     requestedDiff = params.difficulty || 'Standard';
+    stage_id = params.stage_id;
+    paper_id = params.paper_id;
+    paper_title = params.paper_title;
 
     if (params.exam) {
       exam = params.exam;
@@ -371,14 +421,15 @@ export async function generateMockTestForExam(
   }
 
   // Filter existing mocks specifically for this preparation mode to preserve series separation
-  const existingMocks = getMocks(exam.exam_id).filter(
-    m => !m.preparation_mode || m.preparation_mode === prepMode
+  let existingMocks = getMocks(exam.exam_id).filter(
+    m => (!m.preparation_mode || m.preparation_mode === prepMode) && (!paper_id || !m.paper_id || m.paper_id === paper_id)
   );
   let nextMockNumber = blueprint?.mock_number ?? (existingMocks.length + 1);
   if (getPersistenceBackend() === 'DATABASE') {
     try {
       const dbMocks = await getRepositoryRegistry().mocks.getMocks(exam.exam_id);
-      const matching = dbMocks.filter(m => !m.preparation_mode || m.preparation_mode === prepMode);
+      const matching = dbMocks.filter(m => (!m.preparation_mode || m.preparation_mode === prepMode) && (!paper_id || !m.paper_id || m.paper_id === paper_id));
+      existingMocks = matching;
       if (matching.length >= nextMockNumber) {
         nextMockNumber = matching.length + 1;
       }
@@ -400,6 +451,12 @@ export async function generateMockTestForExam(
   });
   let model = resolvedModel.model_id;
   const pyqReferenceContext = await buildPYQReferenceContext(exam.exam_id, blueprint?.slots || []);
+  const storedQuestionsFor = (subject: string, testMode?: string) => existingMocks
+    .filter(mock => testMode === 'SUBJECT_WISE'
+      ? mock.test_mode === 'SUBJECT_WISE'
+      : mock.test_mode !== 'SUBJECT_WISE')
+    .flatMap(mock => mock.sections.flatMap(section => section.questions))
+    .filter(question => testMode !== 'SUBJECT_WISE' || question.section_name.toLowerCase() === subject.toLowerCase());
 
   // =========================================================================
   // PATH A: EVIDENCE-BASED BLUEPRINT GENERATION (Iterating through slots)
@@ -501,6 +558,7 @@ export async function generateMockTestForExam(
 - Avoid Repeated Facts/Fingerprints: ${slot.avoid_fact_fingerprints && slot.avoid_fact_fingerprints.length > 0 ? slot.avoid_fact_fingerprints.join('; ') : 'None'}
 - Visual Requirement: ${slot.visual_requirement ? `Include ASCII diagram/table/flow for ${slot.visual_type || 'DIAGRAM'}` : 'None'}
 - Inclusion Rationale: ${slot.reason_for_inclusion}
+- Language Requirement: ${slot.language_requirement || languageRequirementFor(slot.subject, blueprint, exam)}. Generate the primary fields in English. When this requires another language, also return a faithful bilingual object in that language with the same meaning and answer position.
 `).join('\n');
 
             const prompt = `You are the Official Government Examination Mock Question Generator.
@@ -527,7 +585,8 @@ STRICT SPECIFICATION RULES:
 3. The correct answer MUST strictly correspond to the Target Correct Option indicated in each slot specification.
 4. Distractors must be rigorous and follow the specified Distractor Strategy (no trivial give-away options).
 5. Explanations must provide unambiguous authoritative evidence citing the exact Act, Article, Gazette, Census, Budget, or Standard Reference.
-6. Return output as a STRICT JSON array of question objects without markdown backticks:
+6. Obey each slot's language requirement. Translation must preserve numbers, names, technical terms, and the correct option position. Do not translate a subject that is explicitly marked English Only.
+7. Return output as a STRICT JSON array of question objects without markdown backticks:
 [
   {
     "question_number": number,
@@ -540,7 +599,14 @@ STRICT SPECIFICATION RULES:
     "topic": "Topic name",
     "subtopic": "Subtopic name",
     "difficulty": "EASY" | "MEDIUM" | "HARD",
-    "source_reference": "Specific official reference"
+    "source_reference": "Specific official reference",
+    "bilingual": null OR {
+      "secondary_language": "Telugu, Hindi, Urdu, or the required language",
+      "question_text": "Faithful translated stem",
+      "options": ["Translated A", "Translated B", "Translated C", "Translated D"],
+      "explanation": "Faithful translated explanation",
+      "parity_score": 0
+    }
   }
 ]`;
 
@@ -590,6 +656,8 @@ STRICT SPECIFICATION RULES:
               const targetOptionIdx = slot.target_answer_position === 'A' ? 0 : slot.target_answer_position === 'B' ? 1 : slot.target_answer_position === 'C' ? 2 : 3;
               const actualCorrectIdx = typeof matchedItem.correct_option_index === 'number' ? matchedItem.correct_option_index : targetOptionIdx;
               const diffVal: QuestionDifficulty = slot.difficulty === 'EASY' ? 'EASY' : slot.difficulty === 'DIFFICULT' ? 'HARD' : 'MEDIUM';
+              const requiredLanguage = slot.language_requirement || languageRequirementFor(slot.subject, blueprint, exam);
+              const lifecycle = lifecycleForSlot(slot, new Date().toISOString());
 
               let qCandidate: MockQuestion = {
                 question_id: `q_${mock_id}_${slot.question_number}`,
@@ -621,7 +689,13 @@ STRICT SPECIFICATION RULES:
                   subtopic: slot.subtopic,
                   question_type: slot.question_type
                 }),
-                generation_model_id: model
+                generation_model_id: model,
+                bilingual: bilingualFromModel(matchedItem.bilingual, requiredLanguage),
+                source_exam_date: matchedItem.current_affairs_evidence?.event_date,
+                content_lifecycle: lifecycle.content_lifecycle,
+                review_on: lifecycle.review_on,
+                expires_on: lifecycle.expires_on,
+                is_active: true,
               };
 
               if (isCurrentSlot(slot) && currentArticles.length > 0) {
@@ -679,7 +753,17 @@ STRICT SPECIFICATION RULES:
               qCandidate.symmetry_status = symmetry.symmetry_status;
 
               // 2. Multi-Layer Duplicate Check (Layers 1-5 across SAME_MOCK and SAME_MOCK_SERIES)
-              const multiDup = runMultiLayerDuplicateCheck(qCandidate, slot, exam.exam_id, [...generatedQuestions, ...batchCandidates]);
+              const multiDup = runMultiLayerDuplicateCheck(
+                qCandidate,
+                slot,
+                exam.exam_id,
+                [...generatedQuestions, ...batchCandidates],
+                {
+                  paperId: paper_id,
+                  testMode: blueprint.test_mode,
+                  storedPaperQuestions: storedQuestionsFor(slot.subject, blueprint.test_mode),
+                }
+              );
               qCandidate.duplicate_score = multiDup.duplicateScore;
               qCandidate.duplicate_layer_matched = multiDup.layer;
 
@@ -742,14 +826,17 @@ STRICT SPECIFICATION RULES:
       });
       throw new Error(lockError);
     }
-    while (attemptsMade < MAX_ATTEMPTS && generatedQuestions.length < targetCount) {
+    const plannedBatches = Math.ceil(targetCount / BATCH_SIZE);
+    const maxFallbackCalls = plannedBatches + MAX_ATTEMPTS;
+    while (attemptsMade < maxFallbackCalls && generatedQuestions.length < targetCount) {
       attemptsMade++;
       const neededCount = targetCount - generatedQuestions.length;
+      const batchCount = Math.min(BATCH_SIZE, neededCount);
 
       let parsed: any[] = [];
 
       if (!process.env.GEMINI_API_KEY) {
-        parsed = Array.from({ length: neededCount }).map((_, i) => {
+        parsed = Array.from({ length: batchCount }).map((_, i) => {
           const topic = exam.syllabus_topics[i % exam.syllabus_topics.length] || 'General Studies';
           return {
             section_name: exam.pattern.sections[i % exam.pattern.sections.length] || 'General Studies',
@@ -783,8 +870,9 @@ ${exam.syllabus_topics.map(t => `- ${t}`).join('\n')}
 Sections in this paper:
 ${exam.pattern.sections.slice(0, 4).map(s => `- ${s}`).join('\n')}
 
-Target Question Count for this batch: ${neededCount}
+Target Question Count for this batch: ${batchCount}
 Requested Difficulty Profile: ${requestedDiff}
+Language Requirement: ${exam.languages?.join(' + ') || 'English Only'}
 
 ${pyqReferenceContext}
 
@@ -793,7 +881,8 @@ Rules:
 2. Use the PYQ reference analysis only for pattern, difficulty, cognitive demand, and distractor style. Do not copy, paraphrase, or reuse any previous question, answer, or answerable fact.
 3. Ensure every question is completely NOVEL, factually sound, and relevant to ${exam.title}.
 4. Cite the exact statutory rule, constitutional article, commission notification, or standard authoritative reference in the explanation.
-5. Format output as a STRICT JSON array of question objects without markdown backticks:
+5. Generate English primary fields and, when the language requirement includes another language, provide a faithful bilingual object. Keep all numbers, names, technical terms, meaning, and correct option position aligned.
+6. Format output as a STRICT JSON array of question objects without markdown backticks:
 [
   {
     "section_name": "Name of section from list above",
@@ -803,7 +892,14 @@ Rules:
     "explanation": "Authoritative explanation citing relevant Article, Act, Gazette, or Standard Text",
     "topic": "Specific syllabus topic name",
     "difficulty": "EASY" | "MEDIUM" | "HARD",
-    "source_reference": "Specific official gazette / constitutional article / state act"
+    "source_reference": "Specific official gazette / constitutional article / state act",
+    "bilingual": null OR {
+      "secondary_language": "Required secondary language",
+      "question_text": "Faithful translated stem",
+      "options": ["Translated A", "Translated B", "Translated C", "Translated D"],
+      "explanation": "Faithful translated explanation",
+      "parity_score": 0
+    }
   }
 ]`;
 
@@ -837,8 +933,8 @@ Rules:
             continue;
           }
 
-          if (attemptsMade < MAX_ATTEMPTS && generatedQuestions.length < targetCount) {
-            await new Promise(r => setTimeout(r, 600 * attemptsMade));
+          if (attemptsMade < maxFallbackCalls && generatedQuestions.length < targetCount) {
+            await new Promise(r => setTimeout(r, Math.min(2400, 600 * attemptsMade)));
           }
         }
       }
@@ -847,23 +943,43 @@ Rules:
         for (const item of parsed) {
           if (generatedQuestions.length >= targetCount) break;
 
-          const dupCheck = checkQuestionDuplicate(item.question_text, exam.exam_id);
+          const sectionNameForScope = item.section_name || exam.pattern.sections[0] || 'General Studies';
+          const fallbackTestMode = blueprint?.test_mode || (prepMode === 'CUSTOM_PRACTICE' ? 'SUBJECT_WISE' : 'FULL_LENGTH');
+          const itemHash = computeCanonicalQuestionHash(item.question_text);
+          const sameDraftDuplicate = generatedQuestions.some(question => question.canonical_hash === itemHash);
+          const storedPaperDuplicate = storedQuestionsFor(sectionNameForScope, fallbackTestMode)
+            .some(question => computeCanonicalQuestionHash(question.question_text) === itemHash);
+          if (sameDraftDuplicate || storedPaperDuplicate) {
+            duplicatesBlockedCount++;
+            continue;
+          }
+          const dupCheck = checkQuestionDuplicate(item.question_text, exam.exam_id, {
+            paper_id,
+            test_mode: fallbackTestMode,
+            subject: sectionNameForScope,
+          });
           if (dupCheck.is_duplicate) {
             duplicatesBlockedCount++;
             continue;
           }
 
           const qIndex = generatedQuestions.length + 1;
+          const sectionName = item.section_name || exam.pattern.sections[0] || 'General Studies';
+          const topicName = item.topic || exam.syllabus_topics[0] || 'General Awareness';
+          const lifecycle = lifecycleForGeneratedQuestion(sectionName, topicName, new Date().toISOString());
+          const requiredLanguage = exam.exceptions?.find(exception => exception.subject.toLowerCase() === sectionName.toLowerCase())?.language
+            || exam.languages?.join(' + ')
+            || 'English Only';
           generatedQuestions.push({
             question_id: `q_${mock_id}_${qIndex}`,
             mock_id,
             question_number: qIndex,
-            section_name: item.section_name || exam.pattern.sections[0] || 'General Studies',
+            section_name: sectionName,
             question_text: item.question_text,
             options: item.options && item.options.length === 4 ? item.options : ['Option A', 'Option B', 'Option C', 'Option D'],
             correct_option_index: typeof item.correct_option_index === 'number' ? item.correct_option_index : 0,
             explanation: item.explanation || 'Official verified answer key explanation.',
-            topic: item.topic || exam.syllabus_topics[0] || 'General Awareness',
+            topic: topicName,
             difficulty: (item.difficulty as QuestionDifficulty) || 'MEDIUM',
             canonical_hash: dupCheck.question_hash,
             source_reference: item.source_reference || `${exam.commission} Official Gazette Rules`,
@@ -876,9 +992,19 @@ Rules:
             }),
             data_provenance: (examOrParams as any).data_provenance || 'RETRIEVED_OFFICIAL',
             generation_provenance: process.env.GEMINI_API_KEY ? 'LIVE_GEMINI' : 'TEST_SYNTHESIS',
-            generation_model_id: model
+            generation_model_id: model,
+            bilingual: bilingualFromModel(item.bilingual, requiredLanguage),
+            source_exam_date: item.current_affairs_evidence?.event_date,
+            content_lifecycle: lifecycle.content_lifecycle,
+            review_on: lifecycle.review_on,
+            expires_on: lifecycle.expires_on,
+            is_active: true,
           });
         }
+      }
+
+      if (process.env.GEMINI_API_KEY && generatedQuestions.length < targetCount) {
+        await new Promise(r => setTimeout(r, 600));
       }
     }
   }
@@ -933,6 +1059,9 @@ Rules:
     mock_id,
     exam_id: exam.exam_id,
     exam_title: exam.title,
+    stage_id,
+    paper_id,
+    paper_title,
     mock_number: nextMockNumber,
     title: prepMode === 'CUSTOM_PRACTICE'
       ? `[Custom Practice] ${formattedMockTitle}`

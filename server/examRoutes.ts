@@ -200,7 +200,7 @@ export function registerExamRoutes(app: Express) {
     if (process.env.AI_PROVIDER === 'cloudflare' && req.body?.provider !== 'gemini' && !process.env.GEMINI_API_KEY) {
       return { status: 409, body: { error: 'Open Syllabus Coverage → Question bank & paper builder. Queue questions, review evidence and answers, then assemble the checked paper. No unchecked paper was generated.' } };
     }
-    const { exam_id, blueprint_id, question_count, difficulty, preparation_mode } = req.body || {};
+    const { exam_id, blueprint_id, question_count, difficulty, preparation_mode, stage_id, paper_id, paper_title } = req.body || {};
     let target = exam_id;
     if (!target && blueprint_id) target = (await getRepositoryRegistry().blueprints.getBlueprintById(blueprint_id))?.exam_id;
     if (!target) return { status: 400, body: { error: 'A valid exam or blueprint is required.' } };
@@ -210,7 +210,7 @@ export function registerExamRoutes(app: Express) {
       error: 'Generation is blocked until the preparation basis is verified.', readiness,
     } };
     const mock = await generateMockTestForExam({ exam_id: target, blueprint_id,
-      desiredQuestionCount: question_count, difficulty, preparation_mode });
+      desiredQuestionCount: question_count, difficulty, preparation_mode, stage_id, paper_id, paper_title });
     if (getPersistenceBackend() === 'DATABASE') await getRepositoryRegistry().mocks.saveMock(mock);
     return { body: { success: true, mock } };
   }));

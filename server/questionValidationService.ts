@@ -878,7 +878,8 @@ export function runMultiLayerDuplicateCheck(
   q: MockQuestion,
   slot: BlueprintQuestionSlot,
   examId: string,
-  currentMockQuestions: MockQuestion[] = []
+  currentMockQuestions: MockQuestion[] = [],
+  scope?: { paperId?: string; testMode?: string; storedPaperQuestions?: MockQuestion[] }
 ): {
   decision: DuplicateDecision;
   layer: string;
@@ -888,7 +889,15 @@ export function runMultiLayerDuplicateCheck(
   layers_executed: string[];
   scope_matched?: 'SAME_MOCK' | 'SAME_MOCK_SERIES' | 'PREVIOUS_YEAR_QUESTION';
 } {
-  const ledger = getDuplicateLedger();
+  const ledger = getDuplicateLedger().filter(item => {
+    if (item.exam_id !== examId) return false;
+    if (scope?.testMode === 'SUBJECT_WISE') {
+      return item.test_mode === 'SUBJECT_WISE'
+        && (!item.subject || item.subject.toLowerCase() === slot.subject.toLowerCase());
+    }
+    if (scope?.paperId && item.paper_id) return item.paper_id === scope.paperId;
+    return item.test_mode !== 'SUBJECT_WISE';
+  });
   const qText = q.question_text;
   const hash = computeCanonicalQuestionHash(qText);
   const normalized = normalizeQuestionText(qText);
@@ -913,6 +922,21 @@ export function runMultiLayerDuplicateCheck(
       duplicateScore: 1.0,
       layers_executed,
       scope_matched: 'SAME_MOCK'
+    };
+  }
+
+  const storedPaperCollision = scope?.storedPaperQuestions?.find(
+    cq => computeCanonicalQuestionHash(cq.question_text) === hash || normalizeQuestionText(cq.question_text) === normalized
+  );
+  if (storedPaperCollision) {
+    return {
+      decision: 'DUPLICATE',
+      layer: STANDARDIZED_DUPLICATE_LAYERS.LAYER_1.id,
+      standard_layer_name: STANDARDIZED_DUPLICATE_LAYERS.LAYER_1.name,
+      reason: `Exact canonical question duplicate in an already stored paper (Q${storedPaperCollision.question_number})`,
+      duplicateScore: 1.0,
+      layers_executed,
+      scope_matched: 'SAME_MOCK_SERIES'
     };
   }
 

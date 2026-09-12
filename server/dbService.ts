@@ -1073,7 +1073,10 @@ export function finalizeMockTest(mock_id: string, auditor_notes?: string): {
          q.data_provenance !== 'DEMO_DATA' &&
          ((executionEnv !== 'PRODUCTION' && executionEnv !== 'STAGING') || (q.generation_provenance !== 'TEST_SYNTHESIS' && q.generation_provenance !== 'DEMO_SYNTHESIS'))
   );
-  const ledgerResult = registerQuestionsToLedger(realQuestions, mock.exam_id, mock.mock_id);
+  const ledgerResult = registerQuestionsToLedger(realQuestions, mock.exam_id, mock.mock_id, {
+    paper_id: mock.paper_id,
+    test_mode: mock.test_mode,
+  });
 
   saveGenerationAuditLog({
     log_id: `log_fin_${Date.now().toString(36)}`,
@@ -1134,16 +1137,29 @@ export function saveDuplicateLedger(ledger: DuplicateLedgerEntry[]): void {
  * - 'POSSIBLE_DUPLICATE'
  * - 'DUPLICATE'
  */
-export function checkQuestionDuplicate(questionText: string, exam_id?: string): DuplicateCheckResult {
+export function checkQuestionDuplicate(
+  questionText: string,
+  exam_id?: string,
+  scope?: { paper_id?: string; test_mode?: string; subject?: string }
+): DuplicateCheckResult {
   const hash = computeCanonicalQuestionHash(questionText);
   const normalized = normalizeQuestionText(questionText);
-  const ledger = getDuplicateLedger();
+  const allLedger = getDuplicateLedger();
+  const ledger = allLedger.filter(item => {
+    if (exam_id && item.exam_id !== exam_id) return false;
+    if (scope?.test_mode === 'SUBJECT_WISE') {
+      return item.test_mode === 'SUBJECT_WISE'
+        && (!scope.subject || !item.subject || item.subject.toLowerCase() === scope.subject.toLowerCase());
+    }
+    if (scope?.paper_id && item.paper_id) return item.paper_id === scope.paper_id;
+    return item.test_mode !== 'SUBJECT_WISE';
+  });
 
   // LAYER 1: Exact canonical SHA-256 hash match
   const exactMatch = ledger.find(item => item.question_hash === hash || item.canonical_hash === hash);
   if (exactMatch) {
     exactMatch.duplicate_attempts_blocked = (exactMatch.duplicate_attempts_blocked || 0) + 1;
-    saveDuplicateLedger(ledger);
+    saveDuplicateLedger(allLedger);
 
     return {
       is_duplicate: true,
@@ -1178,7 +1194,7 @@ export function checkQuestionDuplicate(questionText: string, exam_id?: string): 
     // High match -> DUPLICATE
     if (jaccard >= 0.70 || overlapRatio >= 0.80) {
       entry.duplicate_attempts_blocked = (entry.duplicate_attempts_blocked || 0) + 1;
-      saveDuplicateLedger(ledger);
+      saveDuplicateLedger(allLedger);
 
       return {
         is_duplicate: true,
@@ -1225,7 +1241,8 @@ export function checkQuestionDuplicate(questionText: string, exam_id?: string): 
 export function registerQuestionsToLedger(
   questions: MockQuestion[],
   exam_id: string,
-  mock_id: string
+  mock_id: string,
+  scope?: { paper_id?: string; test_mode?: string }
 ): { added: number; duplicatesBlocked: number } {
   const ledger = getDuplicateLedger();
   let added = 0;
@@ -1237,7 +1254,14 @@ export function registerQuestionsToLedger(
     }
     const hash = computeCanonicalQuestionHash(q.question_text);
     const normalized = normalizeQuestionText(q.question_text);
-    const existing = ledger.find(l => l.question_hash === hash || l.canonical_hash === hash);
+    const existing = ledger.find(l => {
+      if (l.exam_id !== exam_id || (l.question_hash !== hash && l.canonical_hash !== hash)) return false;
+      if (scope?.test_mode === 'SUBJECT_WISE') {
+        return l.test_mode === 'SUBJECT_WISE' && (!l.subject || l.subject.toLowerCase() === q.section_name.toLowerCase());
+      }
+      if (scope?.paper_id && l.paper_id) return l.paper_id === scope.paper_id;
+      return l.test_mode !== 'SUBJECT_WISE';
+    });
 
     if (existing) {
       duplicatesBlocked++;
@@ -1263,6 +1287,9 @@ export function registerQuestionsToLedger(
         mock_id,
         mock_ids: [mock_id],
         exam_id,
+        paper_id: scope?.paper_id,
+        test_mode: scope?.test_mode,
+        subject: q.section_name,
         first_registered_at: new Date().toISOString(),
         duplicate_attempts_blocked: 0,
         similarity_cluster_key: (q.topic || 'gs').toLowerCase().replace(/[^a-z0-9]+/g, '_'),

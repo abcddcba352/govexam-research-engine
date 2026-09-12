@@ -1180,11 +1180,11 @@
     "readiness_status": "LIMITED_DATA"
   },
   {
-    "profile_id": "intel_tgpsc_group_2_paper_1_mtv0afc1",
+    "profile_id": "intel_tgpsc_group_2_paper_1_mtxqcmiq",
     "exam_id": "tgpsc_group_2_paper_1",
     "exam_version_id": "tgpsc_g2_v2022",
     "recruitment_cycle": "Notification 28/2022 (Current Cycle 2024-2025)",
-    "analysis_date": "2026-09-10T04:07:15.745Z",
+    "analysis_date": "2026-09-12T01:52:20.738Z",
     "papers_analysed_count": 2,
     "questions_analysed_count": 5,
     "answers_verified_count": 5,
@@ -1192,33 +1192,15 @@
     "unverified_questions_count": 0,
     "subject_distribution": [
       {
-        "subject": "Society, Culture, Heritage, Arts and Literature of Telangana",
-        "count": 2,
-        "percentage": 40,
-        "official_weight": 8.3
-      },
-      {
-        "subject": "Indian Constitution and Polity",
-        "count": 1,
-        "percentage": 20,
-        "official_weight": 8.3
-      },
-      {
-        "subject": "History and Cultural Heritage of India & Telangana",
-        "count": 1,
-        "percentage": 20,
-        "official_weight": 8.3
-      },
-      {
-        "subject": "Geography of India and Telangana",
-        "count": 1,
-        "percentage": 20,
-        "official_weight": 8.3
+        "subject": "General Studies & General Abilities",
+        "count": 5,
+        "percentage": 100,
+        "official_weight": 100
       }
     ],
     "topic_distribution": [
       {
-        "subject": "Indian Constitution and Polity",
+        "subject": "General Studies & General Abilities",
         "topic": "Special Provisions for States & Article 371 Series",
         "subtopic": "Article 371-D & Presidential Order for Local Cadres",
         "sample_size": 2,
@@ -1233,7 +1215,7 @@
         "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
       },
       {
-        "subject": "Society, Culture, Heritage, Arts and Literature of Telangana",
+        "subject": "General Studies & General Abilities",
         "topic": "Kakatiya Dynasty Art, Architecture & Inscriptions",
         "subtopic": "Ramappa (Rudreswara) Temple & UNESCO Heritage",
         "sample_size": 2,
@@ -1248,7 +1230,7 @@
         "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
       },
       {
-        "subject": "Society, Culture, Heritage, Arts and Literature of Telangana",
+        "subject": "General Studies & General Abilities",
         "topic": "Telangana Literature, Periodicals & Cultural Renaissance",
         "subtopic": "Prominent Writers, Poets and Historic Journals",
         "sample_size": 2,
@@ -1263,7 +1245,7 @@
         "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
       },
       {
-        "subject": "History and Cultural Heritage of India & Telangana",
+        "subject": "General Studies & General Abilities",
         "topic": "Telangana Statehood Movement & Chronology (1948 - 2014)",
         "subtopic": "Events of 2009-2014 Statehood Realization",
         "sample_size": 2,
@@ -1278,7 +1260,7 @@
         "sample_size_caution": "Limited historical sample size (< 2 examination cycles). Interpret trends with caution."
       },
       {
-        "subject": "Geography of India and Telangana",
+        "subject": "General Studies & General Abilities",
         "topic": "River Systems, Drainage Basins & Multipurpose Projects of Telangana",
         "subtopic": "Godavari Basin & Left vs Right Bank Tributaries",
         "sample_size": 2,
@@ -1383,7 +1365,7 @@
     },
     "top_recurring_themes": [
       {
-        "theme": "Indian Constitution and Polity - Special Provisions for States & Article 371 Series",
+        "theme": "General Studies & General Abilities - Special Provisions for States & Article 371 Series",
         "count": 1,
         "why_asked": "Appeared persistently across cycles (2023). High probability core focus area.",
         "sample_question_ids": [
@@ -1391,7 +1373,7 @@
         ]
       },
       {
-        "theme": "Society, Culture, Heritage, Arts and Literature of Telangana - Kakatiya Dynasty Art, Architecture & Inscriptions",
+        "theme": "General Studies & General Abilities - Kakatiya Dynasty Art, Architecture & Inscriptions",
         "count": 1,
         "why_asked": "Appeared persistently across cycles (2023). High probability core focus area.",
         "sample_question_ids": [
@@ -1399,7 +1381,7 @@
         ]
       },
       {
-        "theme": "Society, Culture, Heritage, Arts and Literature of Telangana - Telangana Literature, Periodicals & Cultural Renaissance",
+        "theme": "General Studies & General Abilities - Telangana Literature, Periodicals & Cultural Renaissance",
         "count": 1,
         "why_asked": "Appeared persistently across cycles (2023). High probability core focus area.",
         "sample_question_ids": [
@@ -1407,7 +1389,7 @@
         ]
       },
       {
-        "theme": "History and Cultural Heritage of India & Telangana - Telangana Statehood Movement & Chronology (1948 - 2014)",
+        "theme": "General Studies & General Abilities - Telangana Statehood Movement & Chronology (1948 - 2014)",
         "count": 1,
         "why_asked": "Appeared persistently across cycles (2023). High probability core focus area.",
         "sample_question_ids": [
@@ -1415,7 +1397,7 @@
         ]
       },
       {
-        "theme": "Geography of India and Telangana - River Systems, Drainage Basins & Multipurpose Projects of Telangana",
+        "theme": "General Studies & General Abilities - River Systems, Drainage Basins & Multipurpose Projects of Telangana",
         "count": 1,
         "why_asked": "Appeared persistently across cycles (2023). High probability core focus area.",
         "sample_question_ids": [

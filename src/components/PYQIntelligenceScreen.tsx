@@ -64,6 +64,7 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
   const [year, setYear] = useState<number>(2024);
   const [paperName, setPaperName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isExtractingPdf, setIsExtractingPdf] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
@@ -134,10 +135,76 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
     if (!file) return;
     setFileName(file.name);
     setError(null);
+    setSuccessMsg(null);
+
+    // Auto-fill paper name from file name if empty
+    if (!paperName) {
+      const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[_\-+]/g, ' ');
+      setPaperName(cleanName);
+    }
+
+    // 1. PDF File Upload
+    if (file.name.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf') {
+      setIsExtractingPdf(true);
+      setError(null);
+      const reader = new FileReader();
+      reader.onload = async (ev) => {
+        try {
+          const arrayBuf = ev.target?.result as ArrayBuffer;
+          if (!arrayBuf) throw new Error('Could not read PDF file');
+          
+          // Convert array buffer to base64 cleanly in chunks to prevent stack overflow
+          const uint8 = new Uint8Array(arrayBuf);
+          let binary = '';
+          const chunkSize = 8192;
+          for (let i = 0; i < uint8.length; i += chunkSize) {
+            const chunk = uint8.subarray(i, i + chunkSize);
+            binary += String.fromCharCode.apply(null, chunk as any);
+          }
+          const base64 = btoa(binary);
+
+          const res = await fetch('/api/pyq/extract-pdf', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ base64, filename: file.name })
+          });
+
+          const data = await res.json();
+          if (!res.ok || !data.success) {
+            throw new Error(data.error || 'Failed to extract text from PDF.');
+          }
+
+          setPastedText(data.text);
+          setSuccessMsg(`Extracted question paper text from "${file.name}" (${data.page_count || 1} pages)! Review the text below and click "Analyse Paper".`);
+        } catch (err: any) {
+          setError(err.message || 'Error processing PDF file. You can also open the PDF, copy all text, and paste it directly into the text box below.');
+        } finally {
+          setIsExtractingPdf(false);
+        }
+      };
+      reader.onerror = () => {
+        setError('Error reading PDF file from disk.');
+        setIsExtractingPdf(false);
+      };
+      reader.readAsArrayBuffer(file);
+      return;
+    }
+
+    // 2. Plain Text or JSON File Upload
     const reader = new FileReader();
     reader.onload = (ev) => {
       const content = ev.target?.result as string;
-      if (content) setPastedText(content);
+      if (content) {
+        if (content.slice(0, 10).includes('\0') || content.startsWith('%PDF')) {
+          setError('This file contains binary data. Please upload a PDF (.pdf) or plain text (.txt / .json) file.');
+          return;
+        }
+        setPastedText(content);
+        setSuccessMsg(`Loaded text file "${file.name}"!`);
+      }
+    };
+    reader.onerror = () => {
+      setError('Error reading text file.');
     };
     reader.readAsText(file);
   };
@@ -380,15 +447,29 @@ Explanation: Sikkim is bounded by Tibet (China), Bhutan, and Nepal.`);
             />
           </div>
           <div className="flex items-end">
-            <label className="w-full border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-lg px-3 py-2 text-center cursor-pointer hover:bg-blue-50/40 transition-colors flex items-center gap-2 justify-center">
-              <UploadCloud className="w-4 h-4 text-slate-400" />
-              <span className="text-xs font-bold text-slate-600">
-                {fileName || 'Upload File (.txt / .json)'}
-              </span>
+            <label className={`w-full border-2 border-dashed rounded-lg px-3 py-2 text-center cursor-pointer transition-colors flex items-center gap-2 justify-center ${
+              isExtractingPdf
+                ? 'border-indigo-400 bg-indigo-50/50 cursor-wait'
+                : 'border-slate-300 hover:border-blue-500 hover:bg-blue-50/40'
+            }`}>
+              {isExtractingPdf ? (
+                <>
+                  <Loader2 className="w-4 h-4 text-indigo-600 animate-spin" />
+                  <span className="text-xs font-bold text-indigo-700">Extracting PDF text...</span>
+                </>
+              ) : (
+                <>
+                  <UploadCloud className="w-4 h-4 text-slate-400" />
+                  <span className="text-xs font-bold text-slate-600 truncate max-w-[200px]">
+                    {fileName || 'Upload PDF / Text (.pdf, .txt)'}
+                  </span>
+                </>
+              )}
               <input
                 type="file"
-                accept=".txt,.json,.pdf"
+                accept=".txt,.json,.pdf,application/pdf,text/plain"
                 onChange={handleFileUpload}
+                disabled={isExtractingPdf}
                 className="hidden"
               />
             </label>
@@ -439,18 +520,27 @@ Explanation: Article 371-D...`}
         <div className="flex items-center justify-between pt-2 border-t border-slate-100">
           <p className="text-[11px] text-slate-500">
             <Sparkles className="w-3 h-3 inline text-indigo-500 mr-1" />
-            AI will analyse patterns, subject weightage, question design & strategy insights
+            {isExtractingPdf ? (
+              <span className="text-indigo-600 font-semibold animate-pulse">Extracting text from PDF, please wait...</span>
+            ) : (
+              'AI will analyse patterns, subject weightage, question design & strategy insights'
+            )}
           </p>
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={isSubmitting || !pastedText.trim()}
+            disabled={isSubmitting || isExtractingPdf || !pastedText.trim()}
             className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all disabled:opacity-50 flex items-center gap-2 shadow-xs cursor-pointer"
           >
             {isSubmitting ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
                 <span>Analysing with AI...</span>
+              </>
+            ) : isExtractingPdf ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Extracting PDF...</span>
               </>
             ) : (
               <>

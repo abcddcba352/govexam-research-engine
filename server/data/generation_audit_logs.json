@@ -1,5 +1,31 @@
 [
   {
+    "log_id": "log_audit_bp_lock_mtxqcmx1",
+    "audit_type": "GENERATION_AUDIT",
+    "exam_id": "tgpsc_group_2_paper_1",
+    "mock_id": "mock_bp_unlocked_bp_e2e_test_mtxqcmmo",
+    "status": "GENERATION_FAILED",
+    "attempt_count": 0,
+    "target_count": 10,
+    "validated_count": 0,
+    "duplicates_blocked": 0,
+    "error_message": "Question generation blocked: Blueprint \"bp_e2e_test_mtxqcmmo\" is currently in \"DRAFT\" status. Mock question generation strictly requires the Blueprint to be validated or locked first.",
+    "created_at": "2026-09-12T01:52:21.253Z"
+  },
+  {
+    "log_id": "log_audit_bp_lock_mtxqcmwn",
+    "audit_type": "GENERATION_AUDIT",
+    "exam_id": "tgpsc_group_2_paper_1",
+    "mock_id": "mock_bp_unlocked_bp_e2e_test_mtxqcmmo",
+    "status": "GENERATION_FAILED",
+    "attempt_count": 0,
+    "target_count": 10,
+    "validated_count": 0,
+    "duplicates_blocked": 0,
+    "error_message": "Question generation blocked: Blueprint \"bp_e2e_test_mtxqcmmo\" is currently in \"DRAFT\" status. Mock question generation strictly requires the Blueprint to be validated or locked first.",
+    "created_at": "2026-09-12T01:52:21.239Z"
+  },
+  {
     "log_id": "log_fin_mtv0b9po",
     "audit_type": "MOCK_FINALIZATION_AUDIT",
     "action": "MOCK_TEST_FINALIZATION",

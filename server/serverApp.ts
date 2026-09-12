@@ -105,8 +105,11 @@ import {
   deleteAdminGeminiKey,
   getAllGeminiApiKeys,
   testGeminiApiKey,
-  AdminGeminiKeyRecord
+  AdminGeminiKeyRecord,
+  executeWithGeminiFailover,
+  getPrimaryModel,
 } from "./geminiConfig.ts";
+import { extractPdfText } from "./pdfParser.ts";
 
 export function createApp(): express.Application {
   const app = express();
@@ -863,6 +866,67 @@ export function createApp(): express.Application {
       res.json(result);
     } catch (err: any) {
       res.status(400).json({ error: err.message || "Failed to parse and ingest question paper" });
+    }
+  });
+
+  // Extract text from uploaded PDF
+  app.post("/api/pyq/extract-pdf", async (req, res) => {
+    try {
+      const { base64, filename } = req.body;
+      if (!base64) {
+        return res.status(400).json({ error: "Missing base64 PDF data" });
+      }
+
+      const buffer = Buffer.from(base64, 'base64');
+      
+      // 1. Try native fast stream extraction (~1-2ms)
+      const parsed = await extractPdfText(buffer);
+      if (parsed && parsed.success && parsed.text && parsed.text.length > 50) {
+        return res.json({
+          success: true,
+          text: parsed.text,
+          page_count: parsed.page_count,
+          method: 'PDF_PARSER'
+        });
+      }
+
+      // 2. Fallback to Gemini Multimodal PDF extraction
+      let geminiText = '';
+      try {
+        await executeWithGeminiFailover(async (ai) => {
+          const response = await ai.models.generateContent({
+            model: getPrimaryModel(),
+            contents: [
+              {
+                inlineData: {
+                  data: base64,
+                  mimeType: 'application/pdf'
+                }
+              },
+              'Extract all questions from this question paper PDF into plain text. Format each question clearly as:\nQ1. [Question text]\n(A) [Option A]\n(B) [Option B]\n(C) [Option C]\n(D) [Option D]\nAnswer: Option [A/B/C/D]\nExplanation: [Explanation if available]\n\nInclude all multiple-choice questions verbatim.'
+            ]
+          });
+          geminiText = response.text || '';
+        });
+      } catch (geminiErr: any) {
+        console.warn('[PDF Extract] Gemini fallback failed:', geminiErr?.message);
+      }
+
+      if (geminiText && geminiText.trim().length > 30) {
+        return res.json({
+          success: true,
+          text: geminiText.trim(),
+          page_count: parsed?.page_count || 1,
+          method: 'GEMINI_MULTIMODAL'
+        });
+      }
+
+      res.status(422).json({
+        error: "Could not automatically extract text from this PDF. It may be a scanned image without an OCR layer. Please paste the question paper text directly into the text box."
+      });
+    } catch (err: any) {
+      console.error("[PDF Extract Error]", err);
+      res.status(500).json({ error: err.message || "Failed to extract PDF text" });
     }
   });
 
