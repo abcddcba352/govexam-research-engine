@@ -1,5 +1,958 @@
 [
   {
+    "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+    "intake_id": "intake_mtxv9wwo",
+    "title": "Telangana Police Constable (SCT PC Civil) 2026",
+    "commission": "Official Commission / Examination Board",
+    "state_or_central": "STATE",
+    "post": "Official Examination Service",
+    "stage": "Preliminary / Objective Examination",
+    "paper": "Preliminary Written Test 2024 Model Paper",
+    "recruitment_cycle": "2024 Notification Cycle",
+    "active_cycle": "2024 Notification Cycle",
+    "catalog_slug": "state-telangana-police-constable-sct-pc-civil-2026",
+    "exam_kind": "police",
+    "heading": "Telangana Police Constable (SCT PC Civil) 2026 Mock Tests",
+    "fallback_title": "Telangana Police Constable (SCT PC Civil) 2026 Mock Tests in STATE",
+    "fallback_description": "Practise Telangana Police Constable (SCT PC Civil) 2026 mock tests for STATE. Explore papers, take timed tests and review every answer.",
+    "languages": [
+      "English"
+    ],
+    "exceptions": [],
+    "pattern": {
+      "total_questions": 150,
+      "duration_minutes": 150,
+      "total_marks": 150,
+      "marks_per_question": 1,
+      "negative_marking_rate": 0.25,
+      "sections": [
+        "General Studies"
+      ],
+      "mediums": [
+        "English"
+      ],
+      "languages": [
+        "English"
+      ],
+      "exceptions": []
+    },
+    "syllabus_topics": [
+      "General Studies"
+    ],
+    "status": "INTAKE_SUBMITTED",
+    "exam_profile_status": "RESEARCH_REQUIRED",
+    "pattern_status": "UNVERIFIED",
+    "source_confidence_score": 0,
+    "preparation_mode": "PRE_NOTIFICATION_PREPARATION",
+    "stages": [
+      {
+        "stage_id": "tslprb_pc_stage1",
+        "stage_number": 1,
+        "stage_name": "Stage 1: Preliminary Written Test (PWT)",
+        "stage_type": "PRELIMINARY",
+        "is_qualifying_only": true,
+        "total_papers": 1,
+        "total_marks": 200,
+        "description": "Screening test comprising 200 objective questions for 200 marks. 3 Hours duration. Qualifying in nature to proceed to Physical tests.",
+        "papers": [
+          {
+            "paper_id": "tslprb_pc_pwt_paper",
+            "paper_number": "Preliminary Paper",
+            "title": "Syllabus for Preliminary Written Test (Objective Type)",
+            "type": "OBJECTIVE",
+            "total_questions": 200,
+            "total_marks": 200,
+            "duration_minutes": 180,
+            "negative_marking_rate": 0,
+            "is_qualifying": true,
+            "language_mediums": [
+              "English",
+              "Telugu",
+              "Urdu"
+            ],
+            "sections": [
+              "English",
+              "Arithmetic",
+              "General Science",
+              "History of India, Indian culture, Indian National Movement",
+              "Indian Geography, Polity and Economy",
+              "Current events of national and international importance",
+              "Test of Reasoning / Mental Ability",
+              "Contents pertaining to the State of Telangana"
+            ],
+            "syllabus_highlights": [
+              "English Grammar & Vocabulary",
+              "Arithmetic & Quantitative Skills",
+              "General Science (Everyday observation)",
+              "History of India & National Movement",
+              "Indian Geography, Polity & Economy",
+              "National & International Current Affairs",
+              "Reasoning & Mental Ability",
+              "Telangana Movement & Statehood"
+            ]
+          }
+        ]
+      },
+      {
+        "stage_id": "tslprb_pc_stage2",
+        "stage_number": 2,
+        "stage_name": "Stage 2: Physical Measurement Test & Physical Efficiency Test (PMT / PET)",
+        "stage_type": "PHYSICAL_TEST",
+        "is_qualifying_only": true,
+        "total_papers": 0,
+        "total_marks": 0,
+        "description": "Physical Measurement Test (Height & Chest) and Physical Efficiency Test (1600m Run for Men, 800m Run for Women, Long Jump, Shot Put). Qualifying only.",
+        "papers": []
+      },
+      {
+        "stage_id": "tslprb_pc_stage3",
+        "stage_number": 3,
+        "stage_name": "Stage 3: Final Written Examination (FWE)",
+        "stage_type": "MAINS",
+        "is_qualifying_only": false,
+        "total_papers": 1,
+        "total_marks": 200,
+        "description": "Final merit examination for 200 marks (200 objective multiple choice questions, 3 hours duration). Determines final selection ranking.",
+        "papers": [
+          {
+            "paper_id": "tslprb_pc_fwe_paper",
+            "paper_number": "Final Written Paper",
+            "title": "Final Written Examination (Objective Type)",
+            "type": "OBJECTIVE",
+            "total_questions": 200,
+            "total_marks": 200,
+            "duration_minutes": 180,
+            "negative_marking_rate": 0,
+            "is_qualifying": false,
+            "language_mediums": [
+              "English",
+              "Telugu",
+              "Urdu"
+            ],
+            "sections": [
+              "English",
+              "Arithmetic",
+              "General Science",
+              "History of India, Indian culture, Indian National Movement",
+              "Indian Geography, Polity and Economy",
+              "Current events of national and international importance",
+              "Test of Reasoning / Mental Ability",
+              "Personality test (Ethics, Gender Sensitivity, Weaker Sections)",
+              "Contents pertaining to the State of Telangana"
+            ],
+            "syllabus_highlights": [
+              "English Comprehension & Grammar",
+              "Arithmetic & Reasoning",
+              "General Science",
+              "History of India & National Movement",
+              "Indian Polity & Economy",
+              "Current Events",
+              "Ethics & Social Sensitivity",
+              "Telangana History & Culture"
+            ]
+          }
+        ]
+      }
+    ],
+    "structure_scheme": {
+      "query": "tslprb police constable",
+      "exam_name": "TSLPRB Police Constable (SCT PC Civil / AR / SAR CPL / TSSP / Warder / Fireman)",
+      "commission": "Telangana State Level Police Recruitment Board (TSLPRB)",
+      "state_or_central": "Telangana",
+      "recruitment_cycle": "Current Recruitment Cycle",
+      "total_stages": 3,
+      "selection_summary": "Stage 1: Preliminary Written Test (PWT - 200 Marks) ➔ Stage 2: Physical Measurement Test & Physical Efficiency Test (PMT/PET - Qualifying) ➔ Stage 3: Final Written Examination (FWE - 200 Merit Marks).",
+      "official_reference": "https://www.tslprb.in/notifications/pc_scheme.pdf",
+      "source_status": "VERIFIED_OFFICIAL_CATALOG",
+      "stages": [
+        {
+          "stage_id": "tslprb_pc_stage1",
+          "stage_number": 1,
+          "stage_name": "Stage 1: Preliminary Written Test (PWT)",
+          "stage_type": "PRELIMINARY",
+          "is_qualifying_only": true,
+          "total_papers": 1,
+          "total_marks": 200,
+          "description": "Screening test comprising 200 objective questions for 200 marks. 3 Hours duration. Qualifying in nature to proceed to Physical tests.",
+          "papers": [
+            {
+              "paper_id": "tslprb_pc_pwt_paper",
+              "paper_number": "Preliminary Paper",
+              "title": "Syllabus for Preliminary Written Test (Objective Type)",
+              "type": "OBJECTIVE",
+              "total_questions": 200,
+              "total_marks": 200,
+              "duration_minutes": 180,
+              "negative_marking_rate": 0,
+              "is_qualifying": true,
+              "language_mediums": [
+                "English",
+                "Telugu",
+                "Urdu"
+              ],
+              "sections": [
+                "English",
+                "Arithmetic",
+                "General Science",
+                "History of India, Indian culture, Indian National Movement",
+                "Indian Geography, Polity and Economy",
+                "Current events of national and international importance",
+                "Test of Reasoning / Mental Ability",
+                "Contents pertaining to the State of Telangana"
+              ],
+              "syllabus_highlights": [
+                "English Grammar & Vocabulary",
+                "Arithmetic & Quantitative Skills",
+                "General Science (Everyday observation)",
+                "History of India & National Movement",
+                "Indian Geography, Polity & Economy",
+                "National & International Current Affairs",
+                "Reasoning & Mental Ability",
+                "Telangana Movement & Statehood"
+              ]
+            }
+          ]
+        },
+        {
+          "stage_id": "tslprb_pc_stage2",
+          "stage_number": 2,
+          "stage_name": "Stage 2: Physical Measurement Test & Physical Efficiency Test (PMT / PET)",
+          "stage_type": "PHYSICAL_TEST",
+          "is_qualifying_only": true,
+          "total_papers": 0,
+          "total_marks": 0,
+          "description": "Physical Measurement Test (Height & Chest) and Physical Efficiency Test (1600m Run for Men, 800m Run for Women, Long Jump, Shot Put). Qualifying only.",
+          "papers": []
+        },
+        {
+          "stage_id": "tslprb_pc_stage3",
+          "stage_number": 3,
+          "stage_name": "Stage 3: Final Written Examination (FWE)",
+          "stage_type": "MAINS",
+          "is_qualifying_only": false,
+          "total_papers": 1,
+          "total_marks": 200,
+          "description": "Final merit examination for 200 marks (200 objective multiple choice questions, 3 hours duration). Determines final selection ranking.",
+          "papers": [
+            {
+              "paper_id": "tslprb_pc_fwe_paper",
+              "paper_number": "Final Written Paper",
+              "title": "Final Written Examination (Objective Type)",
+              "type": "OBJECTIVE",
+              "total_questions": 200,
+              "total_marks": 200,
+              "duration_minutes": 180,
+              "negative_marking_rate": 0,
+              "is_qualifying": false,
+              "language_mediums": [
+                "English",
+                "Telugu",
+                "Urdu"
+              ],
+              "sections": [
+                "English",
+                "Arithmetic",
+                "General Science",
+                "History of India, Indian culture, Indian National Movement",
+                "Indian Geography, Polity and Economy",
+                "Current events of national and international importance",
+                "Test of Reasoning / Mental Ability",
+                "Personality test (Ethics, Gender Sensitivity, Weaker Sections)",
+                "Contents pertaining to the State of Telangana"
+              ],
+              "syllabus_highlights": [
+                "English Comprehension & Grammar",
+                "Arithmetic & Reasoning",
+                "General Science",
+                "History of India & National Movement",
+                "Indian Polity & Economy",
+                "Current Events",
+                "Ethics & Social Sensitivity",
+                "Telangana History & Culture"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "created_at": "2026-09-12T04:10:12.317Z",
+    "updated_at": "2026-09-12T04:10:12.317Z",
+    "fact_verifications": {
+      "authority": {
+        "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_authority",
+        "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+        "fact_name": "authority",
+        "fact_label": "Commission / Authority",
+        "fact_value": "Official Commission / Examination Board",
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2024 Notification Cycle"
+      },
+      "exam_name": {
+        "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_exam_name",
+        "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+        "fact_name": "exam_name",
+        "fact_label": "Examination Title",
+        "fact_value": "Telangana Police Constable (SCT PC Civil) 2026",
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2024 Notification Cycle"
+      },
+      "recruitment_cycle": {
+        "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_recruitment_cycle",
+        "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+        "fact_name": "recruitment_cycle",
+        "fact_label": "Recruitment Cycle & Year",
+        "fact_value": "2024 Notification Cycle",
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2024 Notification Cycle"
+      },
+      "stage_tier": {
+        "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_stage_tier",
+        "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+        "fact_name": "stage_tier",
+        "fact_label": "Stage / Tier",
+        "fact_value": "Preliminary / Objective Examination",
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2024 Notification Cycle"
+      },
+      "paper": {
+        "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_paper",
+        "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+        "fact_name": "paper",
+        "fact_label": "Paper & Subject Scope",
+        "fact_value": "Preliminary Written Test 2024 Model Paper",
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2024 Notification Cycle"
+      },
+      "question_count": {
+        "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_question_count",
+        "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+        "fact_name": "question_count",
+        "fact_label": "Question Count",
+        "fact_value": 150,
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2024 Notification Cycle"
+      },
+      "marks": {
+        "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_marks",
+        "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+        "fact_name": "marks",
+        "fact_label": "Marks Evaluation Scheme",
+        "fact_value": "150 Total Marks (1 mark/Q)",
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2024 Notification Cycle"
+      },
+      "duration": {
+        "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_duration",
+        "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+        "fact_name": "duration",
+        "fact_label": "Test Duration (Minutes)",
+        "fact_value": "150 minutes",
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2024 Notification Cycle"
+      },
+      "negative_marking": {
+        "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_negative_marking",
+        "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+        "fact_name": "negative_marking",
+        "fact_label": "Negative Marking Penalty",
+        "fact_value": "0.25 (1/4th)",
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2024 Notification Cycle"
+      },
+      "language_rules": {
+        "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_language_rules",
+        "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+        "fact_name": "language_rules",
+        "fact_label": "Medium & Language Rules",
+        "fact_value": [
+          "English"
+        ],
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2024 Notification Cycle"
+      },
+      "section_structure": {
+        "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_section_structure",
+        "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+        "fact_name": "section_structure",
+        "fact_label": "Sectional Breakdown",
+        "fact_value": [
+          "General Studies"
+        ],
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2024 Notification Cycle"
+      },
+      "syllabus_version": {
+        "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_syllabus_version",
+        "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+        "fact_name": "syllabus_version",
+        "fact_label": "Syllabus Version & Gazette",
+        "fact_value": "1 Core Topics Prescribed",
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2024 Notification Cycle"
+      }
+    },
+    "pattern_versions": [
+      {
+        "version_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_v1",
+        "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+        "recruitment_cycle": "2024 Notification Cycle",
+        "notification_number": "2024",
+        "effective_date": "2026-09-12",
+        "pattern": {
+          "total_questions": 150,
+          "duration_minutes": 150,
+          "total_marks": 150,
+          "marks_per_question": 1,
+          "negative_marking_rate": 0.25,
+          "sections": [
+            "General Studies"
+          ],
+          "mediums": [
+            "English"
+          ],
+          "languages": [
+            "English"
+          ],
+          "exceptions": []
+        },
+        "syllabus_topics": [
+          "General Studies"
+        ],
+        "fact_verifications": {
+          "authority": {
+            "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_authority",
+            "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+            "fact_name": "authority",
+            "fact_label": "Commission / Authority",
+            "fact_value": "Official Commission / Examination Board",
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2024 Notification Cycle"
+          },
+          "exam_name": {
+            "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_exam_name",
+            "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+            "fact_name": "exam_name",
+            "fact_label": "Examination Title",
+            "fact_value": "Telangana Police Constable (SCT PC Civil) 2026",
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2024 Notification Cycle"
+          },
+          "recruitment_cycle": {
+            "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_recruitment_cycle",
+            "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+            "fact_name": "recruitment_cycle",
+            "fact_label": "Recruitment Cycle & Year",
+            "fact_value": "2024 Notification Cycle",
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2024 Notification Cycle"
+          },
+          "stage_tier": {
+            "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_stage_tier",
+            "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+            "fact_name": "stage_tier",
+            "fact_label": "Stage / Tier",
+            "fact_value": "Preliminary / Objective Examination",
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2024 Notification Cycle"
+          },
+          "paper": {
+            "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_paper",
+            "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+            "fact_name": "paper",
+            "fact_label": "Paper & Subject Scope",
+            "fact_value": "Preliminary Written Test 2024 Model Paper",
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2024 Notification Cycle"
+          },
+          "question_count": {
+            "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_question_count",
+            "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+            "fact_name": "question_count",
+            "fact_label": "Question Count",
+            "fact_value": 150,
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2024 Notification Cycle"
+          },
+          "marks": {
+            "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_marks",
+            "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+            "fact_name": "marks",
+            "fact_label": "Marks Evaluation Scheme",
+            "fact_value": "150 Total Marks (1 mark/Q)",
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2024 Notification Cycle"
+          },
+          "duration": {
+            "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_duration",
+            "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+            "fact_name": "duration",
+            "fact_label": "Test Duration (Minutes)",
+            "fact_value": "150 minutes",
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2024 Notification Cycle"
+          },
+          "negative_marking": {
+            "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_negative_marking",
+            "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+            "fact_name": "negative_marking",
+            "fact_label": "Negative Marking Penalty",
+            "fact_value": "0.25 (1/4th)",
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2024 Notification Cycle"
+          },
+          "language_rules": {
+            "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_language_rules",
+            "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+            "fact_name": "language_rules",
+            "fact_label": "Medium & Language Rules",
+            "fact_value": [
+              "English"
+            ],
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2024 Notification Cycle"
+          },
+          "section_structure": {
+            "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_section_structure",
+            "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+            "fact_name": "section_structure",
+            "fact_label": "Sectional Breakdown",
+            "fact_value": [
+              "General Studies"
+            ],
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2024 Notification Cycle"
+          },
+          "syllabus_version": {
+            "fact_id": "exam_telangana_police_constable_sct_p_mtxv9wwo_syllabus_version",
+            "exam_id": "exam_telangana_police_constable_sct_p_mtxv9wwo",
+            "fact_name": "syllabus_version",
+            "fact_label": "Syllabus Version & Gazette",
+            "fact_value": "1 Core Topics Prescribed",
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2024 Notification Cycle"
+          }
+        },
+        "is_active": true,
+        "notes": "Initial active recruitment cycle pattern configuration"
+      }
+    ]
+  },
+  {
+    "exam_id": "exam_test_exam_mtxv37t5",
+    "intake_id": "intake_mtxv37t5",
+    "title": "Test Exam",
+    "commission": "Official Commission / Examination Board",
+    "state_or_central": "STATE",
+    "post": "Official Examination Service",
+    "stage": "Preliminary / Objective Examination",
+    "paper": "Test Paper",
+    "recruitment_cycle": "2026 Notification Cycle",
+    "active_cycle": "2026 Notification Cycle",
+    "catalog_slug": "state-test-exam",
+    "exam_kind": "general",
+    "heading": "Test Exam Mock Tests",
+    "fallback_title": "Test Exam Mock Tests in STATE",
+    "fallback_description": "Practise Test Exam mock tests for STATE. Explore papers, take timed tests and review every answer.",
+    "languages": [
+      "English"
+    ],
+    "exceptions": [],
+    "pattern": {
+      "total_questions": 150,
+      "duration_minutes": 150,
+      "total_marks": 150,
+      "marks_per_question": 1,
+      "negative_marking_rate": 0.25,
+      "sections": [
+        "Indian Polity",
+        "Indian Economy",
+        "General Science"
+      ],
+      "mediums": [
+        "English"
+      ],
+      "languages": [
+        "English"
+      ],
+      "exceptions": []
+    },
+    "syllabus_topics": [
+      "Indian Polity",
+      "Indian Economy",
+      "General Science"
+    ],
+    "status": "INTAKE_SUBMITTED",
+    "exam_profile_status": "RESEARCH_REQUIRED",
+    "pattern_status": "UNVERIFIED",
+    "source_confidence_score": 0,
+    "preparation_mode": "PRE_NOTIFICATION_PREPARATION",
+    "created_at": "2026-09-12T04:04:59.854Z",
+    "updated_at": "2026-09-12T04:04:59.854Z",
+    "fact_verifications": {
+      "authority": {
+        "fact_id": "exam_test_exam_mtxv37t5_authority",
+        "exam_id": "exam_test_exam_mtxv37t5",
+        "fact_name": "authority",
+        "fact_label": "Commission / Authority",
+        "fact_value": "Official Commission / Examination Board",
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2026 Notification Cycle"
+      },
+      "exam_name": {
+        "fact_id": "exam_test_exam_mtxv37t5_exam_name",
+        "exam_id": "exam_test_exam_mtxv37t5",
+        "fact_name": "exam_name",
+        "fact_label": "Examination Title",
+        "fact_value": "Test Exam",
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2026 Notification Cycle"
+      },
+      "recruitment_cycle": {
+        "fact_id": "exam_test_exam_mtxv37t5_recruitment_cycle",
+        "exam_id": "exam_test_exam_mtxv37t5",
+        "fact_name": "recruitment_cycle",
+        "fact_label": "Recruitment Cycle & Year",
+        "fact_value": "2026 Notification Cycle",
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2026 Notification Cycle"
+      },
+      "stage_tier": {
+        "fact_id": "exam_test_exam_mtxv37t5_stage_tier",
+        "exam_id": "exam_test_exam_mtxv37t5",
+        "fact_name": "stage_tier",
+        "fact_label": "Stage / Tier",
+        "fact_value": "Preliminary / Objective Examination",
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2026 Notification Cycle"
+      },
+      "paper": {
+        "fact_id": "exam_test_exam_mtxv37t5_paper",
+        "exam_id": "exam_test_exam_mtxv37t5",
+        "fact_name": "paper",
+        "fact_label": "Paper & Subject Scope",
+        "fact_value": "Test Paper",
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2026 Notification Cycle"
+      },
+      "question_count": {
+        "fact_id": "exam_test_exam_mtxv37t5_question_count",
+        "exam_id": "exam_test_exam_mtxv37t5",
+        "fact_name": "question_count",
+        "fact_label": "Question Count",
+        "fact_value": 150,
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2026 Notification Cycle"
+      },
+      "marks": {
+        "fact_id": "exam_test_exam_mtxv37t5_marks",
+        "exam_id": "exam_test_exam_mtxv37t5",
+        "fact_name": "marks",
+        "fact_label": "Marks Evaluation Scheme",
+        "fact_value": "150 Total Marks (1 mark/Q)",
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2026 Notification Cycle"
+      },
+      "duration": {
+        "fact_id": "exam_test_exam_mtxv37t5_duration",
+        "exam_id": "exam_test_exam_mtxv37t5",
+        "fact_name": "duration",
+        "fact_label": "Test Duration (Minutes)",
+        "fact_value": "150 minutes",
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2026 Notification Cycle"
+      },
+      "negative_marking": {
+        "fact_id": "exam_test_exam_mtxv37t5_negative_marking",
+        "exam_id": "exam_test_exam_mtxv37t5",
+        "fact_name": "negative_marking",
+        "fact_label": "Negative Marking Penalty",
+        "fact_value": "0.25 (1/4th)",
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2026 Notification Cycle"
+      },
+      "language_rules": {
+        "fact_id": "exam_test_exam_mtxv37t5_language_rules",
+        "exam_id": "exam_test_exam_mtxv37t5",
+        "fact_name": "language_rules",
+        "fact_label": "Medium & Language Rules",
+        "fact_value": [
+          "English"
+        ],
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2026 Notification Cycle"
+      },
+      "section_structure": {
+        "fact_id": "exam_test_exam_mtxv37t5_section_structure",
+        "exam_id": "exam_test_exam_mtxv37t5",
+        "fact_name": "section_structure",
+        "fact_label": "Sectional Breakdown",
+        "fact_value": [
+          "Indian Polity",
+          "Indian Economy",
+          "General Science"
+        ],
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2026 Notification Cycle"
+      },
+      "syllabus_version": {
+        "fact_id": "exam_test_exam_mtxv37t5_syllabus_version",
+        "exam_id": "exam_test_exam_mtxv37t5",
+        "fact_name": "syllabus_version",
+        "fact_label": "Syllabus Version & Gazette",
+        "fact_value": "3 Core Topics Prescribed",
+        "evidence_text": "",
+        "verification_status": "UNVERIFIED",
+        "confidence": 0,
+        "applicable_cycle": "2026 Notification Cycle"
+      }
+    },
+    "pattern_versions": [
+      {
+        "version_id": "exam_test_exam_mtxv37t5_v1",
+        "exam_id": "exam_test_exam_mtxv37t5",
+        "recruitment_cycle": "2026 Notification Cycle",
+        "notification_number": "2026",
+        "effective_date": "2026-09-12",
+        "pattern": {
+          "total_questions": 150,
+          "duration_minutes": 150,
+          "total_marks": 150,
+          "marks_per_question": 1,
+          "negative_marking_rate": 0.25,
+          "sections": [
+            "Indian Polity",
+            "Indian Economy",
+            "General Science"
+          ],
+          "mediums": [
+            "English"
+          ],
+          "languages": [
+            "English"
+          ],
+          "exceptions": []
+        },
+        "syllabus_topics": [
+          "Indian Polity",
+          "Indian Economy",
+          "General Science"
+        ],
+        "fact_verifications": {
+          "authority": {
+            "fact_id": "exam_test_exam_mtxv37t5_authority",
+            "exam_id": "exam_test_exam_mtxv37t5",
+            "fact_name": "authority",
+            "fact_label": "Commission / Authority",
+            "fact_value": "Official Commission / Examination Board",
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2026 Notification Cycle"
+          },
+          "exam_name": {
+            "fact_id": "exam_test_exam_mtxv37t5_exam_name",
+            "exam_id": "exam_test_exam_mtxv37t5",
+            "fact_name": "exam_name",
+            "fact_label": "Examination Title",
+            "fact_value": "Test Exam",
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2026 Notification Cycle"
+          },
+          "recruitment_cycle": {
+            "fact_id": "exam_test_exam_mtxv37t5_recruitment_cycle",
+            "exam_id": "exam_test_exam_mtxv37t5",
+            "fact_name": "recruitment_cycle",
+            "fact_label": "Recruitment Cycle & Year",
+            "fact_value": "2026 Notification Cycle",
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2026 Notification Cycle"
+          },
+          "stage_tier": {
+            "fact_id": "exam_test_exam_mtxv37t5_stage_tier",
+            "exam_id": "exam_test_exam_mtxv37t5",
+            "fact_name": "stage_tier",
+            "fact_label": "Stage / Tier",
+            "fact_value": "Preliminary / Objective Examination",
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2026 Notification Cycle"
+          },
+          "paper": {
+            "fact_id": "exam_test_exam_mtxv37t5_paper",
+            "exam_id": "exam_test_exam_mtxv37t5",
+            "fact_name": "paper",
+            "fact_label": "Paper & Subject Scope",
+            "fact_value": "Test Paper",
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2026 Notification Cycle"
+          },
+          "question_count": {
+            "fact_id": "exam_test_exam_mtxv37t5_question_count",
+            "exam_id": "exam_test_exam_mtxv37t5",
+            "fact_name": "question_count",
+            "fact_label": "Question Count",
+            "fact_value": 150,
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2026 Notification Cycle"
+          },
+          "marks": {
+            "fact_id": "exam_test_exam_mtxv37t5_marks",
+            "exam_id": "exam_test_exam_mtxv37t5",
+            "fact_name": "marks",
+            "fact_label": "Marks Evaluation Scheme",
+            "fact_value": "150 Total Marks (1 mark/Q)",
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2026 Notification Cycle"
+          },
+          "duration": {
+            "fact_id": "exam_test_exam_mtxv37t5_duration",
+            "exam_id": "exam_test_exam_mtxv37t5",
+            "fact_name": "duration",
+            "fact_label": "Test Duration (Minutes)",
+            "fact_value": "150 minutes",
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2026 Notification Cycle"
+          },
+          "negative_marking": {
+            "fact_id": "exam_test_exam_mtxv37t5_negative_marking",
+            "exam_id": "exam_test_exam_mtxv37t5",
+            "fact_name": "negative_marking",
+            "fact_label": "Negative Marking Penalty",
+            "fact_value": "0.25 (1/4th)",
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2026 Notification Cycle"
+          },
+          "language_rules": {
+            "fact_id": "exam_test_exam_mtxv37t5_language_rules",
+            "exam_id": "exam_test_exam_mtxv37t5",
+            "fact_name": "language_rules",
+            "fact_label": "Medium & Language Rules",
+            "fact_value": [
+              "English"
+            ],
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2026 Notification Cycle"
+          },
+          "section_structure": {
+            "fact_id": "exam_test_exam_mtxv37t5_section_structure",
+            "exam_id": "exam_test_exam_mtxv37t5",
+            "fact_name": "section_structure",
+            "fact_label": "Sectional Breakdown",
+            "fact_value": [
+              "Indian Polity",
+              "Indian Economy",
+              "General Science"
+            ],
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2026 Notification Cycle"
+          },
+          "syllabus_version": {
+            "fact_id": "exam_test_exam_mtxv37t5_syllabus_version",
+            "exam_id": "exam_test_exam_mtxv37t5",
+            "fact_name": "syllabus_version",
+            "fact_label": "Syllabus Version & Gazette",
+            "fact_value": "3 Core Topics Prescribed",
+            "evidence_text": "",
+            "verification_status": "UNVERIFIED",
+            "confidence": 0,
+            "applicable_cycle": "2026 Notification Cycle"
+          }
+        },
+        "is_active": true,
+        "notes": "Initial active recruitment cycle pattern configuration"
+      }
+    ]
+  },
+  {
     "exam_id": "exam_appsc_degree_lecturers_dl_exam_mtx4dbzf",
     "intake_id": "intake_mtx4dbzf",
     "title": "APPSC Degree Lecturers DL Exam",

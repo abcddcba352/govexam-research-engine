@@ -1291,6 +1291,7 @@ export interface PYQQuestionRecord {
   // Why Was This Asked
   reason_tags: WhyAskedReasonTag[];
   reason_summary: string;
+  why_asked_reason?: string;
   evidence_strength: 'STRONG' | 'MODERATE' | 'SPECULATIVE';
 
   // Adjacent Testable Concepts
@@ -1366,6 +1367,28 @@ export interface SubjectWeightageItem {
   };
 }
 
+export interface PaperPatternInsights {
+  exam_design_philosophy: string;
+  cognitive_breakdown?: {
+    recall_pct: number;
+    understand_pct: number;
+    application_pct: number;
+    analytical_pct: number;
+  };
+  nature_breakdown?: {
+    static_pct: number;
+    current_affairs_pct: number;
+    hybrid_pct: number;
+  };
+  difficulty_mix?: {
+    easy_pct: number;
+    moderate_pct: number;
+    difficult_pct: number;
+  };
+  trap_and_distractor_patterns?: string[];
+  strategic_preparation_roadmap?: string;
+}
+
 export interface PaperWeightageAnalysis {
   paper_name: string;
   year?: number;
@@ -1373,8 +1396,10 @@ export interface PaperWeightageAnalysis {
   subjects: SubjectWeightageItem[];
   high_yield_topics: Array<{ topic: string; subject: string; count: number }>;
   strategic_summary: string;
+  pattern_insights?: PaperPatternInsights;
   analyzed_by_gemini: boolean;
   model_used?: string;
+  gemini_error?: string;
   custom_subjects_provided: string[];
 }
 

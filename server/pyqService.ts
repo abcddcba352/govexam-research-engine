@@ -27,8 +27,8 @@ import {
   INITIAL_PYQ_CLUSTERS
 } from './pyqSeedData.ts';
 import { getExamById, saveGenerationAuditLog, getExams, createExamFromIntake, saveExams } from './dbService.ts';
-import { mapQuestionToSubject, resolveCanonicalSubjectsForExam, autoMapAllQuestions } from './subjectMapper.ts';
-import { getGenAI, getPrimaryModel, getThinkingConfig, getThinkingLevelForTask, executeWithGeminiFailover } from './geminiConfig.ts';
+import { resolveCanonicalSubjectsForExam, mapQuestionToSubject } from './subjectMapper.ts';
+import { getGenAI, getPrimaryModel, getThinkingConfig, getThinkingLevelForTask, executeWithGeminiFailover, executeWithModelAndKeyFailover } from './geminiConfig.ts';
 
 const DATA_DIR = path.join(process.cwd(), 'server', 'data');
 const PAPERS_FILE = path.join(DATA_DIR, 'previous_papers.json');
@@ -388,6 +388,14 @@ export async function parseAndIngestQuestionPaper(payload: IngestPaperPayload): 
     reason_summary?: string;
     primary_subject?: string;
     primary_topic?: string;
+    subtopic?: string;
+    microtopic?: string;
+    question_archetype?: string;
+    cognitive_level?: 'RECALL' | 'UNDERSTAND' | 'APPLY' | 'ANALYZE';
+    static_or_current?: 'STATIC' | 'CURRENT_AFFAIRS' | 'HYBRID';
+    state_specificity?: 'STATE_SPECIFIC' | 'ALL_INDIA' | 'INTERNATIONAL';
+    distractor_style?: string;
+    why_asked_reason?: string;
     difficulty?: 'EASY' | 'MODERATE' | 'DIFFICULT';
     matching_rationale?: string;
   }> = [];
@@ -534,131 +542,384 @@ ${payload.raw_text!.substring(0, 15000)}
     throw new Error("Could not parse any valid questions from the provided text. Please ensure questions include stem, options (A, B, C, D) and answer keys.");
   }
 
-  // 3. GEMINI QUESTION-TO-SUBJECT MATCHING
-  // If subjects were provided or can be derived from the target exam's syllabus / sections
-  let candidateSubjects = rawSubjects.length > 0 ? [...rawSubjects] : [];
-  if (candidateSubjects.length === 0 && examId) {
-    const matchedExam = getExams().find(e => e.exam_id === examId);
-    if (matchedExam) {
-      const examTopics = matchedExam.syllabus_topics || matchedExam.pattern?.sections || [];
-      // Also look into the specific stage / paper sections if available
-      const paperSections: string[] = [];
-      matchedExam.stages?.forEach(s => {
-        s.papers?.forEach(p => {
-          if (p.sections && p.sections.length > 0) {
-            paperSections.push(...p.sections);
-          }
-        });
-      });
-      const merged = [...new Set([...paperSections, ...examTopics])].filter(Boolean);
-      if (merged.length > 0) {
-        candidateSubjects = merged;
+  // 3. GEMINI QUESTION-TO-SUBJECT MATCHING & PATTERN ANALYSIS
+  const STANDARD_CORE_DISCIPLINES = [
+    'Indian Polity & Constitution',
+    'History of India & Indian National Movement',
+    'Indian Economy & Banking',
+    'Geography & Environment',
+    'General Science & Technology',
+    'Arithmetic & Quantitative Aptitude',
+    'Test of Reasoning & Mental Ability',
+    'Contents pertaining to the State of Telangana',
+    'General English',
+    'Current Affairs'
+  ];
+
+  function normalizeAndDecomposeSubjects(raw: string[]): string[] {
+    const list: string[] = [];
+    for (const item of raw) {
+      if (!item || !item.trim()) continue;
+      const clean = item.trim();
+      if (clean.includes('Polity') && clean.includes('Economy')) {
+        list.push('Indian Polity & Constitution', 'Indian Economy & Banking');
+        if (clean.includes('Geography')) list.push('Geography & Environment');
+      } else if (clean.includes('History') && clean.includes('Movement')) {
+        list.push('History of India & Indian National Movement');
+      } else if (clean.toLowerCase().includes('telangana')) {
+        list.push('Contents pertaining to the State of Telangana');
+      } else if (clean.toLowerCase() === 'general studies') {
+        list.push(...STANDARD_CORE_DISCIPLINES);
+      } else {
+        list.push(clean);
       }
     }
+    const deduped = [...new Set(list)].filter(Boolean);
+    return deduped.length >= 3 ? deduped : STANDARD_CORE_DISCIPLINES;
+  }
+
+  // Derive candidate subjects
+  let candidateSubjects: string[] = [];
+  const matchedExam = examId ? getExams().find(e => e.exam_id === examId) : null;
+  if (rawSubjects.length > 0) {
+    candidateSubjects = normalizeAndDecomposeSubjects(rawSubjects);
+  } else if (matchedExam) {
+    const examTopics = matchedExam.syllabus_topics || matchedExam.pattern?.sections || [];
+    const paperSections: string[] = [];
+    matchedExam.stages?.forEach(s => {
+      s.papers?.forEach(p => {
+        if (p.sections && p.sections.length > 0) paperSections.push(...p.sections);
+      });
+    });
+    const merged = [...new Set([...paperSections, ...examTopics])].filter(Boolean);
+    candidateSubjects = normalizeAndDecomposeSubjects(merged);
+  } else {
+    candidateSubjects = STANDARD_CORE_DISCIPLINES;
   }
 
   let geminiClassificationSuccess = false;
-  let modelUsedForMatching = 'Heuristic Classification';
+  let modelUsedForMatching = 'Heuristic Domain Engine';
+  let geminiError: string | undefined;
+  let patternInsights: any = null;
 
-  if (candidateSubjects.length > 0 && payload.ai_match_subjects !== false) {
+  // Domain Dictionary for NLP Fallback and Heuristic Scoring
+  const DOMAIN_PATTERNS: Array<{
+    subject: string;
+    keywords: RegExp;
+    defaultTopic: string;
+    archetype: string;
+    cognitive: 'RECALL' | 'UNDERSTAND' | 'APPLY' | 'ANALYZE';
+    whyReason: string;
+  }> = [
+    {
+      subject: 'Contents pertaining to the State of Telangana',
+      keywords: /\b(telangana|andhra|kakatiya|ramappa|recharla|ganapati deva|rudrama devi|gentlemen'?s agreement|mulki|hyderabad|nizam|asaf jahi|qutb shahi|bathukamma|bonalu|golconda|warangal|godavari|krishna|nagarjuna sagar|singareni|kaleshwaram|1969 movement|fazal ali commission|girglani)\b/i,
+      defaultTopic: 'Telangana History, Movement & Heritage',
+      archetype: 'DIRECT_FACT',
+      cognitive: 'RECALL',
+      whyReason: 'Tests state-specific historical milestones, regional governance agreements, and cultural heritage.'
+    },
+    {
+      subject: 'Indian Polity & Constitution',
+      keywords: /\b(article|constitution|parliament|lok sabha|rajya sabha|president|governor|supreme court|high court|fundamental right|directive principle|amendment|election commission|panchayat|judiciary|writ|preamble|ordinance|upsc|finance commission|attorney general|tribunal|371-d|370|356|324|32|21)\b/i,
+      defaultTopic: 'Constitutional Articles & Framework',
+      archetype: 'CONCEPTUAL',
+      cognitive: 'UNDERSTAND',
+      whyReason: 'Evaluates candidate understanding of constitutional balance of powers, fundamental rights, and institutional checks.'
+    },
+    {
+      subject: 'Indian Economy & Banking',
+      keywords: /\b(rbi|reserve bank|repo|reverse repo|crr|slr|monetary|fiscal|inflation|gdp|cpi|wpi|budget|tax|gst|deficit|banking|rupee|sebi|nabard|liquidity|credit rationing|balance of payment|niti aayog|five year plan)\b/i,
+      defaultTopic: 'Monetary Policy & Macroeconomics',
+      archetype: 'CONCEPTUAL',
+      cognitive: 'UNDERSTAND',
+      whyReason: 'Differentiates between quantitative and qualitative macroeconomic instruments and economic governance.'
+    },
+    {
+      subject: 'Geography & Environment',
+      keywords: /\b(river|tributary|mountain|himalaya|pass|plateau|soil|monsoon|climate|latitude|longitude|tropic of cancer|equator|forest|national park|wildlife sanctuary|biodiversity|border|coastal|cyclone|western ghats|eastern ghats|sikkim|bhutan|nepal)\b/i,
+      defaultTopic: 'Indian Physical & Strategic Geography',
+      archetype: 'DIRECT_FACT',
+      cognitive: 'UNDERSTAND',
+      whyReason: 'Assesses candidate precision regarding physical topography, river drainage basins, and strategic international frontiers.'
+    },
+    {
+      subject: 'History of India & Indian National Movement',
+      keywords: /\b(dynasty|maurya|gupta|delhi sultanate|mughal|british|east india company|1857|sepoy mutiny|congress|swadeshi|non-cooperation|civil disobedience|quit india|gandhi|nehru|tilak|ambedkar|subhash chandra bose|viceroy|governor general|harappa|indus valley|vedic|ashoka|akbar)\b/i,
+      defaultTopic: 'Modern National Movement & Historiography',
+      archetype: 'CHRONOLOGY',
+      cognitive: 'RECALL',
+      whyReason: 'Tests chronological awareness of key political turning points and socio-religious reform movements.'
+    },
+    {
+      subject: 'Arithmetic & Quantitative Aptitude',
+      keywords: /\b(percentage|ratio|proportion|simple interest|compound interest|profit|loss|discount|time and work|speed|distance|train|boat|pipe|cistern|average|mixture|alligation|number system|lcm|hcf|algebra|mensuration|area|volume)\b/i,
+      defaultTopic: 'Quantitative Problem Solving',
+      archetype: 'CALCULATION',
+      cognitive: 'APPLY',
+      whyReason: 'Evaluates mathematical accuracy, computational speed, and multi-step word problem formulation.'
+    },
+    {
+      subject: 'Test of Reasoning & Mental Ability',
+      keywords: /\b(series|coding|decoding|analogy|blood relation|direction sense|syllogism|venn diagram|statement and conclusion|assumption|seating arrangement|puzzle|dice|cube|mirror image|water image|embedded figure|odd one out)\b/i,
+      defaultTopic: 'Analytical Reasoning & Logical Deduction',
+      archetype: 'ANALYTICAL',
+      cognitive: 'ANALYZE',
+      whyReason: 'Measures logical pattern recognition, structured deduction, and spatial/verbal reasoning under time pressure.'
+    },
+    {
+      subject: 'General Science & Technology',
+      keywords: /\b(cell|tissue|organ|chromosome|gene|dna|rna|disease|virus|bacteria|vaccine|vitamin|enzyme|hormone|photosynthesis|atom|molecule|acid|base|metal|non-metal|gravity|velocity|acceleration|friction|optics|lens|mirror|sound|wavelength|electricity|satellite|isro|defence|drdo)\b/i,
+      defaultTopic: 'Everyday Scientific Principles',
+      archetype: 'CONCEPTUAL',
+      cognitive: 'UNDERSTAND',
+      whyReason: 'Tests scientific literacy and application of core physical, chemical, and biological principles to real-world phenomena.'
+    },
+    {
+      subject: 'General English',
+      keywords: /\b(synonym|antonym|idiom|phrase|one word substitute|spelling|preposition|article|tense|active voice|passive voice|direct speech|indirect speech|comprehension|cloze test|para jumble|sentence improvement|spotting error)\b/i,
+      defaultTopic: 'Vocabulary, Grammar & Comprehension',
+      archetype: 'DIRECT_FACT',
+      cognitive: 'UNDERSTAND',
+      whyReason: 'Validates language proficiency, contextual grammatical precision, and structural English comprehension.'
+    },
+    {
+      subject: 'Current Affairs',
+      keywords: /\b(summit|g20|cop28|cop29|brics|nato|unsc|nobel prize|bharat ratna|padma award|olympic|paralympic|world cup|chief justice|election 2024|election 2025|election 2026|prime minister|governor appointed|scheme launched|yojana|portal|amrit|budget 2024|budget 2025|budget 2026)\b/i,
+      defaultTopic: 'Contemporary National & International Developments',
+      archetype: 'DIRECT_FACT',
+      cognitive: 'RECALL',
+      whyReason: 'Determines the candidate’s active awareness of high-impact contemporary events and governance initiatives.'
+    }
+  ];
+
+  if (payload.ai_match_subjects !== false) {
     try {
-      console.log(`[PYQ AI Matching] Classifying ${rawQuestions.length} questions into ${candidateSubjects.length} subjects: ${candidateSubjects.join(', ')}`);
+      console.log(`[PYQ AI Analysis] Deep analyzing ${rawQuestions.length} questions into subjects: ${candidateSubjects.join(', ')}`);
 
-      // Batch questions in slices of up to 25 to ensure reliable JSON parsing
-      const BATCH_SIZE = 25;
-      const totalBatches = Math.ceil(rawQuestions.length / BATCH_SIZE);
+      const questionSummaries = rawQuestions.map(q => ({
+        question_number: q.question_number,
+        question: q.question_en,
+        options: {
+          A: q.option_a_en,
+          B: q.option_b_en,
+          C: q.option_c_en,
+          D: q.option_d_en
+        },
+        correct_answer: q.correct_answer || 'A',
+        explanation: q.reason_summary || ''
+      }));
 
-      for (let b = 0; b < totalBatches; b++) {
-        const batch = rawQuestions.slice(b * BATCH_SIZE, (b + 1) * BATCH_SIZE);
-        const batchSummaries = batch.map(q => ({
-          question_number: q.question_number,
-          question: q.question_en.substring(0, 250),
-          options: `A: ${q.option_a_en.substring(0, 60)} | B: ${q.option_b_en.substring(0, 60)} | C: ${q.option_c_en.substring(0, 60)} | D: ${q.option_d_en.substring(0, 60)}`
-        }));
+      const prompt = `You are an elite government examination curriculum director, psychometrician, and question-setter auditor.
+Analyze the following ${rawQuestions.length} questions from the examination paper "${paperName}" (${year}) for exam "${matchedExam?.title || 'Competitive Examination'}".
 
-        await executeWithGeminiFailover(async (ai) => {
-          const prompt = `You are an elite government exam curriculum auditor.
-The user uploaded questions from "${paperName}" and specified these CANONICAL SUBJECTS:
+CANONICAL SUBJECTS TAXONOMY:
 ${candidateSubjects.map((s, i) => `${i + 1}. "${s}"`).join('\n')}
 
-For each question below:
-1. Classify the question strictly into one of the canonical subjects listed above. Do not invent new subjects.
-2. Identify the specific primary topic within that subject (e.g., "Fundamental Rights", "Fiscal Policy", "Telangana Movement 1969", "Percentage & Ratios", "Indian Rivers").
-3. Determine difficulty: "EASY", "MODERATE", or "DIFFICULT".
-4. Provide a brief 1-sentence rationale explaining the classification.
+INSTRUCTIONS:
+1. CLASSIFY EACH QUESTION:
+   - "question_number": number matching input
+   - "matched_subject": Exactly match one of the canonical subjects above. Do not invent unrelated names.
+   - "primary_topic": Specific syllabus concept tested (e.g., "Article 371-D Local Cadre Safeguards", "Kakatiya Architecture & Ramappa Temple", "RBI Monetary Instruments", "Himalayan Mountain Passes", "Quantitative Problem Solving").
+   - "difficulty": "EASY" | "MODERATE" | "DIFFICULT" (based on distractor subtlety, depth of recall, and cognitive steps required).
+   - "question_archetype": "DIRECT_FACT" | "CONCEPTUAL" | "ANALYTICAL" | "STATEMENT_MATCHING" | "CHRONOLOGY" | "ASSERTION_REASON" | "CALCULATION".
+   - "cognitive_level": "RECALL" | "UNDERSTAND" | "APPLY" | "ANALYZE".
+   - "static_or_current": "STATIC" | "CURRENT_AFFAIRS" | "HYBRID".
+   - "state_specificity": "STATE_SPECIFIC" | "ALL_INDIA" | "INTERNATIONAL".
+   - "why_asked_reason": Detailed, insightful 1-2 sentence pedagogical explanation of WHY the commission examiner included this specific question, what cognitive skill or trap is being evaluated, and what common pitfall candidates make.
+   - "distractor_trap": 1 sentence describing how the options are constructed to challenge or mislead careless candidates.
 
-Output ONLY a JSON array with this structure:
-[
-  {
-    "question_number": <number>,
-    "matched_subject": "<Exact match from canonical subjects>",
-    "primary_topic": "<Specific syllabus topic>",
-    "difficulty": "EASY" | "MODERATE" | "DIFFICULT",
-    "rationale": "<Brief rationale>"
+2. PAPER PATTERN & DESIGN PHILOSOPHY ANALYSIS:
+   Synthesize a comprehensive master audit of this paper's architecture:
+   - "exam_design_philosophy": 2-3 substantial paragraphs explaining HOW and WHY this question paper was constructed in this specific way. Address:
+     a) The examiner's core testing objective (screening filter vs knowledge depth).
+     b) Balance between state-specific heritage/governance and pan-India disciplines.
+     c) The balance between rote memorization (dates/articles) and conceptual comprehension.
+   - "cognitive_breakdown": estimated percentages {"recall_pct": number, "understand_pct": number, "application_pct": number, "analytical_pct": number} (must sum to 100).
+   - "nature_breakdown": estimated percentages {"static_pct": number, "current_affairs_pct": number, "hybrid_pct": number} (must sum to 100).
+   - "difficulty_mix": estimated percentages {"easy_pct": number, "moderate_pct": number, "difficult_pct": number} (must sum to 100).
+   - "trap_and_distractor_patterns": array of 3-5 distinct examiner trap patterns observed across the options and phrasing.
+   - "strategic_preparation_roadmap": 2-3 sentences of concrete, high-yield guidance for candidates.
+
+Return ONLY a valid JSON object with this exact structure:
+{
+  "questions": [
+    {
+      "question_number": 1,
+      "matched_subject": "...",
+      "primary_topic": "...",
+      "difficulty": "EASY",
+      "question_archetype": "DIRECT_FACT",
+      "cognitive_level": "RECALL",
+      "static_or_current": "STATIC",
+      "state_specificity": "STATE_SPECIFIC",
+      "why_asked_reason": "...",
+      "distractor_trap": "..."
+    }
+  ],
+  "paper_analysis": {
+    "exam_design_philosophy": "...",
+    "cognitive_breakdown": {
+      "recall_pct": 30,
+      "understand_pct": 40,
+      "application_pct": 20,
+      "analytical_pct": 10
+    },
+    "nature_breakdown": {
+      "static_pct": 80,
+      "current_affairs_pct": 15,
+      "hybrid_pct": 5
+    },
+    "difficulty_mix": {
+      "easy_pct": 25,
+      "moderate_pct": 55,
+      "difficult_pct": 20
+    },
+    "trap_and_distractor_patterns": [
+      "..."
+    ],
+    "strategic_preparation_roadmap": "..."
   }
-]
+}
 
-QUESTIONS TO CLASSIFY:
-${JSON.stringify(batchSummaries, null, 2)}
+QUESTIONS TO ANALYZE:
+${JSON.stringify(questionSummaries, null, 2)}
 `;
-          const modelId = getPrimaryModel();
-          modelUsedForMatching = modelId;
+
+      const candidateModels = [
+        'gemini-3.1-flash-lite',
+        'gemini-2.5-flash',
+        'gemini-2.5-flash-lite',
+        'gemini-3.6-flash'
+      ];
+
+      const { result: textOut, modelUsed } = await executeWithModelAndKeyFailover(
+        candidateModels,
+        async (ai, _key, model) => {
           const res = await ai.models.generateContent({
-            model: modelId,
+            model,
             contents: prompt
           });
+          return res.text || '';
+        }
+      );
 
-          const textOut = res.text || '';
-          const jsonMatch = textOut.match(/\[\s*\{[\s\S]*\}\s*\]/);
-          if (jsonMatch) {
-            const classifications: Array<{
-              question_number: number;
-              matched_subject: string;
-              primary_topic: string;
-              difficulty?: 'EASY' | 'MODERATE' | 'DIFFICULT';
-              rationale?: string;
-            }> = JSON.parse(jsonMatch[0]);
-
-            for (const c of classifications) {
-              const target = rawQuestions.find(q => q.question_number === c.question_number);
-              if (target) {
-                // Ensure the matched subject is from candidateSubjects
-                const exactMatch = candidateSubjects.find(cs => cs.toLowerCase() === (c.matched_subject || '').toLowerCase());
-                target.primary_subject = exactMatch || c.matched_subject || candidateSubjects[0];
-                target.primary_topic = c.primary_topic || target.primary_topic || 'Core Concept';
-                if (c.difficulty && ['EASY', 'MODERATE', 'DIFFICULT'].includes(c.difficulty)) {
-                  target.difficulty = c.difficulty;
-                }
-                target.matching_rationale = c.rationale;
+      modelUsedForMatching = modelUsed;
+      const jsonMatch = textOut.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        if (Array.isArray(parsed.questions)) {
+          for (const c of parsed.questions) {
+            const target = rawQuestions.find(q => q.question_number === c.question_number);
+            if (target) {
+              const exactMatch = candidateSubjects.find(cs => cs.toLowerCase() === (c.matched_subject || '').toLowerCase());
+              target.primary_subject = exactMatch || c.matched_subject || candidateSubjects[0];
+              target.primary_topic = c.primary_topic || target.primary_topic || 'Core Concept';
+              if (c.difficulty && ['EASY', 'MODERATE', 'DIFFICULT'].includes(c.difficulty)) {
+                target.difficulty = c.difficulty;
               }
+              target.question_archetype = c.question_archetype || target.question_archetype || 'DIRECT_FACT';
+              target.cognitive_level = c.cognitive_level || 'UNDERSTAND';
+              target.static_or_current = c.static_or_current || 'STATIC';
+              target.state_specificity = c.state_specificity || 'ALL_INDIA';
+              target.distractor_style = c.distractor_trap || 'NEAR_FACT';
+              target.why_asked_reason = c.why_asked_reason || target.why_asked_reason || 'OFFICIAL_COMMISSION_ITEM';
+              target.matching_rationale = c.why_asked_reason || c.rationale;
             }
           }
-        });
+        }
+        if (parsed.paper_analysis) {
+          patternInsights = parsed.paper_analysis;
+        }
+        geminiClassificationSuccess = true;
+        console.log(`[PYQ AI Analysis] Successfully analyzed paper using ${modelUsed}`);
       }
-
-      geminiClassificationSuccess = true;
-      console.log(`[PYQ AI Matching] Successfully classified questions using Gemini AI.`);
     } catch (aiErr: any) {
-      console.warn('[PYQ AI Matching] Gemini matching encountered error, applying heuristic fallback:', aiErr?.message || aiErr);
-      // Fallback: match based on keywords
-      for (const q of rawQuestions) {
-        const text = `${q.question_en} ${q.option_a_en} ${q.option_b_en}`.toLowerCase();
-        let matched = candidateSubjects[0];
-        let maxMatches = 0;
-        for (const subj of candidateSubjects) {
-          const words = subj.toLowerCase().split(/\s+/).filter(w => w.length > 3);
-          let matchCount = 0;
-          for (const w of words) {
-            if (text.includes(w)) matchCount++;
-          }
-          if (matchCount > maxMatches) {
-            maxMatches = matchCount;
-            matched = subj;
+      geminiError = aiErr?.message || String(aiErr);
+      console.warn('[PYQ AI Matching] Gemini matching encountered error, applying domain NLP fallback:', geminiError);
+    }
+  }
+
+  // 3b. FALLBACK / DOMAIN CLASSIFIER (Applied if AI matching did not succeed or left empty fields)
+  if (!geminiClassificationSuccess) {
+    let easyCount = 0;
+    let modCount = 0;
+    let diffCount = 0;
+
+    for (const q of rawQuestions) {
+      const text = `${q.question_en} ${q.option_a_en} ${q.option_b_en} ${q.option_c_en} ${q.option_d_en} ${q.reason_summary || ''}`.toLowerCase();
+      let bestMatch = candidateSubjects[0];
+      let bestScore = -1;
+      let matchedPattern: typeof DOMAIN_PATTERNS[0] | null = null;
+
+      for (const pattern of DOMAIN_PATTERNS) {
+        // Only consider if subject is in candidate subjects or candidate subjects allows it
+        const candidateMatch = candidateSubjects.find(cs => cs.toLowerCase().includes(pattern.subject.toLowerCase()) || pattern.subject.toLowerCase().includes(cs.toLowerCase()));
+        if (candidateMatch || candidateSubjects.length === 0) {
+          const matches = (text.match(pattern.keywords) || []).length;
+          if (matches > bestScore) {
+            bestScore = matches;
+            bestMatch = candidateMatch || pattern.subject;
+            matchedPattern = pattern;
           }
         }
-        q.primary_subject = matched;
       }
+
+      q.primary_subject = bestMatch;
+      if (matchedPattern && bestScore > 0) {
+        q.primary_topic = q.primary_topic && q.primary_topic !== 'Official Question Item' ? q.primary_topic : matchedPattern.defaultTopic;
+        q.question_archetype = matchedPattern.archetype;
+        q.cognitive_level = matchedPattern.cognitive;
+        q.why_asked_reason = matchedPattern.whyReason;
+        q.matching_rationale = matchedPattern.whyReason;
+      } else {
+        q.primary_topic = q.primary_topic || 'Examination Item';
+        q.question_archetype = 'DIRECT_FACT';
+        q.cognitive_level = 'UNDERSTAND';
+        q.why_asked_reason = 'Official examination question evaluating core syllabus mastery.';
+      }
+
+      // Estimate difficulty heuristics
+      const stemLen = (q.question_en || '').length;
+      const isDifficult = stemLen > 180 || text.includes('statement') || text.includes('not correct') || text.includes('neither');
+      const isEasy = stemLen < 80 && (text.includes('who') || text.includes('capital') || text.includes('which year'));
+      q.difficulty = isDifficult ? 'DIFFICULT' : (isEasy ? 'EASY' : 'MODERATE');
+
+      if (q.difficulty === 'EASY') easyCount++;
+      else if (q.difficulty === 'DIFFICULT') diffCount++;
+      else modCount++;
+
+      // Detect state vs all-india
+      q.state_specificity = text.includes('telangana') || text.includes('andhra') ? 'STATE_SPECIFIC' : 'ALL_INDIA';
+      q.static_or_current = text.includes('2024') || text.includes('2025') || text.includes('2026') || text.includes('recent') ? 'CURRENT_AFFAIRS' : 'STATIC';
     }
+
+    const total = rawQuestions.length || 1;
+    patternInsights = {
+      exam_design_philosophy: `This examination paper (${paperName}) was structured to balance core disciplinary static knowledge with state-specific regional mastery. The questions test candidate aptitude across key governance domains, utilizing factual recall as well as conceptual understanding to differentiate well-prepared candidates.`,
+      cognitive_breakdown: {
+        recall_pct: Math.round((easyCount / total) * 100),
+        understand_pct: Math.round((modCount / total) * 100),
+        application_pct: Math.round((diffCount / total) * 100),
+        analytical_pct: 0
+      },
+      nature_breakdown: {
+        static_pct: 85,
+        current_affairs_pct: 15,
+        hybrid_pct: 0
+      },
+      difficulty_mix: {
+        easy_pct: Math.round((easyCount / total) * 100),
+        moderate_pct: Math.round((modCount / total) * 100),
+        difficult_pct: Math.round((diffCount / total) * 100)
+      },
+      trap_and_distractor_patterns: [
+        'Close chronological dates designed to test historical precision',
+        'Similar-sounding administrative and institutional acronyms',
+        'Negative phrasing qualifiers (e.g. "which of the following is NOT correct")'
+      ],
+      strategic_preparation_roadmap: 'Focus on high-frequency constitutional articles, state movement milestones, and foundational macroeconomic tools to maximize scoring efficiency.'
+    };
   }
 
   // 4. REGISTER PREVIOUS PAPER RECORD
@@ -679,7 +940,7 @@ ${JSON.stringify(batchSummaries, null, 2)}
     official_status: 'OFFICIAL',
     extraction_status: 'EXTRACTED',
     analysis_status: 'COMPLETED',
-    notes: `Paper ingested on ${new Date().toLocaleDateString()}. Subjects configured: ${candidateSubjects.length}. AI matching: ${geminiClassificationSuccess ? 'Gemini AI' : 'Heuristic'}.`
+    notes: `Paper ingested on ${new Date().toLocaleDateString()}. Subjects configured: ${candidateSubjects.length}. AI matching: ${geminiClassificationSuccess ? modelUsedForMatching : 'Heuristic Domain Engine'}.`
   });
 
   // 5. CONVERT TO PYQQuestionRecord AND PERSIST
@@ -713,15 +974,15 @@ ${JSON.stringify(batchSummaries, null, 2)}
       primary_topic: q.primary_topic || 'Official Question Item',
       subtopic: 'Examination Item',
       microtopic: 'Syllabus Concept',
-      question_type: 'DIRECT_FACT',
-      question_archetype: 'DIRECT_FACT',
+      question_type: (q.question_archetype as any) || 'DIRECT_FACT',
+      question_archetype: q.question_archetype || 'DIRECT_FACT',
       difficulty: diff,
-      cognitive_level: 'UNDERSTAND',
-      static_or_current: 'STATIC',
-      state_specificity: 'STATE_SPECIFIC',
-      distractor_style: 'NEAR_FACT',
-      why_asked_reason: 'OFFICIAL_COMMISSION_ITEM',
-      reason_summary: q.reason_summary || q.matching_rationale || 'Verified commission item.',
+      cognitive_level: q.cognitive_level || 'UNDERSTAND',
+      static_or_current: q.static_or_current || 'STATIC',
+      state_specificity: q.state_specificity || 'ALL_INDIA',
+      distractor_style: (q.distractor_style as any) || 'NEAR_FACT',
+      why_asked_reason: q.why_asked_reason || 'OFFICIAL_COMMISSION_ITEM',
+      reason_summary: q.matching_rationale || q.why_asked_reason || q.reason_summary || 'Verified commission item.',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       data_provenance: 'RETRIEVED_OFFICIAL'
@@ -740,7 +1001,7 @@ ${JSON.stringify(batchSummaries, null, 2)}
     difficulty: { EASY: number; MODERATE: number; DIFFICULT: number };
   }> = {};
 
-  // Initialize with user's candidate subjects so 0-count subjects are visible
+  // Initialize with candidate subjects
   for (const s of candidateSubjects) {
     subjectMap[s] = {
       count: 0,
@@ -802,8 +1063,11 @@ ${JSON.stringify(batchSummaries, null, 2)}
   const topTwo = subjectItems.slice(0, 2);
   const combinedTopPct = topTwo.reduce((sum, s) => sum + s.percentage, 0);
 
-  let strategicSummary = `In this examination paper (${paperName}), the highest weightage was observed in "${topSubject?.subject || 'General Studies'}" with ${topSubject?.question_count || 0} questions (${topSubject?.percentage || 0}%).`;
-  if (topTwo.length > 1) {
+  let strategicSummary = patternInsights?.exam_design_philosophy
+    ? patternInsights.exam_design_philosophy
+    : `In this examination paper (${paperName}), the highest weightage was observed in "${topSubject?.subject || 'General Studies'}" with ${topSubject?.question_count || 0} questions (${topSubject?.percentage || 0}%).`;
+
+  if (!patternInsights?.exam_design_philosophy && topTwo.length > 1) {
     strategicSummary += ` The top two subjects ("${topTwo[0].subject}" and "${topTwo[1].subject}") account for ${combinedTopPct.toFixed(1)}% of all questions, indicating essential core priority areas for test takers.`;
   }
 
@@ -814,8 +1078,10 @@ ${JSON.stringify(batchSummaries, null, 2)}
     subjects: subjectItems,
     high_yield_topics: highYieldTopics,
     strategic_summary: strategicSummary,
+    pattern_insights: patternInsights,
     analyzed_by_gemini: geminiClassificationSuccess,
     model_used: geminiClassificationSuccess ? modelUsedForMatching : undefined,
+    gemini_error: geminiClassificationSuccess ? undefined : geminiError,
     custom_subjects_provided: candidateSubjects
   };
 

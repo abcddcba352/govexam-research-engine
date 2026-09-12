@@ -24,6 +24,11 @@ import {
   Eye,
   Download,
   Copy,
+  Lightbulb,
+  ShieldAlert,
+  Target,
+  Compass,
+  BookOpen,
 } from 'lucide-react';
 import {
   isCentralExam,
@@ -584,10 +589,12 @@ Explanation: Article 371-D...`}
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-base font-bold tracking-tight">Paper Analysis Results</h3>
+                  <h3 className="text-base font-bold tracking-tight">Paper Analysis & Pattern Intelligence</h3>
                   <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
                     <Sparkles className="w-3 h-3" />
-                    {analysisResult.analyzed_by_gemini ? 'Gemini AI' : 'Rule-Based'}
+                    {analysisResult.analyzed_by_gemini
+                      ? `Gemini AI (${analysisResult.model_used || 'Active'})`
+                      : 'Domain NLP Engine'}
                   </span>
                 </div>
                 <p className="text-xs text-slate-300 mt-0.5">
@@ -597,81 +604,198 @@ Explanation: Article 371-D...`}
             </div>
           </div>
 
-          <div className="p-6 space-y-5">
-            {/* Strategic Summary */}
-            {analysisResult.strategic_summary && (
-              <div className="p-4 rounded-xl bg-indigo-50/80 border border-indigo-200">
-                <div className="text-xs font-bold text-indigo-900 flex items-center gap-1.5 mb-1.5">
-                  <Brain className="w-4 h-4 text-indigo-600" />
-                  <span>Strategic Insights — Why This Paper Was Designed This Way</span>
+          <div className="p-6 space-y-6">
+            {/* 1. Commission Design Strategy & Philosophy */}
+            <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-50/90 via-blue-50/50 to-slate-50 border border-indigo-200/80 shadow-2xs">
+              <div className="text-xs font-bold text-indigo-900 flex items-center gap-1.5 mb-2">
+                <Compass className="w-4 h-4 text-indigo-600" />
+                <span className="uppercase tracking-wider">Commission Design Strategy & Paper Architecture</span>
+              </div>
+              <p className="text-xs text-indigo-950 leading-relaxed whitespace-pre-line font-normal">
+                {analysisResult.pattern_insights?.exam_design_philosophy || analysisResult.strategic_summary}
+              </p>
+            </div>
+
+            {/* 2. Cognitive & Nature Metrics Grid */}
+            {analysisResult.pattern_insights && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {/* Cognitive Distribution */}
+                {analysisResult.pattern_insights.cognitive_breakdown && (
+                  <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2">
+                    <span className="text-[11px] font-bold text-slate-700 flex items-center gap-1 uppercase tracking-wider">
+                      <Brain className="w-3.5 h-3.5 text-indigo-600" />
+                      Cognitive Depth
+                    </span>
+                    <div className="grid grid-cols-2 gap-1.5 text-xs">
+                      <div className="bg-white p-2 rounded-lg border border-slate-200">
+                        <span className="text-[10px] text-slate-500 block">Factual Recall</span>
+                        <span className="font-bold text-slate-800">{analysisResult.pattern_insights.cognitive_breakdown.recall_pct}%</span>
+                      </div>
+                      <div className="bg-white p-2 rounded-lg border border-slate-200">
+                        <span className="text-[10px] text-slate-500 block">Comprehension</span>
+                        <span className="font-bold text-slate-800">{analysisResult.pattern_insights.cognitive_breakdown.understand_pct}%</span>
+                      </div>
+                      <div className="bg-white p-2 rounded-lg border border-slate-200">
+                        <span className="text-[10px] text-slate-500 block">Application</span>
+                        <span className="font-bold text-slate-800">{analysisResult.pattern_insights.cognitive_breakdown.application_pct}%</span>
+                      </div>
+                      <div className="bg-white p-2 rounded-lg border border-slate-200">
+                        <span className="text-[10px] text-slate-500 block">Analytical</span>
+                        <span className="font-bold text-slate-800">{analysisResult.pattern_insights.cognitive_breakdown.analytical_pct}%</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Static vs Current Balance */}
+                {analysisResult.pattern_insights.nature_breakdown && (
+                  <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2">
+                    <span className="text-[11px] font-bold text-slate-700 flex items-center gap-1 uppercase tracking-wider">
+                      <BookOpen className="w-3.5 h-3.5 text-blue-600" />
+                      Domain Balance
+                    </span>
+                    <div className="space-y-1.5 text-xs">
+                      <div className="bg-white p-2 rounded-lg border border-slate-200 flex justify-between items-center">
+                        <span className="text-[10px] text-slate-600">Static Foundation</span>
+                        <span className="font-bold text-blue-600">{analysisResult.pattern_insights.nature_breakdown.static_pct}%</span>
+                      </div>
+                      <div className="bg-white p-2 rounded-lg border border-slate-200 flex justify-between items-center">
+                        <span className="text-[10px] text-slate-600">Current Affairs</span>
+                        <span className="font-bold text-emerald-600">{analysisResult.pattern_insights.nature_breakdown.current_affairs_pct}%</span>
+                      </div>
+                      {analysisResult.pattern_insights.nature_breakdown.hybrid_pct > 0 && (
+                        <div className="bg-white p-2 rounded-lg border border-slate-200 flex justify-between items-center">
+                          <span className="text-[10px] text-slate-600">Hybrid Linkage</span>
+                          <span className="font-bold text-purple-600">{analysisResult.pattern_insights.nature_breakdown.hybrid_pct}%</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Difficulty Mix */}
+                {analysisResult.pattern_insights.difficulty_mix && (
+                  <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2">
+                    <span className="text-[11px] font-bold text-slate-700 flex items-center gap-1 uppercase tracking-wider">
+                      <BarChart3 className="w-3.5 h-3.5 text-amber-600" />
+                      Difficulty Tier
+                    </span>
+                    <div className="space-y-1.5 text-xs">
+                      <div className="bg-white p-2 rounded-lg border border-slate-200 flex justify-between items-center">
+                        <span className="text-[10px] text-emerald-700 font-medium">Easy Questions</span>
+                        <span className="font-bold text-emerald-600">{analysisResult.pattern_insights.difficulty_mix.easy_pct}%</span>
+                      </div>
+                      <div className="bg-white p-2 rounded-lg border border-slate-200 flex justify-between items-center">
+                        <span className="text-[10px] text-amber-700 font-medium">Moderate Questions</span>
+                        <span className="font-bold text-amber-600">{analysisResult.pattern_insights.difficulty_mix.moderate_pct}%</span>
+                      </div>
+                      <div className="bg-white p-2 rounded-lg border border-slate-200 flex justify-between items-center">
+                        <span className="text-[10px] text-rose-700 font-medium">Difficult Questions</span>
+                        <span className="font-bold text-rose-600">{analysisResult.pattern_insights.difficulty_mix.difficult_pct}%</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 3. Trap & Distractor Patterns */}
+            {analysisResult.pattern_insights?.trap_and_distractor_patterns &&
+              analysisResult.pattern_insights.trap_and_distractor_patterns.length > 0 && (
+                <div className="p-4 rounded-xl bg-amber-50/70 border border-amber-200/80 space-y-2">
+                  <div className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+                    <ShieldAlert className="w-4 h-4 text-amber-600" />
+                    <span className="uppercase tracking-wider">Examiner Pitfalls & Distractor Traps Detected</span>
+                  </div>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-amber-950">
+                    {analysisResult.pattern_insights.trap_and_distractor_patterns.map((trap, i) => (
+                      <li key={i} className="flex items-start gap-1.5 bg-white/80 p-2.5 rounded-lg border border-amber-200">
+                        <span className="text-amber-600 font-bold">•</span>
+                        <span>{trap}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <p className="text-xs text-indigo-950 leading-relaxed">
-                  {analysisResult.strategic_summary}
+              )}
+
+            {/* 4. Strategic Preparation Roadmap */}
+            {analysisResult.pattern_insights?.strategic_preparation_roadmap && (
+              <div className="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200/80 space-y-1">
+                <div className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+                  <Target className="w-4 h-4 text-emerald-600" />
+                  <span className="uppercase tracking-wider">High-Yield Preparation Strategy</span>
+                </div>
+                <p className="text-xs text-emerald-950 leading-relaxed font-medium">
+                  {analysisResult.pattern_insights.strategic_preparation_roadmap}
                 </p>
               </div>
             )}
 
-            {/* Subject Weightage Bars */}
-            <div className="space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600">
-                Subject Weightage Distribution ({analysisResult.subjects.length} Subjects)
+            {/* 5. Subject Weightage Distribution */}
+            <div className="space-y-3 pt-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center justify-between">
+                <span>Subject Weightage Distribution ({analysisResult.subjects.filter(s => s.question_count > 0).length} Tested Subjects)</span>
+                <span className="text-[10px] text-slate-500 lowercase font-normal">ranked by question share</span>
               </h4>
-              {analysisResult.subjects.map((item, idx) => (
-                <div
-                  key={item.subject}
-                  className="p-3 rounded-xl border border-slate-200 bg-white shadow-2xs hover:border-indigo-300 transition-colors"
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <div className="flex items-center gap-2">
-                      <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-[10px] font-bold">
-                        {idx + 1}
-                      </span>
-                      <span className="text-xs font-bold text-slate-900">{item.subject}</span>
+              <div className="space-y-2.5">
+                {analysisResult.subjects.filter(item => item.question_count > 0).map((item, idx) => (
+                  <div
+                    key={item.subject}
+                    className="p-3 rounded-xl border border-slate-200 bg-white shadow-2xs hover:border-indigo-300 transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-bold">
+                          {idx + 1}
+                        </span>
+                        <span className="text-xs font-bold text-slate-900">{item.subject}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="font-bold text-slate-800">{item.question_count} Qs</span>
+                        <span className="font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
+                          {item.percentage}%
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 text-xs">
-                      <span className="font-bold text-slate-800">{item.question_count} Qs</span>
-                      <span className="font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
-                        {item.percentage}%
-                      </span>
+                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                      <div
+                        className="bg-indigo-600 h-full rounded-full transition-all duration-500"
+                        style={{ width: `${Math.min(100, Math.max(2, item.percentage))}%` }}
+                      />
                     </div>
+                    {item.difficulty_breakdown && (
+                      <div className="flex items-center gap-2 mt-2 text-[10px]">
+                        <span className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200">
+                          Easy: {item.difficulty_breakdown.EASY || 0}
+                        </span>
+                        <span className="px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 font-semibold border border-amber-200">
+                          Moderate: {item.difficulty_breakdown.MODERATE || 0}
+                        </span>
+                        <span className="px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 font-semibold border border-rose-200">
+                          Difficult: {item.difficulty_breakdown.DIFFICULT || 0}
+                        </span>
+                      </div>
+                    )}
                   </div>
-                  <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                    <div
-                      className="bg-indigo-600 h-full rounded-full transition-all duration-500"
-                      style={{ width: `${Math.min(100, Math.max(2, item.percentage))}%` }}
-                    />
-                  </div>
-                  {item.difficulty_breakdown && (
-                    <div className="flex items-center gap-2 mt-2 text-[10px]">
-                      <span className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200">
-                        Easy: {item.difficulty_breakdown.EASY || 0}
-                      </span>
-                      <span className="px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 font-semibold border border-amber-200">
-                        Moderate: {item.difficulty_breakdown.MODERATE || 0}
-                      </span>
-                      <span className="px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 font-semibold border border-rose-200">
-                        Difficult: {item.difficulty_breakdown.DIFFICULT || 0}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
-            {/* High-Yield Topics */}
+            {/* 6. High-Yield Focus Areas */}
             {analysisResult.high_yield_topics && analysisResult.high_yield_topics.length > 0 && (
-              <div className="space-y-2">
+              <div className="space-y-2 pt-2">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
                   <TrendingUp className="w-3.5 h-3.5 text-indigo-600" />
-                  <span>High-Yield Focus Areas</span>
+                  <span>High-Yield Recurring Focus Areas</span>
                 </h4>
                 <div className="flex flex-wrap gap-1.5">
                   {analysisResult.high_yield_topics.map((t, i) => (
                     <span
                       key={i}
-                      className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium border border-slate-200 flex items-center gap-1"
+                      className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium border border-slate-200 flex items-center gap-1.5"
                     >
-                      <span>{t.topic}</span>
+                      <span className="text-[10px] text-slate-400 font-semibold">{t.subject.split('&')[0].trim()}:</span>
+                      <span className="font-semibold text-slate-900">{t.topic}</span>
                       <span className="text-[10px] font-bold text-indigo-600 bg-white px-1.5 py-0.5 rounded">
                         {t.count} Qs
                       </span>
@@ -686,42 +810,88 @@ Explanation: Article 371-D...`}
 
       {/* ── IMPORTED QUESTIONS PREVIEW ── */}
       {importedQuestions.length > 0 && (
-        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs space-y-3">
+        <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-slate-100">
             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              Imported Questions ({importedQuestions.length})
+              <span>Questions Analysed & Saved to Question Bank ({importedQuestions.length})</span>
             </h3>
+            <span className="text-xs text-slate-500 font-medium">Click each card to review examiner design strategy</span>
           </div>
-          <div className="space-y-2 max-h-[400px] overflow-y-auto">
-            {importedQuestions.slice(0, 20).map((q, i) => (
-              <div key={q.pyq_question_id || i} className="p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-bold text-slate-800">Q{q.question_number || (i + 1)}.</span>
+          <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+            {importedQuestions.slice(0, 30).map((q, i) => (
+              <div
+                key={q.pyq_question_id || i}
+                className="p-4 rounded-xl bg-slate-50/80 border border-slate-200 text-xs space-y-2 hover:border-indigo-300 transition-colors"
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-bold text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-200">
+                    Q{q.question_number || (i + 1)}
+                  </span>
                   {q.primary_subject && (
-                    <span className="px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 font-semibold border border-blue-200 text-[10px]">
+                    <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-semibold border border-blue-200 text-[10px]">
                       {q.primary_subject}
                     </span>
                   )}
+                  {q.primary_topic && (
+                    <span className="px-2 py-0.5 rounded bg-purple-50 text-purple-700 font-semibold border border-purple-200 text-[10px]">
+                      {q.primary_topic}
+                    </span>
+                  )}
+                  {q.question_archetype && (
+                    <span className="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-semibold border border-indigo-200 text-[10px]">
+                      {q.question_archetype.replace(/_/g, ' ')}
+                    </span>
+                  )}
                   {q.difficulty && (
-                    <span className={`px-1.5 py-0.5 rounded font-semibold border text-[10px] ${
-                      q.difficulty === 'EASY' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                      q.difficulty === 'DIFFICULT' ? 'bg-rose-50 text-rose-700 border-rose-200' :
-                      'bg-amber-50 text-amber-700 border-amber-200'
-                    }`}>
+                    <span
+                      className={`px-2 py-0.5 rounded font-semibold border text-[10px] ${
+                        q.difficulty === 'EASY'
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          : q.difficulty === 'DIFFICULT'
+                          ? 'bg-rose-50 text-rose-700 border-rose-200'
+                          : 'bg-amber-50 text-amber-700 border-amber-200'
+                      }`}
+                    >
                       {q.difficulty}
                     </span>
                   )}
+                  {q.state_specificity === 'STATE_SPECIFIC' && (
+                    <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-800 font-semibold border border-amber-200 text-[10px]">
+                      State-Specific
+                    </span>
+                  )}
                 </div>
-                <p className="text-slate-700 leading-relaxed">{q.question_en}</p>
+
+                <p className="text-slate-800 font-medium leading-relaxed pt-1">
+                  {q.question_en}
+                </p>
+
                 {q.correct_answer && (
-                  <p className="mt-1 text-emerald-700 font-semibold">Answer: {q.correct_answer}</p>
+                  <div className="text-[11px] text-slate-600 font-semibold flex items-center gap-2">
+                    <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      Official Answer: Option {q.correct_answer}
+                    </span>
+                  </div>
+                )}
+
+                {/* Why Asked / Examiner Strategy callout */}
+                {(q.why_asked_reason || q.reason_summary) && (
+                  <div className="p-3 rounded-lg bg-amber-50/70 border border-amber-200/80 text-[11px] space-y-1">
+                    <div className="flex items-center gap-1.5 font-bold text-amber-900">
+                      <Lightbulb className="w-3.5 h-3.5 text-amber-600" />
+                      <span>Why This Question Was Asked (Examiner Strategy):</span>
+                    </div>
+                    <p className="text-amber-950 leading-relaxed">
+                      {q.why_asked_reason || q.reason_summary}
+                    </p>
+                  </div>
                 )}
               </div>
             ))}
-            {importedQuestions.length > 20 && (
+            {importedQuestions.length > 30 && (
               <p className="text-xs text-slate-500 text-center py-2">
-                ... and {importedQuestions.length - 20} more questions stored
+                ... and {importedQuestions.length - 30} more questions saved to database
               </p>
             )}
           </div>

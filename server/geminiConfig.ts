@@ -13,18 +13,20 @@ import {
 } from '../src/types.ts';
 
 // Server-side configurable environment variable for Gemini model
-export const GEMINI_PRIMARY_MODEL = process.env.GEMINI_PRIMARY_MODEL || 'gemini-3.8-flash';
-export const GEMINI_FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL || 'gemini-3.1-flash-lite';
+export const GEMINI_PRIMARY_MODEL = process.env.GEMINI_PRIMARY_MODEL || 'gemini-3.1-flash-lite';
+export const GEMINI_FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL || 'gemini-2.5-flash';
 
 export const QUALITY_TIER_MODELS: readonly string[] = [
   'gemini-3.8-flash',
   'gemini-3.7-flash',
   'gemini-3.6-flash',
+  'gemini-2.5-flash',
 ];
 
 export const ECONOMY_TIER_MODELS: readonly string[] = [
-  'gemini-3.5-flash-lite',
   'gemini-3.1-flash-lite',
+  'gemini-2.5-flash-lite',
+  'gemini-3.5-flash-lite',
 ];
 
 export interface ModelResolutionOptions {
@@ -124,9 +126,14 @@ export function getFallbackModel(): string {
 export function getCandidateModels(): string[] {
   const primary = getPrimaryModel();
   const fallback = getFallbackModel();
-  const candidates = process.env.GEMINI_ADDITIONAL_FALLBACKS === 'true'
-    ? [primary, 'gemini-3.7-flash', 'gemini-3.6-flash', fallback, 'gemini-3.5-flash-lite']
-    : [primary, fallback];
+  const candidates = [
+    primary,
+    fallback,
+    'gemini-3.1-flash-lite',
+    'gemini-2.5-flash',
+    'gemini-2.5-flash-lite',
+    'gemini-3.6-flash'
+  ];
   return [...new Set(candidates.filter(Boolean))];
 }
 
@@ -422,6 +429,52 @@ export async function executeWithGeminiFailover<T>(
   }
 
   throw new Error(`All ${totalKeys} configured Gemini API keys exhausted or rate-limited. Last error: ${lastError?.message || String(lastError)}`);
+}
+
+/**
+  * Executes an AI operation with automatic failover rotation across both models and API keys.
+  * If a model hits a 429 quota or rate limit error, it seamlessly rotates to candidate fallback models
+  * (e.g. gemini-3.1-flash-lite, gemini-2.5-flash) and available API keys.
+  */
+export async function executeWithModelAndKeyFailover<T>(
+  candidateModels: string[],
+  operation: (ai: GoogleGenAI, apiKey: string, model: string) => Promise<T>
+): Promise<{ result: T; modelUsed: string; keyUsed: string }> {
+  const allKeys = getAllGeminiApiKeys();
+  if (allKeys.length === 0) {
+    throw new Error('No Google Gemini API keys available. Please add a key in the Admin API Keys settings.');
+  }
+
+  const models = candidateModels.length > 0 ? candidateModels : getCandidateModels();
+  let lastError: any = null;
+
+  for (const model of models) {
+    for (let attempt = 0; attempt < allKeys.length; attempt++) {
+      const keyIdx = (activeKeyIndex + attempt) % allKeys.length;
+      const currentKey = allKeys[keyIdx];
+      const client = createGenAIClient(currentKey);
+
+      try {
+        const result = await operation(client, currentKey, model);
+        activeKeyIndex = keyIdx;
+        const adminKeys = getAdminGeminiKeys();
+        const match = adminKeys.find(k => k.key === currentKey);
+        if (match) {
+          match.status = 'ACTIVE';
+          match.last_used_at = new Date().toISOString();
+          match.success_count = (match.success_count || 0) + 1;
+          saveAdminGeminiKeys(adminKeys);
+        }
+        return { result, modelUsed: model, keyUsed: currentKey };
+      } catch (err: any) {
+        lastError = err;
+        const errMsg = String(err?.message || err);
+        console.warn(`[GeminiFailover] Model ${model} on key (${maskApiKey(currentKey)}) attempt failed: ${errMsg.slice(0, 140)}`);
+      }
+    }
+  }
+
+  throw new Error(`All candidate Gemini models (${models.join(', ')}) and keys exhausted. Last error: ${lastError?.message || String(lastError)}`);
 }
 
 /**

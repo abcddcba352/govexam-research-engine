@@ -194,3 +194,97 @@ test('PYQ Ingestion: Custom Exam Details, Subject Names, and Syllabus Weightage 
   assert.ok(weightage.high_yield_topics.length > 0, 'High-yield topics should be populated');
   assert.ok(weightage.strategic_summary.length > 20, 'Strategic summary should be generated');
 });
+
+test('Live or Fallback PYQ AI Matching with Gemini', async () => {
+  const result = await parseAndIngestQuestionPaper({
+    exam_title: 'Test Exam',
+    paper_name: 'Test Paper',
+    year: 2026,
+    raw_text: `Q1. Which Article of the Indian Constitution deals with the Election Commission?
+(A) Article 324
+(B) Article 356
+(C) Article 370
+(D) Article 280
+Answer: Option A
+Explanation: Article 324 provides for the Election Commission of India.`,
+    custom_subjects: ['Indian Polity', 'Indian Economy', 'General Science'],
+    ai_match_subjects: true
+  });
+
+  console.log('[TEST AI MATCH RESULT]', {
+    count: result.count,
+    analyzed_by_gemini: result.weightage_analysis?.analyzed_by_gemini,
+    model_used: result.weightage_analysis?.model_used,
+    questions: result.questions?.map(q => ({ num: q.question_number, subj: q.primary_subject, topic: q.primary_topic }))
+  });
+
+  assert.equal(result.success, true);
+  assert.equal(result.count, 1);
+});
+
+test('Full Paper Multi-Discipline AI Pattern & Design Analysis', async () => {
+  const result = await parseAndIngestQuestionPaper({
+    exam_title: 'Telangana Police Constable (SCT PC Civil) 2026',
+    paper_name: 'Preliminary Written Test 2024 Model Paper',
+    year: 2024,
+    raw_text: `Q1. Under Article 371-D of the Constitution of India, which of the following provisions was specifically created for the State of Andhra Pradesh?
+(A) Creation of a Special Administrative Tribunal for Civil Services
+(B) Exclusive reservation of 80% seats in all central universities
+(C) Direct administration by the Union Home Ministry
+(D) Complete exemption from NJAC guidelines
+Answer: Option A
+Explanation: Article 371-D governs public employment and educational quotas for local cadres.
+
+Q2. Who among the following Kakatiya rulers constructed the Ramappa Temple?
+(A) Prataparudra I
+(B) Ganapati Deva
+(C) Recharla Rudra
+(D) Rani Rudrama Devi
+Answer: Option C
+Explanation: Commissioned in 1213 CE by Recharla Rudra, a general under Kakatiya king Ganapati Deva.
+
+Q3. In which year was the Gentlemen's Agreement signed between leaders of Andhra and Telangana regions?
+(A) 1953
+(B) 1956
+(C) 1969
+(D) 1972
+Answer: Option B
+Explanation: Signed on 20 February 1956 prior to the formation of Andhra Pradesh.
+
+Q4. Which monetary policy tool is a quantitative credit control measure by RBI?
+(A) Moral Suasion
+(B) Margin Requirements
+(C) Cash Reserve Ratio (CRR)
+(D) Credit Rationing
+Answer: Option C
+Explanation: CRR, SLR, and Repo rate are quantitative instruments used by the RBI.
+
+Q5. Which Indian state shares borders with Nepal, Bhutan, and China?
+(A) Sikkim
+(B) Arunachal Pradesh
+(C) West Bengal
+(D) Uttarakhand
+Answer: Option A
+Explanation: Sikkim is bounded by Tibet (China), Bhutan, and Nepal.`,
+    ai_match_subjects: true
+  });
+
+  console.log('=== MULTI-DISCIPLINE AI ANALYSIS RESULT ===');
+  console.log('Analyzed by Gemini:', result.weightage_analysis?.analyzed_by_gemini);
+  console.log('Model Used:', result.weightage_analysis?.model_used);
+  console.log('Design Philosophy:', result.weightage_analysis?.pattern_insights?.exam_design_philosophy?.slice(0, 150) + '...');
+  console.log('Cognitive Breakdown:', result.weightage_analysis?.pattern_insights?.cognitive_breakdown);
+  console.log('Subject Breakdown:');
+  result.weightage_analysis?.subjects.filter(s => s.question_count > 0).forEach(s => {
+    console.log(` - ${s.subject}: ${s.question_count} Qs (${s.percentage}%)`);
+  });
+  console.log('Classified Questions:');
+  result.questions?.forEach(q => {
+    console.log(` Q${q.question_number}: [${q.primary_subject}] -> ${q.primary_topic} (${q.difficulty} / ${q.question_archetype}) | Why: ${q.why_asked_reason?.slice(0, 80)}...`);
+  });
+
+  assert.equal(result.success, true);
+  assert.equal(result.count, 5);
+  assert.ok(result.weightage_analysis?.subjects.filter(s => s.question_count > 0).length >= 3, 'Should span at least 3 distinct subjects');
+});
+

@@ -27,8 +27,8 @@
     "PERSISTENCE_BACKEND": "DATABASE",
     "AI_PROVIDER": "gemini",
     "FREE_ENGINE_DAILY_NEURONS": "6000",
-    "GEMINI_PRIMARY_MODEL": "gemini-3.6-flash",
-    "GEMINI_FALLBACK_MODEL": "gemini-3.1-flash-lite",
+    "GEMINI_PRIMARY_MODEL": "gemini-3.1-flash-lite",
+    "GEMINI_FALLBACK_MODEL": "gemini-2.5-flash",
     "MODEL_TIER_POLICY": "ALLOW_ECONOMY_FALLBACK_WITH_STRICT_AUDIT"
   }
 }
