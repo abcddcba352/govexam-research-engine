@@ -472,7 +472,7 @@ export async function parseAndIngestQuestionPaper(payload: IngestPaperPayload): 
     // 5. Standalone number on its own line: \b\d{1,3}\s*\n
     // 6. Number 5..350 followed by space and capitalized word: \b(?:[5-9]|[1-9]\d{1,2})\s+[A-Z\u0900-\u0D7F]
     const UNIVERSAL_Q_SPLIT = new RegExp(
-      `(?:^|\\n)\\s*(?=(?:(?:Q(?:uestion)?\\.?\\s*(?:No\\.?)?|Sl\\.?\\s*No\\.?|Item)\\s*[\\.\\:\\-–—]?\\s*\\d+|\\b\\d{1,3}\\s*[\\.\\:\\/–—\\-][ \\t]*|\\b\\d{1,3}\\s*\\n|(?:\\(\\d{1,3}\\)|\\[\\d{1,3}\\])[ \\t]*[A-Za-z\\u0900-\\u0D7F]|${parenPattern}|\\b(?:[5-9]|[1-9]\\d{1,2})\\s+[A-Z\\u0900-\\u0D7F][a-z\\u0900-\\u0D7F]{2,}))`,
+      `(?:^|\\n)\\s*(?=(?:(?:Q(?:uestion)?\\.?\\s*(?:No\\.?)?|Sl\\.?\\s*No\\.?|Item|ప్రశ్న\\.?)\\s*[\\.\\:\\-–—]?\\s*\\d+|\\b\\d{1,3}\\s*[\\.\\:\\/–—\\-][ \\t]*|\\b\\d{1,3}\\s*\\n|(?:\\(\\d{1,3}\\)|\\[\\d{1,3}\\])[ \\t]*[A-Za-z\\u0900-\\u0D7F]|${parenPattern}|\\b(?:[5-9]|[1-9]\\d{1,2})\\s+[A-Z\\u0900-\\u0D7F][a-z\\u0900-\\u0D7F]{2,}))`,
       'i'
     );
     const chunks = cleanText
@@ -481,11 +481,11 @@ export async function parseAndIngestQuestionPaper(payload: IngestPaperPayload): 
 
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i].trim();
-      const questionNumberMatch = chunk.match(/^(?:(?:Q(?:uestion)?\.?\s*(?:No\.?)?|Sl\.?\s*No\.?|Item)\s*[\.\:\-–—]?\s*(\d{1,3})[\.\:\)\-–—]?|(\d{1,3})\s*[\.\:\/–—\-]|(?:\((\d{1,3})\)|\[(\d{1,3})\])|(\d{1,3})\s*\n|(\d{1,3})\)|\b(\d{1,3})\s+[A-Za-z\u0900-\u0D7F])/i);
+      const questionNumberMatch = chunk.match(/^(?:(?:Q(?:uestion)?\.?\s*(?:No\.?)?|Sl\.?\s*No\.?|Item|ప్రశ్న\.?)\s*[\.\:\-–—]?\s*(\d{1,3})[\.\:\)\-–—]?|(\d{1,3})\s*[\.\:\/–—\-]|(?:\((\d{1,3})\)|\[(\d{1,3})\])|(\d{1,3})\s*\n|(\d{1,3})\)|\b(\d{1,3})\s+[A-Za-z\u0900-\u0D7F])/i);
       const qNum = questionNumberMatch
         ? parseInt(questionNumberMatch[1] || questionNumberMatch[2] || questionNumberMatch[3] || questionNumberMatch[4] || questionNumberMatch[5] || questionNumberMatch[6] || questionNumberMatch[7], 10)
         : i + 1;
-      const withoutQNum = chunk.replace(/^(?:(?:Q(?:uestion)?\.?\s*(?:No\.?)?|Sl\.?\s*No\.?|Item)\s*[\.\:\-–—]?\s*\d{1,3}[\.\:\)\-–—]?|(?:\d{1,3})\s*[\.\:\/–—\-]|(?:\(\d{1,3}\)|\[\d{1,3}\])|\d{1,3}\s*\n|\d{1,3}\)|\d{1,3}\s+(?=[A-Za-z\u0900-\u0D7F]))\s*/i, '').trim();
+      const withoutQNum = chunk.replace(/^(?:(?:Q(?:uestion)?\.?\s*(?:No\.?)?|Sl\.?\s*No\.?|Item|ప్రశ్న\.?)\s*[\.\:\-–—]?\s*\d{1,3}[\.\:\)\-–—]?|(?:\d{1,3})\s*[\.\:\/–—\-]|(?:\(\d{1,3}\)|\[\d{1,3}\])|\d{1,3}\s*\n|\d{1,3}\)|\d{1,3}\s+(?=[A-Za-z\u0900-\u0D7F]))\s*/i, '').trim();
 
       // Find letter options: (A), (B), (C), (D) or Option A / A.
       const optLetterA = (chunk.match(/(?:(?:\(?A\)?[\.\:\)]|\bOption\s*A\b))\s*([\s\S]*?)(?=(?:\(?B\)?[\.\:\)]|\bOption\s*B\b)|Answer|Key|Ans|$)/i)?.[1] || '').trim();

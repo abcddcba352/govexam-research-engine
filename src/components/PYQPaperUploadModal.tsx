@@ -98,11 +98,109 @@ export const PYQPaperUploadModal: React.FC<Props> = ({
 
   const groupedExams = useMemo(() => groupExamsByJurisdiction(exams), [exams]);
 
-  // Real-time detection of question count (safe line-by-line, no catastrophic backtracking)
+  // Real-time detection of question count (accurate multi-format & multi-section matching)
   const detectedQuestionCount = useMemo(() => {
     if (!pastedText.trim()) return 0;
     const lines = pastedText.split('\n');
-    return lines.filter(l => /^\s*(Q\s*\d+|Question\s*\d+|\(?\d+\)?[\.\:\)])/i.test(l)).length;
+    let count = 0;
+    let lastQNum = 0;
+
+    for (let i = 0; i < lines.length; i++) {
+      const l = lines[i].trim();
+      if (!l) continue;
+
+      // Reset sequence on section headers
+      if (/^(?:SECTION|PART|PAPER|MODULE|GROUP|SUBJECT|GENERAL\s+STUDIES|ARITHMETIC|REASONING)\b/i.test(l)) {
+        lastQNum = 0;
+        continue;
+      }
+
+      // 1. Explicit Question prefix: Q1, Q.1, Q-1, Q.No. 1, Question 1, Question No. 1, Sl.No. 1, Item 1, ప్రశ్న 1
+      const qPrefixMatch = l.match(/^(?:Q(?:uestion)?\.?\s*(?:No\.?)?|Sl\.?\s*No\.?|Item|ప్రశ్న\.?)\s*[\.\:\-–—]?\s*(\d{1,3})[\.\:\)\-–—\s]*/i);
+      if (qPrefixMatch) {
+        const num = parseInt(qPrefixMatch[1], 10);
+        if (num >= 1 && num <= 350) {
+          count++;
+          lastQNum = num;
+          continue;
+        }
+      }
+
+      // Explicitly reject option lines: (A)-(D), [A]-[D], A)-D), (1)-(4), [1]-[4]
+      if (/^(?:\([A-Da-d1-4]\)|\[[A-Da-d1-4]\]|[A-Da-d]\))[ \t]+/.test(l)) {
+        continue;
+      }
+
+      // 2. Numbered lines: 1., 1 ., 1:, 1 :, 1-, 1 -, 1–, 1—, 1/, 1 /
+      const numDotMatch = l.match(/^(\d{1,3})\s*(?:\.|\:|\/|[–—-]|-(?!\d))\s*/);
+      if (numDotMatch) {
+        const num = parseInt(numDotMatch[1], 10);
+        if (num >= 1 && num <= 350) {
+          if (num <= 4 && lastQNum > 4) {
+            continue;
+          }
+          count++;
+          lastQNum = num;
+          continue;
+        }
+      }
+
+      // 3. Number with closing paren: 1), 2), ..., 200)
+      const numParenMatch = l.match(/^(\d{1,3})\)[ \t]*/);
+      if (numParenMatch) {
+        const num = parseInt(numParenMatch[1], 10);
+        if (num >= 5 && num <= 350) {
+          count++;
+          lastQNum = num;
+          continue;
+        } else if (num >= 1 && num <= 4 && lastQNum <= 4 && (lastQNum === 0 || num === lastQNum + 1)) {
+          count++;
+          lastQNum = num;
+          continue;
+        }
+      }
+
+      // 4. Parenthesized numbers for 5+: (5) to (350) or [5] to [350]
+      const parenNumMatch = l.match(/^(?:\((\d{1,3})\)|\[(\d{1,3})\])[ \t]*/);
+      if (parenNumMatch) {
+        const num = parseInt(parenNumMatch[1] || parenNumMatch[2], 10);
+        if (num >= 5 && num <= 350) {
+          count++;
+          lastQNum = num;
+          continue;
+        }
+      }
+
+      // 5. Standalone number line (1 to 350 on its own line followed by question text on next line)
+      const standaloneMatch = l.match(/^(\d{1,3})$/);
+      if (standaloneMatch && i + 1 < lines.length) {
+        const num = parseInt(standaloneMatch[1], 10);
+        if (num >= 1 && num <= 350) {
+          if (lastQNum > 4 && num <= 4) {
+            continue;
+          }
+          const nextLine = lines[i + 1].trim();
+          if (nextLine.length > 5 && !/^[A-Da-d1-4][\.\)]/.test(nextLine)) {
+            count++;
+            lastQNum = num;
+            continue;
+          }
+        }
+      }
+
+      // 6. Number 5..350 directly followed by space and text (e.g. "170 Which of the following...")
+      const numWordMatch = l.match(/^(\d{1,3})\s+([A-Za-z\u0900-\u0D7F].*)/);
+      if (numWordMatch) {
+        const num = parseInt(numWordMatch[1], 10);
+        if (num >= 5 && num <= 350) {
+          count++;
+          lastQNum = num;
+          continue;
+        }
+      }
+    }
+
+    return count;
   }, [pastedText]);
 
   // Current active exam object

@@ -997,7 +997,7 @@ Rules:
 
       const text = ((await Promise.race([geminiPromise, timeoutPromise])) as string) || '';
       const cleanText = text.trim();
-      const qCount = (cleanText.match(/(?:^|\n)\s*(?:Q\s*\d+|\b\d+[\.\)])/gi) || []).length;
+      const qCount = (cleanText.match(/(?:^|\n)\s*(?:(?:Q(?:uestion)?\.?\s*(?:No\.?)?|Sl\.?\s*No\.?|Item|ప్రశ్న\.?)\s*[\.\:\-–—]?\s*\d+|\b\d{1,3}\s*(?:\.|\:|\/|[–—-]|-(?!\d))\s*|(?:\(\d{1,3}\)|\[\d{1,3}\])|\b\d{1,3}\s+[A-Za-z\u0900-\u0D7F])/gi) || []).length;
 
       return res.json({
         success: true,

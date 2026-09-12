@@ -210,7 +210,7 @@ export async function extractPdfTextInBrowser(
       const y = transform[5];
 
       const isVerticalJump = lastY !== null && Math.abs(y - lastY) > 3.5;
-      const startsQuestion = /^\s*(?:(?:Q(?:uestion)?|Sl\.?\s*No\.?|Item)?\s*[\.\:\-]?\s*(?:\(?\s*\d+\s*\)?|\[\s*\d+\s*\])[\.\:\)\-\s]*|\bQ\d+\b)/i.test(str);
+      const startsQuestion = /^\s*(?:(?:Q(?:uestion)?\.?\s*(?:No\.?)?|Sl\.?\s*No\.?|Item|ప్రశ్న\.?)\s*[\.\:\-–—]?\s*\d+|\b\d{1,3}\s*(?:\.|\:|\/|[–—-]|-(?!\d))\s*|\bQ\d+\b)/i.test(str);
       const startsOption = /^\s*(?:\(?[A-Da-d]\)[\.\:\)]?|\bOption\s*[A-D]\b|\(?[1-4]\)[\.\:\)]?|\[[1-4]\])/i.test(str);
 
       if (isVerticalJump || item.hasEOL || (currentLine.length > 0 && (startsQuestion || startsOption))) {
@@ -297,7 +297,7 @@ async function renderPageToJpegBase64(page: any, scale: number = 1.3): Promise<s
  */
 export async function extractScannedPdfWithVisionOcr(
   file: File,
-  maxPages: number = 50,
+  maxPages: number = 120,
   onProgress?: (msg: string, current: number, total: number) => void
 ): Promise<{ text: string; page_count: number; question_count: number }> {
   const arrayBuffer = await file.arrayBuffer();
@@ -309,7 +309,7 @@ export async function extractScannedPdfWithVisionOcr(
   const pagesToScan = Math.min(totalPages, maxPages);
 
   const accumulatedPages: { pageNum: number; text: string; qCount: number }[] = [];
-  const BATCH_SIZE = 2;
+  const BATCH_SIZE = 3;
 
   for (let i = 1; i <= pagesToScan; i += BATCH_SIZE) {
     const batchEnd = Math.min(i + BATCH_SIZE - 1, pagesToScan);
@@ -322,34 +322,44 @@ export async function extractScannedPdfWithVisionOcr(
     for (let p = i; p <= batchEnd; p++) {
       const pageNum = p;
       batchPromises.push((async () => {
-        try {
-          const page = await pdf.getPage(pageNum);
-          const imageBase64 = await renderPageToJpegBase64(page, 1.3);
+        let attempts = 0;
+        const maxAttempts = 2;
 
-          const res = await fetch('/api/pyq/ocr-page', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              image: imageBase64,
-              pageNumber: pageNum,
-              totalPages: pagesToScan
-            })
-          });
+        while (attempts < maxAttempts) {
+          attempts++;
+          try {
+            const page = await pdf.getPage(pageNum);
+            const imageBase64 = await renderPageToJpegBase64(page, 1.3);
 
-          if (res.ok) {
-            const data = await res.json();
-            if (data.success && data.text) {
-              return {
-                pageNum,
-                text: `--- Page ${pageNum} ---\n` + data.text,
-                qCount: data.questionCount || 0
-              };
+            const res = await fetch('/api/pyq/ocr-page', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                image: imageBase64,
+                pageNumber: pageNum,
+                totalPages: pagesToScan
+              })
+            });
+
+            if (res.ok) {
+              const data = await res.json();
+              if (data.success && data.text) {
+                return {
+                  pageNum,
+                  text: `--- Page ${pageNum} ---\n` + data.text,
+                  qCount: data.questionCount || 0
+                };
+              }
+            } else {
+              console.warn(`[Vision OCR] Page ${pageNum} returned status ${res.status} (attempt ${attempts})`);
             }
-          } else {
-            console.warn(`[Vision OCR] Page ${pageNum} returned status ${res.status}`);
+          } catch (pageErr: any) {
+            console.warn(`[Vision OCR] Error scanning page ${pageNum} (attempt ${attempts}):`, pageErr?.message);
           }
-        } catch (pageErr: any) {
-          console.warn(`[Vision OCR] Error scanning page ${pageNum}:`, pageErr?.message);
+
+          if (attempts < maxAttempts) {
+            await new Promise(r => setTimeout(r, 800));
+          }
         }
         return { pageNum, text: '', qCount: 0 };
       })());

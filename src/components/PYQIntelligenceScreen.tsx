@@ -124,14 +124,14 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
       const l = lines[i].trim();
       if (!l) continue;
 
-      // Reset sequence on section headers (e.g. SECTION B, PART II, PAPER 2)
-      if (/^(?:SECTION|PART|PAPER|MODULE|GROUP)\b/i.test(l)) {
+      // Reset sequence on section headers (e.g. SECTION B, PART II, PAPER 2, GENERAL STUDIES, ARITHMETIC)
+      if (/^(?:SECTION|PART|PAPER|MODULE|GROUP|SUBJECT|GENERAL\s+STUDIES|ARITHMETIC|REASONING)\b/i.test(l)) {
         lastQNum = 0;
         continue;
       }
 
-      // 1. Explicit Question prefix: Q1, Q.1, Q-1, Question 1, Sl.No. 1, Item 1
-      const qPrefixMatch = l.match(/^(?:Q(?:uestion)?|Sl\.?\s*No\.?|Item)\s*[\.\:\-]?\s*(\d{1,3})[\.\:\)\-\s]*/i);
+      // 1. Explicit Question prefix: Q1, Q.1, Q-1, Q.No. 1, Question 1, Question No. 1, Sl.No. 1, Item 1, ప్రశ్న 1
+      const qPrefixMatch = l.match(/^(?:Q(?:uestion)?\.?\s*(?:No\.?)?|Sl\.?\s*No\.?|Item|ప్రశ్న\.?)\s*[\.\:\-–—]?\s*(\d{1,3})[\.\:\)\-–—\s]*/i);
       if (qPrefixMatch) {
         const num = parseInt(qPrefixMatch[1], 10);
         if (num >= 1 && num <= 350) {
@@ -146,8 +146,8 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
         continue;
       }
 
-      // 2. Numbered lines: 1., 1:, 1 - (with dot, colon, or spaced dash)
-      const numDotMatch = l.match(/^(\d{1,3})(?:\.|\:|\s+-)[\s\t]*/);
+      // 2. Numbered lines: 1., 1 ., 1:, 1 :, 1-, 1 -, 1–, 1—, 1/, 1 /
+      const numDotMatch = l.match(/^(\d{1,3})\s*(?:\.|\:|\/|[–—-]|-(?!\d))\s*/);
       if (numDotMatch) {
         const num = parseInt(numDotMatch[1], 10);
         if (num >= 1 && num <= 350) {
@@ -195,11 +195,22 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
             continue;
           }
           const nextLine = lines[i + 1].trim();
-          if (nextLine.length > 8 && !/^[A-Da-d1-4][\.\)]/.test(nextLine)) {
+          if (nextLine.length > 5 && !/^[A-Da-d1-4][\.\)]/.test(nextLine)) {
             count++;
             lastQNum = num;
             continue;
           }
+        }
+      }
+
+      // 6. Number 5..350 directly followed by space and text (e.g. "170 Which of the following...")
+      const numWordMatch = l.match(/^(\d{1,3})\s+([A-Za-z\u0900-\u0D7F].*)/);
+      if (numWordMatch) {
+        const num = parseInt(numWordMatch[1], 10);
+        if (num >= 5 && num <= 350) {
+          count++;
+          lastQNum = num;
+          continue;
         }
       }
     }
@@ -264,7 +275,7 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
           // B. If PDF text layer is missing or contains only integers/page numbers, use HTML5 Canvas AI Vision OCR
           if (extracted?.isScannedOrIntegerOnly || !extracted?.text) {
             const totalPdfPages = extracted?.page_count || 30;
-            const pagesToScan = Math.min(totalPdfPages, 50);
+            const pagesToScan = Math.min(totalPdfPages, 120);
             setPdfStatus(`Scanned/image PDF detected (${totalPdfPages} pages). Extracting all questions using AI Vision OCR...`);
 
             try {
