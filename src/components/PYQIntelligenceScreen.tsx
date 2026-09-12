@@ -117,7 +117,7 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
   const detectedQuestionCount = useMemo(() => {
     if (!pastedText.trim()) return 0;
     return pastedText.split('\n').filter(l =>
-      /^\s*(Q\s*\d+|Question\s*\d+|\(?\d+\)?[\.\:\)])/i.test(l)
+      /^\s*(?:Q(?:uestion)?\s*\d+[\.\:\)]?|\bQ\d+\b|\d+[\.\:][ \t])/i.test(l)
     ).length;
   }, [pastedText]);
 

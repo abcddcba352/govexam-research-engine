@@ -28,7 +28,7 @@ import {
 } from './pyqSeedData.ts';
 import { getExamById, saveGenerationAuditLog, getExams, createExamFromIntake, saveExams } from './dbService.ts';
 import { resolveCanonicalSubjectsForExam, mapQuestionToSubject } from './subjectMapper.ts';
-import { getGenAI, getPrimaryModel, getThinkingConfig, getThinkingLevelForTask, executeWithGeminiFailover, executeWithModelAndKeyFailover } from './geminiConfig.ts';
+import { getGenAI, getPrimaryModel, getCandidateModels, getThinkingConfig, getThinkingLevelForTask, executeWithGeminiFailover, executeWithModelAndKeyFailover } from './geminiConfig.ts';
 
 const DATA_DIR = path.join(process.cwd(), 'server', 'data');
 const PAPERS_FILE = path.join(DATA_DIR, 'previous_papers.json');
@@ -442,24 +442,57 @@ export async function parseAndIngestQuestionPaper(payload: IngestPaperPayload): 
 
   // 2c. Robust Regex Parser for text
   if (rawQuestions.length === 0 && payload.raw_text && payload.raw_text.trim()) {
-    const text = payload.raw_text.trim();
-    const chunks = text.split(/(?:^|\n)(?=(?:Q(?:\.|\s*|uestion\s*)|(?:\d+)[\.\:\)]))\s*/i).filter(c => c.trim().length > 10);
+    const rawInput = payload.raw_text.trim();
+    // Clean page markers, booklet codes, headers
+    const cleanText = rawInput
+      .replace(/^---\s*Page\s*\d+\s*---$/gim, '')
+      .replace(/Booklet\s*(?:Series|Code)?\s*[:\-]?[A-D]/gi, '')
+      .replace(/Subject\s*Code\s*[:\-]?\s*\d+/gi, '')
+      .trim();
+
+    // Split on question boundaries (Q1., Question 1:, 1. What, Q1)
+    const chunks = cleanText
+      .split(/(?:^|\n)\s*(?=(?:Q(?:uestion)?\s*\d+[\.\:\)]?|\bQ\d+\b|(?:\d+)[\.\:][ \t]))\s*/i)
+      .filter(c => c.trim().length > 15);
 
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i].trim();
-      const questionNumberMatch = chunk.match(/^(?:Q(?:uestion)?\s*(\d+)[\.\:\)]?|(\d+)[\.\:\)])/i);
-      const qNum = questionNumberMatch ? parseInt(questionNumberMatch[1] || questionNumberMatch[2], 10) : i + 1;
-      const withoutQNum = chunk.replace(/^(?:Q(?:uestion)?\s*\d+[\.\:\)]?|\(?\d+\)?[\.\:\)])\s*/i, '').trim();
+      const questionNumberMatch = chunk.match(/^(?:Q(?:uestion)?\s*(\d+)[\.\:\)]?|(\d+)[\.\:][ \t]|\bQ(\d+)\b)/i);
+      const qNum = questionNumberMatch ? parseInt(questionNumberMatch[1] || questionNumberMatch[2] || questionNumberMatch[3], 10) : i + 1;
+      const withoutQNum = chunk.replace(/^(?:Q(?:uestion)?\s*\d+[\.\:\)]?|\d+[\.\:][ \t]|\bQ\d+\b)\s*/i, '').trim();
 
-      // Find start of options (A, B, C, D or Option A)
-      const optMatch = withoutQNum.match(/(?:(?:\r?\n|^)\s*(?:\(?([A-Da-d])\)?[\.\:\)]|\bOption\s*([A-D]))|(?:\(?([A-Da-d])\)?[\.\:\)]|\bOption\s*([A-D]))\s*)/);
-      const optIndex = optMatch && optMatch.index !== undefined ? optMatch.index : -1;
-      const stem = (optIndex > 0 ? withoutQNum.substring(0, optIndex) : withoutQNum.split(/\r?\n/)[0]).trim();
+      // Find letter options: (A), (B), (C), (D) or Option A / A.
+      const optLetterA = (chunk.match(/(?:(?:\(?A\)?[\.\:\)]|\bOption\s*A\b))\s*([\s\S]*?)(?=(?:\(?B\)?[\.\:\)]|\bOption\s*B\b)|Answer|Key|Ans|$)/i)?.[1] || '').trim();
+      const optLetterB = (chunk.match(/(?:(?:\(?B\)?[\.\:\)]|\bOption\s*B\b))\s*([\s\S]*?)(?=(?:\(?C\)?[\.\:\)]|\bOption\s*C\b)|Answer|Key|Ans|$)/i)?.[1] || '').trim();
+      const optLetterC = (chunk.match(/(?:(?:\(?C\)?[\.\:\)]|\bOption\s*C\b))\s*([\s\S]*?)(?=(?:\(?D\)?[\.\:\)]|\bOption\s*D\b)|Answer|Key|Ans|$)/i)?.[1] || '').trim();
+      const optLetterD = (chunk.match(/(?:(?:\(?D\)?[\.\:\)]|\bOption\s*D\b))\s*([\s\S]*?)(?=(?:Answer|Key|Ans|Explanation|Ref|$))/i)?.[1] || '').trim();
 
-      const optA = (chunk.match(/(?:(?:\(?A\)?[\.\:\)]|\bOption\s*A\b))\s*([\s\S]*?)(?=(?:\(?B\)?[\.\:\)]|\bOption\s*B\b)|Answer|Key|Ans|$)/i)?.[1] || '').trim();
-      const optB = (chunk.match(/(?:(?:\(?B\)?[\.\:\)]|\bOption\s*B\b))\s*([\s\S]*?)(?=(?:\(?C\)?[\.\:\)]|\bOption\s*C\b)|Answer|Key|Ans|$)/i)?.[1] || '').trim();
-      const optC = (chunk.match(/(?:(?:\(?C\)?[\.\:\)]|\bOption\s*C\b))\s*([\s\S]*?)(?=(?:\(?D\)?[\.\:\)]|\bOption\s*D\b)|Answer|Key|Ans|$)/i)?.[1] || '').trim();
-      const optD = (chunk.match(/(?:(?:\(?D\)?[\.\:\)]|\bOption\s*D\b))\s*([\s\S]*?)(?=(?:Answer|Key|Ans|Explanation|Ref|$))/i)?.[1] || '').trim();
+      // Find numeric options: (1), (2), (3), (4) or 1), 2), 3), 4) or [1], [2]
+      const optNum1 = (chunk.match(/(?:(?:\(1\)|\b1\)|\[1\]))\s*([\s\S]*?)(?=(?:\(2\)|\b2\)|\[2\])|Answer|Key|Ans|$)/i)?.[1] || '').trim();
+      const optNum2 = (chunk.match(/(?:(?:\(2\)|\b2\)|\[2\]))\s*([\s\S]*?)(?=(?:\(3\)|\b3\)|\[3\])|Answer|Key|Ans|$)/i)?.[1] || '').trim();
+      const optNum3 = (chunk.match(/(?:(?:\(3\)|\b3\)|\[3\]))\s*([\s\S]*?)(?=(?:\(4\)|\b4\)|\[4\])|Answer|Key|Ans|$)/i)?.[1] || '').trim();
+      const optNum4 = (chunk.match(/(?:(?:\(4\)|\b4\)|\[4\]))\s*([\s\S]*?)(?=(?:Answer|Key|Ans|Explanation|Ref|$))/i)?.[1] || '').trim();
+
+      let optA = optLetterA;
+      let optB = optLetterB;
+      let optC = optLetterC;
+      let optD = optLetterD;
+
+      if (!optA && optNum1 && optNum2) {
+        optA = optNum1;
+        optB = optNum2;
+        optC = optNum3 || 'Option C';
+        optD = optNum4 || 'Option D';
+      }
+
+      // Determine question stem
+      let stem = '';
+      const optStartMatch = withoutQNum.match(/(?:(?:\r?\n|^)\s*(?:\(?[A-Da-d]\)[\.\:\)]|\bOption\s*[A-D]\b|\([1-4]\)|\[[1-4]\]|[1-4]\)))/);
+      if (optStartMatch && optStartMatch.index !== undefined && optStartMatch.index > 5) {
+        stem = withoutQNum.substring(0, optStartMatch.index).trim();
+      } else {
+        stem = withoutQNum.split(/\r?\n/)[0].trim();
+      }
 
       const keyMatch = chunk.match(/(?:Answer|Ans|Key|Correct(?:\s*Option)?)\s*[:\-\=]?\s*(?:Option\s*)?\(?([A-D1-4])/i);
       let key = 'A';
@@ -475,7 +508,7 @@ export async function parseAndIngestQuestionPaper(payload: IngestPaperPayload): 
       const expMatch = chunk.match(/(?:Explanation|Solution|Rationale|Ref|Citation)\s*[:\-\=]?\s*([\s\S]*?)$/i);
       const explanation = expMatch ? expMatch[1].trim() : 'Official commission previous year question with verified answer key.';
 
-      if (stem && (optA || optB)) {
+      if (stem && stem.length > 5) {
         rawQuestions.push({
           question_number: qNum,
           question_en: stem,
@@ -493,46 +526,63 @@ export async function parseAndIngestQuestionPaper(payload: IngestPaperPayload): 
     }
   }
 
-  // 2d. Gemini AI Parsing Fallback for complex unstructured dumps
-  if (rawQuestions.length === 0 && payload.raw_text && payload.raw_text.trim()) {
+  // 2d. Gemini AI Parsing Fallback if regex found very few questions from substantial text
+  if ((rawQuestions.length < 5 && payload.raw_text && payload.raw_text.trim().length > 1500) || rawQuestions.length === 0) {
     try {
-      await executeWithGeminiFailover(async (ai) => {
-        const prompt = `You are a government exam paper ingestion expert.
-Parse the following pasted raw examination text and return a pure JSON array of extracted multiple-choice questions.
-Each question must strictly have this JSON format:
+      const { result: aiQuestions } = await executeWithModelAndKeyFailover(
+        getCandidateModels(),
+        async (ai, _key, model) => {
+          const prompt = `You are a government examination paper ingestion expert.
+Parse the following raw question paper text and extract ALL multiple-choice questions into a pure JSON array.
+Each question MUST follow this schema:
 [
   {
     "question_number": 1,
     "question_en": "Question text here",
-    "option_a_en": "Text of option A",
-    "option_b_en": "Text of option B",
-    "option_c_en": "Text of option C",
-    "option_d_en": "Text of option D",
+    "option_a_en": "Option A text",
+    "option_b_en": "Option B text",
+    "option_c_en": "Option C text",
+    "option_d_en": "Option D text",
     "correct_answer": "A" | "B" | "C" | "D",
-    "reason_summary": "Explanation or why this answer is correct",
-    "primary_subject": "General Studies",
-    "primary_topic": "Official Question Item",
-    "difficulty": "MODERATE"
+    "reason_summary": "Explanation if available or commission verified key"
   }
 ]
-Only return valid parseable JSON array, no extra commentary.
+Extract as many questions as possible. Return ONLY valid JSON array:
 
-RAW TEXT:
-${payload.raw_text!.substring(0, 15000)}
+RAW PAPER TEXT:
+${payload.raw_text!.substring(0, 20000)}
 `;
-        const res = await ai.models.generateContent({
-          model: getPrimaryModel(),
-          contents: prompt
-        });
-        const textOut = res.text || '';
-        const jsonMatch = textOut.match(/\[\s*\{[\s\S]*\}\s*\]/);
-        if (jsonMatch) {
-          const parsed = JSON.parse(jsonMatch[0]);
-          if (Array.isArray(parsed)) {
-            rawQuestions = parsed;
+          const res = await ai.models.generateContent({
+            model,
+            contents: prompt
+          });
+          const textOut = res.text || '';
+          const jsonMatch = textOut.match(/\[\s*\{[\s\S]*\}\s*\]/);
+          if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch[0]);
+            if (Array.isArray(parsed) && parsed.length > rawQuestions.length) {
+              return parsed.map((item: any, idx: number) => ({
+                question_number: item.question_number || idx + 1,
+                question_en: item.question_en || `Question ${idx + 1}`,
+                option_a_en: item.option_a_en || item.option_a || 'Option A',
+                option_b_en: item.option_b_en || item.option_b || 'Option B',
+                option_c_en: item.option_c_en || item.option_c || 'Option C',
+                option_d_en: item.option_d_en || item.option_d || 'Option D',
+                correct_answer: (item.correct_answer || 'A').toUpperCase().charAt(0) || 'A',
+                reason_summary: item.reason_summary || 'Official question item.',
+                primary_subject: 'General Studies',
+                primary_topic: 'Imported PYQ Question',
+                difficulty: (item.difficulty === 'EASY' || item.difficulty === 'DIFFICULT' ? item.difficulty : 'MODERATE') as 'EASY' | 'MODERATE' | 'DIFFICULT'
+              }));
+            }
           }
+          return [];
         }
-      });
+      );
+
+      if (Array.isArray(aiQuestions) && aiQuestions.length > rawQuestions.length) {
+        rawQuestions = aiQuestions;
+      }
     } catch (e) {
       console.warn("[PYQ Ingestion] Gemini question parsing fallback notice:", e);
     }
