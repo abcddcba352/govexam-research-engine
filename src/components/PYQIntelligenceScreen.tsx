@@ -71,6 +71,7 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
   const [paperName, setPaperName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isExtractingPdf, setIsExtractingPdf] = useState(false);
+  const [pdfStatus, setPdfStatus] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
@@ -152,17 +153,18 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
     // 1. PDF File Upload
     if (file.name.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf') {
       setIsExtractingPdf(true);
+      setPdfStatus('Reading PDF document...');
       setError(null);
       (async () => {
         try {
-          if (file.size > 30 * 1024 * 1024) {
-            throw new Error(`The PDF is ${(file.size / 1024 / 1024).toFixed(1)} MB, which exceeds the 30 MB upload limit. Please select a smaller PDF or copy and paste the question text directly.`);
+          if (file.size > 50 * 1024 * 1024) {
+            throw new Error(`The PDF is ${(file.size / 1024 / 1024).toFixed(1)} MB, which exceeds the 50 MB upload limit. Please select a smaller PDF or copy and paste the question text directly.`);
           }
 
           // A. Attempt client-side in-browser text extraction first (instantaneous, 0 network payload, 0 timeout risk)
           let extracted: { text: string; page_count: number } | null = null;
           try {
-            extracted = await extractPdfTextInBrowser(file);
+            extracted = await extractPdfTextInBrowser(file, (msg) => setPdfStatus(msg));
           } catch (clientErr: any) {
             console.warn('[PDF Extract] Client-side extraction notice:', clientErr?.message);
           }
@@ -173,52 +175,56 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
             return;
           }
 
-          // B. Server fallback with timeout if client could not parse complex streams
-          const arrayBuf = await file.arrayBuffer();
-          const uint8 = new Uint8Array(arrayBuf);
-          let binary = '';
-          const chunkSize = 8192;
-          for (let i = 0; i < uint8.length; i += chunkSize) {
-            const chunk = uint8.subarray(i, i + chunkSize);
-            binary += String.fromCharCode.apply(null, chunk as any);
-          }
-          const base64 = btoa(binary);
-
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 20000);
-
-          try {
-            const res = await fetch('/api/pyq/extract-pdf', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ base64, filename: file.name }),
-              signal: controller.signal
-            });
-            clearTimeout(timeoutId);
-
-            const contentType = res.headers.get('content-type') || '';
-            if (contentType.includes('application/json')) {
-              const data = await res.json().catch(() => ({}));
-              if (res.ok && data.success && data.text) {
-                setPastedText(data.text);
-                setSuccessMsg(`Extracted question paper text from "${file.name}" (${data.page_count || 1} pages)! Review the text below and click "Analyse Paper".`);
-                return;
-              }
-              if (data.error) {
-                throw new Error(data.error);
-              }
+          // B. Server fallback with timeout if client could not parse complex streams and file is < 8MB
+          if (file.size <= 8 * 1024 * 1024) {
+            setPdfStatus('Processing with cloud assistance...');
+            const arrayBuf = await file.arrayBuffer();
+            const uint8 = new Uint8Array(arrayBuf);
+            let binary = '';
+            const chunkSize = 8192;
+            for (let i = 0; i < uint8.length; i += chunkSize) {
+              const chunk = uint8.subarray(i, i + chunkSize);
+              binary += String.fromCharCode.apply(null, chunk as any);
             }
-          } catch (serverErr: any) {
-            clearTimeout(timeoutId);
-            console.warn('[PDF Extract] Server fallback notice:', serverErr?.message);
+            const base64 = btoa(binary);
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+            try {
+              const res = await fetch('/api/pyq/extract-pdf', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ base64, filename: file.name }),
+                signal: controller.signal
+              });
+              clearTimeout(timeoutId);
+
+              const contentType = res.headers.get('content-type') || '';
+              if (contentType.includes('application/json')) {
+                const data = await res.json().catch(() => ({}));
+                if (res.ok && data.success && data.text) {
+                  setPastedText(data.text);
+                  setSuccessMsg(`Extracted question paper text from "${file.name}" (${data.page_count || 1} pages)! Review the text below and click "Analyse Paper".`);
+                  return;
+                }
+                if (data.error) {
+                  throw new Error(data.error);
+                }
+              }
+            } catch (serverErr: any) {
+              clearTimeout(timeoutId);
+              console.warn('[PDF Extract] Server fallback notice:', serverErr?.message);
+            }
           }
 
-          // C. If both could not extract text, give clear and helpful guidance
-          throw new Error(`Could not automatically extract text from "${file.name}". This PDF may be a scanned image or restricted document. Please copy and paste the question paper text directly into the text box below.`);
+          // C. If text could not be extracted (e.g. scanned image / non-selectable PDF)
+          throw new Error(`Could not automatically extract selectable text from "${file.name}". This PDF may be a scanned image without an OCR text layer. Please open the PDF on your computer, copy the questions, and paste them directly into the text box below.`);
         } catch (err: any) {
           setError(err.message || 'Error processing PDF file. You can also open the PDF, copy all text, and paste it directly into the text box below.');
         } finally {
           setIsExtractingPdf(false);
+          setPdfStatus('');
         }
       })();
       return;
@@ -495,7 +501,9 @@ Explanation: Sikkim is bounded by Tibet (China), Bhutan, and Nepal.`);
               {isExtractingPdf ? (
                 <>
                   <Loader2 className="w-4 h-4 text-indigo-600 animate-spin" />
-                  <span className="text-xs font-bold text-indigo-700">Extracting PDF text...</span>
+                  <span className="text-xs font-bold text-indigo-700 truncate max-w-[220px]">
+                    {pdfStatus || 'Extracting PDF text...'}
+                  </span>
                 </>
               ) : (
                 <>

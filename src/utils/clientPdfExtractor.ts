@@ -4,6 +4,19 @@
  * large base64 network payloads, Cloudflare 50ms CPU limits, and 503 worker timeouts.
  */
 
+import * as pdfjsLib from 'pdfjs-dist';
+import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
+
+// Initialize PDF.js worker with local bundled worker asset
+if (typeof window !== 'undefined') {
+  try {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+  } catch {
+    // Fallback to exact matching unpkg version
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+  }
+}
+
 async function decompressFlate(bytes: Uint8Array): Promise<string> {
   if (typeof DecompressionStream !== 'undefined') {
     try {
@@ -61,6 +74,36 @@ async function decompressFlate(bytes: Uint8Array): Promise<string> {
   return new TextDecoder('latin1').decode(bytes);
 }
 
+// Convert hex string <00410042> or <4142> into readable ASCII text
+function decodeHexPdfStr(hexStr: string): string {
+  const clean = hexStr.replace(/[^0-9a-fA-F]/g, '');
+  let result = '';
+  if (clean.length % 4 === 0 && clean.length >= 4) {
+    // UTF-16BE / CID encoding
+    for (let i = 0; i < clean.length; i += 4) {
+      const code = parseInt(clean.substring(i, i + 4), 16);
+      if (code >= 32 && code <= 126) {
+        result += String.fromCharCode(code);
+      } else if (code === 10 || code === 13) {
+        result += '\n';
+      }
+    }
+  }
+  if (!result || result.length < clean.length / 4) {
+    // 8-bit hex
+    result = '';
+    for (let i = 0; i < clean.length; i += 2) {
+      const code = parseInt(clean.substring(i, i + 2), 16);
+      if (code >= 32 && code <= 126) {
+        result += String.fromCharCode(code);
+      } else if (code === 10 || code === 13) {
+        result += '\n';
+      }
+    }
+  }
+  return result;
+}
+
 // Pure client-side PDF stream extractor for instantaneous text recovery (<50ms)
 async function fastExtractFromBinary(bytes: Uint8Array): Promise<{ text: string; page_count: number } | null> {
   try {
@@ -78,7 +121,7 @@ async function fastExtractFromBinary(bytes: Uint8Array): Promise<{ text: string;
     let match: RegExpExecArray | null;
     let streamCount = 0;
 
-    while ((match = streamRegex.exec(latin1)) !== null && streamCount < 150 && extractedText.length < 500000) {
+    while ((match = streamRegex.exec(latin1)) !== null && streamCount < 200 && extractedText.length < 500000) {
       streamCount++;
       const streamData = match[1];
       let decompressed = streamData;
@@ -101,9 +144,16 @@ async function fastExtractFromBinary(bytes: Uint8Array): Promise<{ text: string;
       let tjMatch: RegExpExecArray | null;
       while ((tjMatch = tjArrayRegex.exec(decompressed)) !== null) {
         const inner = tjMatch[1];
+        // Handle parenthesis strings: (text)
         const strMatches = inner.match(/\((?:[^\\)]|\\.)*\)/g);
         if (strMatches) {
           const line = strMatches.map(s => unescapePdf(s.slice(1, -1))).join('');
+          if (line.trim()) extractedText += line + ' ';
+        }
+        // Handle hex strings: <0041>
+        const hexMatches = inner.match(/<[0-9a-fA-F]+>/g);
+        if (hexMatches) {
+          const line = hexMatches.map(h => decodeHexPdfStr(h.slice(1, -1))).join('');
           if (line.trim()) extractedText += line + ' ';
         }
       }
@@ -113,6 +163,14 @@ async function fastExtractFromBinary(bytes: Uint8Array): Promise<{ text: string;
       let dirMatch: RegExpExecArray | null;
       while ((dirMatch = tjDirectRegex.exec(decompressed)) !== null) {
         const line = unescapePdf(dirMatch[1]);
+        if (line.trim()) extractedText += line + '\n';
+      }
+
+      // 3. Direct hex strings: <hex> Tj
+      const tjHexDirectRegex = /<([0-9a-fA-F]+)>\s*(?:Tj|'|")/g;
+      let dirHexMatch: RegExpExecArray | null;
+      while ((dirHexMatch = tjHexDirectRegex.exec(decompressed)) !== null) {
+        const line = decodeHexPdfStr(dirHexMatch[1]);
         if (line.trim()) extractedText += line + '\n';
       }
     }
@@ -152,34 +210,35 @@ function unescapePdf(str: string): string {
  * Main client-side PDF text extractor.
  * Combines fast client stream extraction with full PDF.js browser parsing.
  */
-export async function extractPdfTextInBrowser(file: File): Promise<{ text: string; page_count: number }> {
+export async function extractPdfTextInBrowser(
+  file: File,
+  onProgress?: (msg: string) => void
+): Promise<{ text: string; page_count: number }> {
   const arrayBuffer = await file.arrayBuffer();
   const uint8 = new Uint8Array(arrayBuffer);
+
+  onProgress?.('Reading document structure...');
 
   // 1. Try instantaneous fast binary stream extraction (decompresses Flate streams with browser DecompressionStream)
   try {
     const fast = await fastExtractFromBinary(uint8);
-    if (fast && fast.text.length > 150) {
+    if (fast && fast.text.length > 200) {
       return fast;
     }
   } catch (fastErr) {
     console.warn('[clientPdfExtractor] Fast binary extraction error, trying PDF.js:', fastErr);
   }
 
-  // 2. Load PDF.js dynamically in the browser
-  try {
-    const pdfjsLib = await import('pdfjs-dist');
-    
-    // Configure worker via CDN or fake worker fallback so it works universally in all browsers
-    if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs';
-    }
+  onProgress?.('Extracting text layers from PDF pages...');
 
+  // 2. Load PDF.js in the browser with local worker
+  try {
     const loadingTask = pdfjsLib.getDocument({
       data: uint8,
       useSystemFonts: true,
       isEvalSupported: false,
-      disableFontFace: true
+      disableFontFace: true,
+      stopAtErrors: false
     });
 
     const pdf = await loadingTask.promise;
@@ -187,6 +246,7 @@ export async function extractPdfTextInBrowser(file: File): Promise<{ text: strin
     const totalPages = pdf.numPages;
 
     for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+      onProgress?.(`Extracting page ${pageNum} of ${totalPages}...`);
       const page = await pdf.getPage(pageNum);
       const textContent = await page.getTextContent();
       const pageStrings = textContent.items
@@ -209,9 +269,49 @@ export async function extractPdfTextInBrowser(file: File): Promise<{ text: strin
     if (cleaned.length > 50) {
       return { text: cleaned, page_count: totalPages };
     }
-  } catch (pdfjsErr) {
-    console.warn('[clientPdfExtractor] PDF.js browser extraction error:', pdfjsErr);
+  } catch (pdfjsErr: any) {
+    console.warn('[clientPdfExtractor] PDF.js browser extraction error:', pdfjsErr?.message || pdfjsErr);
+    
+    // Fallback 2b: Try again with worker disabled / fake worker
+    try {
+      const loadingTaskNoWorker = pdfjsLib.getDocument({
+        data: uint8,
+        useWorkerFetch: false,
+        isEvalSupported: false,
+        useSystemFonts: true,
+        disableFontFace: true,
+        stopAtErrors: false
+      });
+      const pdf = await loadingTaskNoWorker.promise;
+      let fullText = '';
+      const totalPages = pdf.numPages;
+      for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const textContent = await page.getTextContent();
+        const pageStrings = textContent.items
+          .map((item: any) => ('str' in item ? item.str : ''))
+          .filter(Boolean);
+        const pageText = pageStrings.join(' ');
+        if (pageText.trim()) {
+          fullText += `\n--- Page ${pageNum} ---\n` + pageText + '\n';
+        }
+      }
+      const cleaned = fullText.trim();
+      if (cleaned.length > 50) {
+        return { text: cleaned, page_count: totalPages };
+      }
+    } catch (fallbackErr: any) {
+      console.warn('[clientPdfExtractor] Fake worker fallback error:', fallbackErr?.message);
+    }
   }
 
-  throw new Error('Could not extract selectable text from this PDF. It may be a scanned image or image-only document.');
+  // 3. If fast binary found any text at all (>50 chars), return it as a best effort
+  try {
+    const fast = await fastExtractFromBinary(uint8);
+    if (fast && fast.text.length > 40) {
+      return fast;
+    }
+  } catch {}
+
+  throw new Error('Could not extract selectable text from this PDF. It appears to be a scanned image without an OCR text layer.');
 }
