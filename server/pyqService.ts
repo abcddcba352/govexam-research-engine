@@ -450,16 +450,17 @@ export async function parseAndIngestQuestionPaper(payload: IngestPaperPayload): 
       .replace(/Subject\s*Code\s*[:\-]?\s*\d+/gi, '')
       .trim();
 
-    // Split on question boundaries (Q1., Question 1:, 1. What, Q1)
+    // Split on question boundaries: Q1., Question 1:, 1., 1), (1), [1], 1:, 1 -, Q1, etc.
+    const UNIVERSAL_Q_SPLIT = /(?:^|\n)\s*(?=(?:(?:Q(?:uestion)?|Sl\.?\s*No\.?|Item)?\s*[\.\:\-]?\s*(?:\(?\s*\d+\s*\)?|\[\s*\d+\s*\])[\.\:\)\-\s][ \t]*|\bQ\d+\b))/i;
     const chunks = cleanText
-      .split(/(?:^|\n)\s*(?=(?:Q(?:uestion)?\s*\d+[\.\:\)]?|\bQ\d+\b|(?:\d+)[\.\:][ \t]))\s*/i)
+      .split(UNIVERSAL_Q_SPLIT)
       .filter(c => c.trim().length > 15);
 
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i].trim();
-      const questionNumberMatch = chunk.match(/^(?:Q(?:uestion)?\s*(\d+)[\.\:\)]?|(\d+)[\.\:][ \t]|\bQ(\d+)\b)/i);
+      const questionNumberMatch = chunk.match(/^(?:(?:Q(?:uestion)?|Sl\.?\s*No\.?|Item)?\s*[\.\:\-]?\s*(?:\(?\s*(\d+)\s*\)?|\[\s*(\d+)\s*\])[\.\:\)\-\s]*|\bQ(\d+)\b)/i);
       const qNum = questionNumberMatch ? parseInt(questionNumberMatch[1] || questionNumberMatch[2] || questionNumberMatch[3], 10) : i + 1;
-      const withoutQNum = chunk.replace(/^(?:Q(?:uestion)?\s*\d+[\.\:\)]?|\d+[\.\:][ \t]|\bQ\d+\b)\s*/i, '').trim();
+      const withoutQNum = chunk.replace(/^(?:(?:Q(?:uestion)?|Sl\.?\s*No\.?|Item)?\s*[\.\:\-]?\s*(?:\(?\s*\d+\s*\)?|\[\s*\d+\s*\])[\.\:\)\-\s]*|\bQ\d+\b)\s*/i, '').trim();
 
       // Find letter options: (A), (B), (C), (D) or Option A / A.
       const optLetterA = (chunk.match(/(?:(?:\(?A\)?[\.\:\)]|\bOption\s*A\b))\s*([\s\S]*?)(?=(?:\(?B\)?[\.\:\)]|\bOption\s*B\b)|Answer|Key|Ans|$)/i)?.[1] || '').trim();

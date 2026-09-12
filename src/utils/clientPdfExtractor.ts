@@ -210,7 +210,7 @@ export async function extractPdfTextInBrowser(
       const y = transform[5];
 
       const isVerticalJump = lastY !== null && Math.abs(y - lastY) > 3.5;
-      const startsQuestion = /^\s*(?:Q(?:uestion)?\s*\d+[\.\:\)]|\b\d+[\.\:\)][ \t]*|\bQ\d+\b)/i.test(str);
+      const startsQuestion = /^\s*(?:(?:Q(?:uestion)?|Sl\.?\s*No\.?|Item)?\s*[\.\:\-]?\s*(?:\(?\s*\d+\s*\)?|\[\s*\d+\s*\])[\.\:\)\-\s]*|\bQ\d+\b)/i.test(str);
       const startsOption = /^\s*(?:\(?[A-Da-d]\)[\.\:\)]?|\bOption\s*[A-D]\b|\(?[1-4]\)[\.\:\)]?|\[[1-4]\])/i.test(str);
 
       if (isVerticalJump || item.hasEOL || (currentLine.length > 0 && (startsQuestion || startsOption))) {
@@ -297,7 +297,7 @@ async function renderPageToJpegBase64(page: any, scale: number = 1.3): Promise<s
  */
 export async function extractScannedPdfWithVisionOcr(
   file: File,
-  maxPages: number = 6,
+  maxPages: number = 50,
   onProgress?: (msg: string, current: number, total: number) => void
 ): Promise<{ text: string; page_count: number; question_count: number }> {
   const arrayBuffer = await file.arrayBuffer();
@@ -308,43 +308,66 @@ export async function extractScannedPdfWithVisionOcr(
   const totalPages = pdf.numPages;
   const pagesToScan = Math.min(totalPages, maxPages);
 
-  const accumulatedPages: string[] = [];
-  let totalDetectedQuestions = 0;
+  const accumulatedPages: { pageNum: number; text: string; qCount: number }[] = [];
+  const BATCH_SIZE = 2;
 
-  for (let pageNum = 1; pageNum <= pagesToScan; pageNum++) {
-    onProgress?.(`AI Vision OCR: Scanning Page ${pageNum} of ${pagesToScan}...`, pageNum, pagesToScan);
-    try {
-      const page = await pdf.getPage(pageNum);
-      const imageBase64 = await renderPageToJpegBase64(page, 1.3);
+  for (let i = 1; i <= pagesToScan; i += BATCH_SIZE) {
+    const batchEnd = Math.min(i + BATCH_SIZE - 1, pagesToScan);
+    const progressLabel = batchEnd > i
+      ? `AI Vision OCR: Scanning Pages ${i}-${batchEnd} of ${pagesToScan}...`
+      : `AI Vision OCR: Scanning Page ${i} of ${pagesToScan}...`;
+    onProgress?.(progressLabel, i, pagesToScan);
 
-      const res = await fetch('/api/pyq/ocr-page', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          image: imageBase64,
-          pageNumber: pageNum,
-          totalPages: pagesToScan
-        })
-      });
+    const batchPromises = [];
+    for (let p = i; p <= batchEnd; p++) {
+      const pageNum = p;
+      batchPromises.push((async () => {
+        try {
+          const page = await pdf.getPage(pageNum);
+          const imageBase64 = await renderPageToJpegBase64(page, 1.3);
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && data.text) {
-          accumulatedPages.push(`--- Page ${pageNum} ---\n` + data.text);
-          totalDetectedQuestions += (data.questionCount || 0);
+          const res = await fetch('/api/pyq/ocr-page', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              image: imageBase64,
+              pageNumber: pageNum,
+              totalPages: pagesToScan
+            })
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && data.text) {
+              return {
+                pageNum,
+                text: `--- Page ${pageNum} ---\n` + data.text,
+                qCount: data.questionCount || 0
+              };
+            }
+          } else {
+            console.warn(`[Vision OCR] Page ${pageNum} returned status ${res.status}`);
+          }
+        } catch (pageErr: any) {
+          console.warn(`[Vision OCR] Error scanning page ${pageNum}:`, pageErr?.message);
         }
-      } else {
-        console.warn(`[Vision OCR] Page ${pageNum} transcription returned status ${res.status}`);
-      }
-    } catch (pageErr: any) {
-      console.warn(`[Vision OCR] Error scanning page ${pageNum}:`, pageErr?.message);
+        return { pageNum, text: '', qCount: 0 };
+      })());
+    }
+
+    const batchResults = await Promise.all(batchPromises);
+    for (const r of batchResults) {
+      if (r.text) accumulatedPages.push(r);
     }
   }
 
-  const combinedText = accumulatedPages.join('\n\n').trim();
+  accumulatedPages.sort((a, b) => a.pageNum - b.pageNum);
+  const combinedText = accumulatedPages.map(p => p.text).join('\n\n').trim();
+  const totalQuestions = accumulatedPages.reduce((acc, p) => acc + p.qCount, 0);
+
   return {
     text: combinedText,
     page_count: totalPages,
-    question_count: totalDetectedQuestions
+    question_count: totalQuestions
   };
 }

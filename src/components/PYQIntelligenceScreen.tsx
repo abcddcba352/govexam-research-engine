@@ -113,12 +113,34 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
 
   const activeExam = exams.find(e => e.exam_id === selectedExamId) || filteredExams[0] || exams[0];
 
-  // ── Question count (safe line-by-line) ──
+  // ── Question count (safe monotonic multi-format matching) ──
   const detectedQuestionCount = useMemo(() => {
     if (!pastedText.trim()) return 0;
-    return pastedText.split('\n').filter(l =>
-      /^\s*(?:Q(?:uestion)?\s*\d+[\.\:\)]?|\bQ\d+\b|\d+[\.\:][ \t])/i.test(l)
-    ).length;
+    const lines = pastedText.split('\n');
+    let count = 0;
+    let lastQNum = 0;
+
+    for (const l of lines) {
+      const trimmed = l.trim();
+      if (!trimmed) continue;
+
+      // Reject lines that are clearly options: (A)-(D), (1)-(4), [1]-[4], or A)-D)
+      const isOptionLine = /^\s*(?:\([A-Da-d1-4]\)|\[[A-Da-d1-4]\]|[A-Da-d]\))\s+/.test(trimmed);
+      if (isOptionLine) continue;
+
+      const numMatch = trimmed.match(/^(?:(?:Q(?:uestion)?|Sl\.?\s*No\.?|Item)?\s*[\.\:\-]?\s*(?:\(?\s*(\d+)\s*\)?|\[\s*(\d+)\s*\])[\.\:\)\-\s]*|\bQ(\d+)\b)/i);
+      if (numMatch) {
+        const n = parseInt(numMatch[1] || numMatch[2] || numMatch[3], 10);
+        if (lastQNum > 4 && n <= 4 && !/^\s*Q(?:uestion)?/i.test(trimmed)) {
+          continue;
+        }
+        if (n > lastQNum || lastQNum === 0 || /^\s*Q(?:uestion)?\s*\d+/i.test(trimmed)) {
+          count++;
+          if (n > lastQNum) lastQNum = n;
+        }
+      }
+    }
+    return count;
   }, [pastedText]);
 
   // ── Handlers ──
@@ -177,15 +199,16 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
 
           // B. If PDF text layer is missing or contains only integers/page numbers, use HTML5 Canvas AI Vision OCR
           if (extracted?.isScannedOrIntegerOnly || !extracted?.text) {
-            const pagesToScan = Math.min(extracted?.page_count || 6, 8);
-            setPdfStatus(`Scanned/image PDF detected. Extracting questions using AI Vision OCR (Page 1 of ${pagesToScan})...`);
+            const totalPdfPages = extracted?.page_count || 30;
+            const pagesToScan = Math.min(totalPdfPages, 50);
+            setPdfStatus(`Scanned/image PDF detected (${totalPdfPages} pages). Extracting all questions using AI Vision OCR...`);
 
             try {
-              const ocrResult = await extractScannedPdfWithVisionOcr(file, 8, (msg) => setPdfStatus(msg));
+              const ocrResult = await extractScannedPdfWithVisionOcr(file, pagesToScan, (msg) => setPdfStatus(msg));
               if (ocrResult && ocrResult.text && ocrResult.text.length > 50) {
                 setPastedText(ocrResult.text);
                 const qMsg = ocrResult.question_count > 0 ? ` (${ocrResult.question_count} questions detected)` : '';
-                setSuccessMsg(`AI Vision OCR successfully extracted questions from scanned paper "${file.name}"${qMsg}! Review below and click "Analyse Paper".`);
+                setSuccessMsg(`AI Vision OCR successfully extracted questions across ${ocrResult.page_count} pages from "${file.name}"${qMsg}! Review below and click "Analyse Paper".`);
                 return;
               }
             } catch (ocrErr: any) {
