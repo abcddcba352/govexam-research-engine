@@ -963,7 +963,7 @@ export function createApp(): express.Application {
       }
 
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('TIMEOUT')), 25000)
+        setTimeout(() => reject(new Error('TIMEOUT')), 55000)
       );
 
       const geminiPromise = executeWithGeminiFailover(async (ai) => {

@@ -355,33 +355,26 @@ export async function extractScannedPdfWithVisionOcr(
             pageTranscribed = true;
             break;
           }
-        } else if (res.status === 429 || res.status === 500 || res.status === 503) {
-          // Gemini free tier resets on a rolling 60-second window. A 15-25s cooldown allows the quota bucket to drain.
-          const waitSec = 15 + (attempts - 1) * 5;
-          onProgress?.(
-            `Page ${pageNum}: API quota limit reached. Pausing ${waitSec}s for quota cooldown before retry (attempt ${attempts}/${maxAttempts})...`,
-            i + 1,
-            targetPages.length
-          );
-          await new Promise(r => setTimeout(r, waitSec * 1000));
-          continue;
-        } else {
-          console.warn(`[Vision OCR] Page ${pageNum} returned unexpected status ${res.status}`);
-          await new Promise(r => setTimeout(r, attempts * 3000));
         }
+
+        // Retry logic on any failure (rate-limits, 5xx server issues, or cloudflare timeouts)
+        const isQuota = res.status === 429;
+        const waitSec = isQuota ? (15 + (attempts - 1) * 5) : (4 + attempts * 2);
+        onProgress?.(
+          `Page ${pageNum}: ${isQuota ? 'API quota limit reached' : `Server busy (status ${res.status})`}. Pausing ${waitSec}s before retry (attempt ${attempts}/${maxAttempts})...`,
+          i + 1,
+          targetPages.length
+        );
+        await new Promise(r => setTimeout(r, waitSec * 1000));
       } catch (pageErr: any) {
         console.warn(`[Vision OCR] Error scanning page ${pageNum} (attempt ${attempts}):`, pageErr?.message);
-        await new Promise(r => setTimeout(r, attempts * 3000));
+        await new Promise(r => setTimeout(r, (4 + attempts * 2) * 1000));
       }
     }
 
     if (!pageTranscribed) {
       missingPages.push(pageNum);
-      accumulatedPages.push({
-        pageNum,
-        text: `--- Page ${pageNum} ---\n[Page ${pageNum} failed to transcribe after ${maxAttempts} attempts]`,
-        qCount: 0
-      });
+      // Note: Do not push dummy text into accumulatedPages so the gap remains cleanly detectable and retrievable
     }
 
     // Pacing delay between pages to stay comfortably within Gemini's 15 RPM limit (~12 requests/minute)

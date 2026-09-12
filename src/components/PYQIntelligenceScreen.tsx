@@ -219,19 +219,37 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
     return count;
   }, [pastedText]);
 
-  // ── Missing Page Gap Detector (detects dropped pages like Page 16 to Page 29) ──
+  // ── Missing / Incomplete Page Detector (detects missing page gaps and failed scans) ──
   const missingPageGap = useMemo(() => {
     if (!pastedText) return null;
-    const pageMatches = [...pastedText.matchAll(/---\s*Page\s*(\d+)\s*---/gi)].map(m => parseInt(m[1], 10));
-    if (pageMatches.length <= 1) return null;
+    const pageChunks = pastedText.split(/(?=---\s*Page\s*\d+\s*---)/gi);
+    const validPages = new Set<number>();
+    const failedPages = new Set<number>();
+    const allPageNums: number[] = [];
 
-    const pageSet = new Set(pageMatches);
-    const minPage = Math.min(...pageMatches);
-    const maxPage = Math.max(...pageMatches);
+    for (const chunk of pageChunks) {
+      const match = chunk.match(/---\s*Page\s*(\d+)\s*---/i);
+      if (match) {
+        const pageNum = parseInt(match[1], 10);
+        allPageNums.push(pageNum);
+        if (/failed to transcribe|could not transcribe|error scanning/i.test(chunk)) {
+          failedPages.add(pageNum);
+        } else {
+          validPages.add(pageNum);
+        }
+      }
+    }
+
+    if (allPageNums.length <= 1) return null;
+
+    const minPage = Math.min(...allPageNums);
+    const maxPage = Math.max(...allPageNums);
     const missing: number[] = [];
 
     for (let p = minPage; p <= maxPage; p++) {
-      if (!pageSet.has(p)) missing.push(p);
+      if (!validPages.has(p) || failedPages.has(p)) {
+        missing.push(p);
+      }
     }
 
     if (missing.length === 0) return null;
@@ -254,20 +272,23 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
       );
 
       if (ocrResult && ocrResult.scanned_pages && ocrResult.scanned_pages.length > 0) {
-        // Parse existing pages from pastedText
+        // Parse existing pages from pastedText, stripping failed placeholders
         const pageChunks = pastedText.split(/(?=---\s*Page\s*\d+\s*---)/gi);
         const allPagesMap = new Map<number, string>();
 
         for (const chunk of pageChunks) {
           const match = chunk.match(/---\s*Page\s*(\d+)\s*---/i);
           if (match) {
-            allPagesMap.set(parseInt(match[1], 10), chunk.trim());
+            const pNum = parseInt(match[1], 10);
+            if (!/failed to transcribe|could not transcribe|error scanning/i.test(chunk)) {
+              allPagesMap.set(pNum, chunk.trim());
+            }
           }
         }
 
         // Add newly scanned pages
         for (const sp of ocrResult.scanned_pages) {
-          if (sp.text) {
+          if (sp.text && !/failed to transcribe|could not transcribe/i.test(sp.text)) {
             allPagesMap.set(sp.pageNum, sp.text.trim());
           }
         }
@@ -279,7 +300,7 @@ export const PYQIntelligenceScreen: React.FC<Props> = ({
 
         const merged = sortedPages.join('\n\n');
         setPastedText(merged);
-        setSuccessMsg(`Successfully scanned missing pages (${missingPageGap.join(', ')})! Question paper now complete.`);
+        setSuccessMsg(`Successfully scanned missing pages! Question paper now updated.`);
       } else {
         setError(`Could not scan pages ${missingPageGap.join(', ')}. Please try again.`);
       }
@@ -724,10 +745,10 @@ Explanation: Sikkim is bounded by Tibet (China), Bhutan, and Nepal.`);
               <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
               <div>
                 <p className="text-xs font-bold text-amber-800">
-                  Missing Page Gap Detected (Pages {missingPageGap[0]} to {missingPageGap[missingPageGap.length - 1]} &bull; {missingPageGap.length} {missingPageGap.length === 1 ? 'page' : 'pages'} missing)
+                  Missing / Incomplete Pages Detected ({missingPageGap.length <= 6 ? `Pages ${missingPageGap.join(', ')}` : `Pages ${missingPageGap[0]}–${missingPageGap[missingPageGap.length - 1]}`} &bull; {missingPageGap.length} {missingPageGap.length === 1 ? 'page' : 'pages'} to scan)
                 </p>
                 <p className="text-[11px] text-amber-700">
-                  These pages were skipped (e.g. dropped during rapid OCR rate-limiting). You can scan only these missing pages and automatically merge them into the paper.
+                  Some pages were skipped or timed out. Click below to scan only these missing pages and automatically merge them into the paper.
                 </p>
               </div>
             </div>
